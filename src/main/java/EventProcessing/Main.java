@@ -27,6 +27,7 @@ public class Main {
         String myQueueUrl = sqsClient.getQueueUrl();
 
         SnsClient snsClient = new SnsClient();
+        snsClient.buildSNSClient();
 
         Topics.subscribeQueue(snsClient.getSns(), sqsClient.getSqs(), S3Details.arnTopic, myQueueUrl);
 

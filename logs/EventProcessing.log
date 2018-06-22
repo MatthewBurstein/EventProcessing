@@ -3,3 +3,13 @@
 [2018-06-22 12:27:17,423] INFO - SqsClient - Creating queue: EventProcessing
 [2018-06-22 12:27:17,640] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
 [2018-06-22 12:27:18,175] INFO - SqsClient - Destroying queue EventProcessing at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-22 13:56:28,707] DEBUG - Main - App launched
+[2018-06-22 13:56:29,891] DEBUG - S3Client - AWS S3 connection established
+[2018-06-22 13:56:30,376] INFO - SqsClient - Creating queue: EventProcessing
+[2018-06-22 13:56:30,536] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-22 13:57:36,535] DEBUG - Main - App launched
+[2018-06-22 13:57:37,719] DEBUG - S3Client - AWS S3 connection established
+[2018-06-22 13:57:38,326] INFO - SqsClient - Creating queue: EventProcessing
+[2018-06-22 13:57:38,732] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-22 13:57:38,759] ERROR - SnSClient - Unable to create AmazonSNSClient
+[2018-06-22 13:57:38,759] ERROR - SnSClient - Could not find region information for 'null' in SDK metadata.
