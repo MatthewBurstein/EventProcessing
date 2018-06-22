@@ -12,6 +12,7 @@ public class DataReader {
         byte[] read_buf = new byte[1024];
         int read_len;
         while ((read_len = amazonS3Stream.read(read_buf)) > 0) {
+            System.out.println("in here");
             fos.write(read_buf, 0, read_len);
         }
         amazonS3Stream.close();

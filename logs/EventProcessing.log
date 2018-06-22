@@ -1,0 +1,5 @@
+[2018-06-22 09:54:17,620] DEBUG - Main - AWS S3 connection established
+[2018-06-22 09:56:53,609] DEBUG - S3Client - AWS S3 connection established
+[2018-06-22 09:56:53,939] DEBUG - Main - AWS S3 connection established
+[2018-06-22 09:57:31,937] DEBUG - Main - App launched
+[2018-06-22 09:57:33,105] DEBUG - S3Client - AWS S3 connection established
