@@ -18,6 +18,7 @@ public class SnsClient {
                     .withRegion(System.getenv("AWS_REGION"))
                     .withCredentials(new EnvironmentVariableCredentialsProvider())
                     .build();
+            logger.info("SnsClient created");
         } catch (SdkClientException e) {
             logger.error("Unable to create AmazonSNSClient");
             logger.error(e.getMessage());

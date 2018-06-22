@@ -5,10 +5,7 @@ import com.amazonaws.services.sns.util.Topics;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
-import eventprocessing.amazonservices.S3Client;
-import eventprocessing.amazonservices.S3Details;
-import eventprocessing.amazonservices.SnsClient;
-import eventprocessing.amazonservices.SqsClient;
+import eventprocessing.amazonservices.*;
 import eventprocessing.fileservices.JSONParser;
 import eventprocessing.models.Sensor;
 import eventprocessing.models.SensorList;
@@ -27,20 +24,11 @@ public class Main {
         SensorList sensors = jsonParser.createSensorList();
         sensors.getSensors().forEach(sensor -> System.out.println(sensor.getId()));
 
-        S3ObjectInputStream s3is = new S3Client().generateS3InputStream();
-        DataReader reader = new DataReader();
-        reader.saveToFile(s3is);
+        AmazonController amazonController = new AmazonController();
+        SqsClient sqsClient = amazonController.getSqsClient();
+        String queueUrl = amazonController.getQueueUrl();
 
-        SqsClient sqsClient= new SqsClient();
-        sqsClient.buildSQSClient();
-        String myQueueUrl = sqsClient.getQueueUrl();
-
-        SnsClient snsClient = new SnsClient();
-        snsClient.buildSNSClient();
-
-        Topics.subscribeQueue(snsClient.getSns(), sqsClient.getSqs(), S3Details.arnTopic, myQueueUrl);
-
-        ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(myQueueUrl);
+        ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
 //        receiveMessageRequest.setWaitTimeSeconds(3);
         int counter = 0;
 
