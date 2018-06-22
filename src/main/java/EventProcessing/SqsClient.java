@@ -1,6 +1,7 @@
 package EventProcessing;
 
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
+import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.CreateQueueRequest;
@@ -11,7 +12,11 @@ public class SqsClient {
     private final AmazonSQS sqs;
 
     public SqsClient() {
-        this.sqs = new AmazonSQSClient(new EnvironmentVariableCredentialsProvider());
+        this.sqs = AmazonSQSClient
+                .builder()
+                .withRegion(System.getenv("AWS_REGION"))
+                .withCredentials(new EnvironmentVariableCredentialsProvider())
+                .build();
     }
 
     public String getQueueUrl(){
@@ -24,13 +29,5 @@ public class SqsClient {
     public AmazonSQS getSqs() {
         return sqs;
     }
-
-    public void listQueues() {
-        ListQueuesResult result = sqs.listQueues();
-        for(String url : result.getQueueUrls()) {
-            System.out.println(url);
-        }
-    }
-
 
 }

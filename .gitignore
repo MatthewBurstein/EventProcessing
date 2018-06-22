@@ -9,4 +9,4 @@ src/main/resources/liquibase.properties
 
 dependency-reduced-pom.xml
 
-locations.json
+locations.json  

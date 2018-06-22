@@ -18,13 +18,6 @@ public class SnsClient {
                 .build();
     }
 
-    public String getTopicArn() {
-        CreateTopicRequest createTopicRequest = new CreateTopicRequest(S3Details.arnTopic);
-        CreateTopicResult topic = sns.createTopic(createTopicRequest);
-        String myTopicArn = topic.getTopicArn();
-        return myTopicArn;
-    }
-
     public AmazonSNS getSns() {
         return sns;
     }

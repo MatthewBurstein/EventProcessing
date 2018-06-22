@@ -26,16 +26,12 @@ public class Main {
         String myQueueUrl = sqsClient.getQueueUrl();
 
         SnsClient snsClient = new SnsClient();
-        String myTopicArn = snsClient.getTopicArn();
 
-//        sqsClient.listQueues();
-
-        Topics.subscribeQueue(snsClient.getSns(), sqsClient.getSqs(), myTopicArn, myQueueUrl);
+        Topics.subscribeQueue(snsClient.getSns(), sqsClient.getSqs(), S3Details.arnTopic, myQueueUrl);
 
         List<Message> messages = sqsClient.getSqs().receiveMessage(new ReceiveMessageRequest(myQueueUrl)).getMessages();
         if (messages.size() > 0) {
-            byte[] decodedBytes = Base64.decodeBase64((messages.get(0)).getBody().getBytes());
-            System.out.println("Message: " + new String(decodedBytes));
+            System.out.println(messages.get(0).getBody());
         }
 
     }
