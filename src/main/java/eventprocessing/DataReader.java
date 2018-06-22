@@ -1,4 +1,4 @@
-package EventProcessing;
+package eventprocessing;
 
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 

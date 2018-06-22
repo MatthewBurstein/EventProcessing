@@ -1,4 +1,4 @@
-package EventProcessing;
+package eventprocessing.amazonservices;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;

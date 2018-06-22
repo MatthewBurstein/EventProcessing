@@ -1,14 +1,12 @@
-package EventProcessing;
+package eventprocessing.amazonservices;
 
 import com.amazonaws.SdkClientException;
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
-import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.CreateQueueRequest;
 import com.amazonaws.services.sqs.model.CreateQueueResult;
 import com.amazonaws.services.sqs.model.DeleteQueueRequest;
-import com.amazonaws.services.sqs.model.ListQueuesResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

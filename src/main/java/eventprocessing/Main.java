@@ -1,10 +1,17 @@
-package EventProcessing;
+package eventprocessing;
 
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.sns.util.Topics;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
+import eventprocessing.amazonservices.S3Client;
+import eventprocessing.amazonservices.S3Details;
+import eventprocessing.amazonservices.SnsClient;
+import eventprocessing.amazonservices.SqsClient;
+import eventprocessing.fileservices.JSONParser;
+import eventprocessing.models.Sensor;
+import eventprocessing.models.SensorList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,6 +22,10 @@ public class Main {
     static Logger logger = LogManager.getLogger(Main.class);
     public static void main(String[] args) throws IOException, InterruptedException {
         logger.debug("App launched");
+
+        JSONParser jsonParser = new JSONParser("locations.json");
+        SensorList sensors = jsonParser.createSensorList();
+        sensors.getSensors().forEach(sensor -> System.out.println(sensor.getId()));
 
         S3ObjectInputStream s3is = new S3Client().generateS3InputStream();
         DataReader reader = new DataReader();
@@ -31,7 +42,6 @@ public class Main {
 
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(myQueueUrl);
 //        receiveMessageRequest.setWaitTimeSeconds(3);
-
         int counter = 0;
 
         while (true) {

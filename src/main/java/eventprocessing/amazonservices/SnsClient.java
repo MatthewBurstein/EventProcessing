@@ -1,4 +1,4 @@
-package EventProcessing;
+package eventprocessing.amazonservices;
 
 import com.amazonaws.SdkClientException;
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
