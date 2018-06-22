@@ -23,6 +23,7 @@ public class Main {
         reader.saveToFile(s3is);
 
         SqsClient sqsClient= new SqsClient();
+        sqsClient.buildSQSClient();
         String myQueueUrl = sqsClient.getQueueUrl();
 
         SnsClient snsClient = new SnsClient();
@@ -34,6 +35,7 @@ public class Main {
             System.out.println(messages.get(0).getBody());
         }
 
+        sqsClient.destroyQueue();
     }
 
 }
