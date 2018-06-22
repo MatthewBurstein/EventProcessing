@@ -27,7 +27,7 @@ public class S3Client {
         AmazonS3 s3 = clientBuilder();
         S3ObjectInputStream s3is = null;
         try {
-            S3Object o = s3.getObject("eventprocessing-suzannejune2018-locationss3bucket-1jlchplwcxr2n", "locations.json");
+            S3Object o = s3.getObject(S3Details.s3BucketLocation, S3Details.s3Key);
             s3is = o.getObjectContent();
         } catch (AmazonServiceException e) {
             System.err.println(e.getErrorMessage());

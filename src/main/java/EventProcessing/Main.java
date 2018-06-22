@@ -1,10 +1,17 @@
 package EventProcessing;
 
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.sns.model.MessageAttributeValue;
+import com.amazonaws.services.sns.model.PublishRequest;
+import com.amazonaws.services.sns.util.Topics;
+import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.util.List;
 
 public class Main {
     static Logger logger = LogManager.getLogger(Main.class);
@@ -14,6 +21,23 @@ public class Main {
         S3ObjectInputStream s3is = new S3Client().generateS3InputStream();
         DataReader reader = new DataReader();
         reader.saveToFile(s3is);
+
+        SqsClient sqsClient= new SqsClient();
+        String myQueueUrl = sqsClient.getQueueUrl();
+
+        SnsClient snsClient = new SnsClient();
+        String myTopicArn = snsClient.getTopicArn();
+
+//        sqsClient.listQueues();
+
+        Topics.subscribeQueue(snsClient.getSns(), sqsClient.getSqs(), myTopicArn, myQueueUrl);
+
+        List<Message> messages = sqsClient.getSqs().receiveMessage(new ReceiveMessageRequest(myQueueUrl)).getMessages();
+        if (messages.size() > 0) {
+            byte[] decodedBytes = Base64.decodeBase64((messages.get(0)).getBody().getBytes());
+            System.out.println("Message: " + new String(decodedBytes));
+        }
+
     }
 
 }
