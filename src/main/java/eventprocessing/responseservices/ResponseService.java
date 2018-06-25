@@ -11,28 +11,19 @@ public class ResponseService {
 
     private final Logger logger = LogManager.getLogger("ResponseService");
 
-    public void parseResponse(String jsonString) {
+    public Response parseResponse(String jsonString) {
         Gson gson = new Gson();
-        Response responseObject;
+        Response responseObject = null;
         try {
             responseObject = gson.fromJson(jsonString, Response.class);
-            logger.info("Try...");
-            logger.info("Input variable: " + jsonString);
-            logger.info("responseObject: " + responseObject.toString());
-
-            String currMessage = responseObject.getMessageString();
-            Message newMessage = gson.fromJson(currMessage, Message.class);
-            responseObject.setMessage(newMessage);
-
-            System.out.println(responseObject.toString());
-
+            String messageString = responseObject.getMessageString();
+            Message messageObject = gson.fromJson(messageString, Message.class);
+            responseObject.setMessage(messageObject);
         } catch (IllegalStateException | JsonSyntaxException e) {
-            logger.info("Caught response..." + e.getMessage());
-            logger.info("Input variable: " + jsonString);
-//            logger.info("responseObject: " + responseObject);
+            logger.warn("Invalid JSON string received" + e.getMessage());
+            logger.warn("Received json string: " + jsonString);
         }
-
-
+        return responseObject;
     }
 
 }

@@ -1082,3 +1082,81 @@ Message: NULL
 [2018-06-25 14:59:25,503] INFO - ResponseService - responseObject: messageId: 6febb1ea-ca05-58b4-8359-e2403d14d854
 Message: NULL
 [2018-06-25 14:59:26,504] INFO - SqsClient - Destroying queue EventProcessing at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-25 15:14:54,980] DEBUG - Main - App launched
+[2018-06-25 15:14:56,188] DEBUG - S3Client - AWS S3 connection established
+[2018-06-25 15:14:56,534] INFO - SqsClient - Creating queue: EventProcessing
+[2018-06-25 15:14:56,904] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-25 15:14:56,937] INFO - SnSClient - SnsClient created
+[2018-06-25 15:14:57,263] INFO - SqsClient - Creating queue: EventProcessing
+[2018-06-25 15:14:57,299] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-25 15:14:58,410] INFO - ResponseService - Try...
+[2018-06-25 15:14:58,410] INFO - ResponseService - Input variable: {
+  "Type" : "Notification",
+  "MessageId" : "6cb15f00-c57d-5464-b572-0caa3e5cabc8",
+  "TopicArn" : "arn:aws:sns:eu-west-1:552908040772:EventProcessing-SuzanneJune2018-snsTopicSensorDataPart1-1GKYP5V52Q07X",
+  "Message" : "{\"locationId\":\"63c95044-891f-418f-a465-50a9c766aa4f\",\"eventId\":\"22c2ebcc-6054-4fc8-98b6-ddf97ae19dd5\",\"value\":5.636668054150024,\"timestamp\":1529936097398}",
+  "Timestamp" : "2018-06-25T14:14:57.398Z",
+  "SignatureVersion" : "1",
+  "Signature" : "TObAqqlpFliLmreEY0MleWL1qPS0nOaBhQrzIzB/2XoEPAj0rgSRmtl7ilZyEYUbQ1H2JU0Jd2oxgMDDA68y8vNoXjD1i+THPr3dlVmUWLTYEeRsYkz5uSjW1a2pDdhfAnHgrC/ZH9PbhON7zu5IZ3A665tIWvnj72hsTPuvPMTQ1anXekRC1c8nxR2tELymiSq5UzvMk5BwG4n32ttBDMjzpdqo4Cn1iV6U/GyW/Z/fgEYbzw0t3jm3r1jZjBtBXDePzXubnTi8FrJvSHFjKh4EKEyjCyEEeY3k1el35CuePGknq24JYMMZ8ZTxqTXYGN/wyV8YVVIZ76Q4dSy1RA==",
+  "SigningCertURL" : "https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-eaea6120e66ea12e88dcd8bcbddca752.pem",
+  "UnsubscribeURL" : "https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-1:552908040772:EventProcessing-SuzanneJune2018-snsTopicSensorDataPart1-1GKYP5V52Q07X:7ed66a2d-a525-4f83-89b8-b8382fa08d9b"
+}
+[2018-06-25 15:14:58,411] INFO - ResponseService - responseObject: messageId: 6cb15f00-c57d-5464-b572-0caa3e5cabc8
+Message: NULL
+[2018-06-25 15:14:59,438] INFO - ResponseService - Try...
+[2018-06-25 15:14:59,439] INFO - ResponseService - Input variable: {
+  "Type" : "Notification",
+  "MessageId" : "00c8d2f7-f0ce-5cc7-9d43-815d0bec336b",
+  "TopicArn" : "arn:aws:sns:eu-west-1:552908040772:EventProcessing-SuzanneJune2018-snsTopicSensorDataPart1-1GKYP5V52Q07X",
+  "Message" : "{\"locationId\":\"3ebb96ca-266d-428e-ad1a-6d7807ff3999\",\"eventId\":\"9a5579aa-7612-46f2-b2c1-ed097ec7f37c\",\"value\":10.309655647641215,\"timestamp\":1529936098551}",
+  "Timestamp" : "2018-06-25T14:14:58.552Z",
+  "SignatureVersion" : "1",
+  "Signature" : "psvctbCerWn0CYWQNor4xq/sYOJhiH0IxP33UBwQmgkRDAl5QZA0wglyjrLGWoozM83orG27T6wd165aGHqXlP1x7d3RAd34XG6cScmlhBDAzkgl3RKaQ/DihihxKEXy3MCYBa4W/yLnvrVDXZXNpSN/s8isRvbE1G5HYkLq37ZsXlaOmJTgTQpj+7PjMy8iFDUAj1UT6ieWIZv0aHA4UQtINp4PCelFZexGlcD+OdVrj6jPQoDGfr7nW8DzJZZDKlS1LeFMhRHoeO6Znhc5P0Qi73MCPdMNI98ZtTXJj86dISTF4uCOxgpsbW5qczBc0uacRNLYKvDCgxqwjJzg9g==",
+  "SigningCertURL" : "https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-eaea6120e66ea12e88dcd8bcbddca752.pem",
+  "UnsubscribeURL" : "https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-1:552908040772:EventProcessing-SuzanneJune2018-snsTopicSensorDataPart1-1GKYP5V52Q07X:7ed66a2d-a525-4f83-89b8-b8382fa08d9b"
+}
+[2018-06-25 15:14:59,439] INFO - ResponseService - responseObject: messageId: 00c8d2f7-f0ce-5cc7-9d43-815d0bec336b
+Message: NULL
+[2018-06-25 15:15:00,465] INFO - ResponseService - Try...
+[2018-06-25 15:15:00,465] INFO - ResponseService - Input variable: {
+  "Type" : "Notification",
+  "MessageId" : "5728a138-7de2-57bb-8f46-f29286c1e817",
+  "TopicArn" : "arn:aws:sns:eu-west-1:552908040772:EventProcessing-SuzanneJune2018-snsTopicSensorDataPart1-1GKYP5V52Q07X",
+  "Message" : "{\"locationId\":\"5c4c9ece-1ee8-4240-8394-8227be64d3b0\",\"eventId\":\"1647df49-ba6a-414b-9b48-a4f0c0c76bef\",\"value\":9.277334005087996,\"timestamp\":1529936099827}",
+  "Timestamp" : "2018-06-25T14:14:59.827Z",
+  "SignatureVersion" : "1",
+  "Signature" : "eCIzHBm0JaXJD6YXfcm2LZi1FGixlmsnkGwAK8nVk2vFfvjoX7SphNFvmhiKvo0RGP0sGsDBW/8q1yW0PmhztnTQst5zOb2yI94Qd41X+E6I6CM7B3YyCQbXD8g8C4V3uUxTcqBgI/YvcDgUlSA4eKY/KTy0YaPxSm6PY2ilT2N1LtDWFoBWF5uKZPrxpcbY2alxeviVPgm5DYQ67tvOwA4N6ZNH5fF3wKDjRMjO+lLMEfH/7BB4jIzkEdRagb1vqHz9kvy3z0G7OSVZF2Q4IaLdlN8pT1Q+vuMXcPE39amEfw1mfRQAm+GlUMu/FWcZrYFnjpG/SRpd8PTXhNosyQ==",
+  "SigningCertURL" : "https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-eaea6120e66ea12e88dcd8bcbddca752.pem",
+  "UnsubscribeURL" : "https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-1:552908040772:EventProcessing-SuzanneJune2018-snsTopicSensorDataPart1-1GKYP5V52Q07X:7ed66a2d-a525-4f83-89b8-b8382fa08d9b"
+}
+[2018-06-25 15:15:00,465] INFO - ResponseService - responseObject: messageId: 5728a138-7de2-57bb-8f46-f29286c1e817
+Message: NULL
+[2018-06-25 15:15:01,492] INFO - ResponseService - Try...
+[2018-06-25 15:15:01,492] INFO - ResponseService - Input variable: {
+  "Type" : "Notification",
+  "MessageId" : "8c623086-51b0-5179-803a-632caa94881a",
+  "TopicArn" : "arn:aws:sns:eu-west-1:552908040772:EventProcessing-SuzanneJune2018-snsTopicSensorDataPart1-1GKYP5V52Q07X",
+  "Message" : "{\"locationId\":\"d11efe56-b90f-4ee7-a0ee-e8262613a8e6\",\"eventId\":\"a787a342-0830-4006-ad0b-e89d3fef4b45\",\"value\":2.6286205847926456,\"timestamp\":1529936100728}",
+  "Timestamp" : "2018-06-25T14:15:00.737Z",
+  "SignatureVersion" : "1",
+  "Signature" : "OYGwjXaCTREcc6Ysmro14NWbSsCgNnWi7Xwb6izGHnYdHbfAQqOBKfRUpRDBEp1RUJ7nv5ja61DQhH6R9reWmP8Rv963PsFT0xcvICbSPFKTxcLa+4cUQz3BVVhbXfiGzYgZp7bDULZK55zk7Oee9bGHDMDhBd6dlKSw6wJrzZCeJEKjydEoxFeW/7AddTd+rEe/gZKuUGKbyalXpdwtC3Dwhf/g4e7IMAu4GyyqUMQP6y0YyXuK7RxVWeXSkZ/OaYKKMed1Bd/znIAUaQ7A4lg1Vcnh0e+cToM+gtdtAw8Da7AE6mdU/iDW1bQ9RlbNLWiwKYeCTeeadOVxgPZa/Q==",
+  "SigningCertURL" : "https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-eaea6120e66ea12e88dcd8bcbddca752.pem",
+  "UnsubscribeURL" : "https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-1:552908040772:EventProcessing-SuzanneJune2018-snsTopicSensorDataPart1-1GKYP5V52Q07X:7ed66a2d-a525-4f83-89b8-b8382fa08d9b"
+}
+[2018-06-25 15:15:01,493] INFO - ResponseService - responseObject: messageId: 8c623086-51b0-5179-803a-632caa94881a
+Message: NULL
+[2018-06-25 15:15:02,518] INFO - ResponseService - Try...
+[2018-06-25 15:15:02,518] INFO - ResponseService - Input variable: {
+  "Type" : "Notification",
+  "MessageId" : "b9775a44-ff23-5ba4-b71b-09ee040652c7",
+  "TopicArn" : "arn:aws:sns:eu-west-1:552908040772:EventProcessing-SuzanneJune2018-snsTopicSensorDataPart1-1GKYP5V52Q07X",
+  "Message" : "{\"locationId\":\"8ca66b27-d86a-44f1-a6f4-6245e671a40d\",\"eventId\":\"15b43cf9-c78c-4322-a70f-2ddbb2641efe\",\"value\":6.688589103333963,\"timestamp\":1529936101345}",
+  "Timestamp" : "2018-06-25T14:15:01.352Z",
+  "SignatureVersion" : "1",
+  "Signature" : "rtdrbvvY4kiqIHc4GZU+BmZREGTm17Xd+XqzIYhTX6R+JIsUvcjxGwRP4JBtPiE3fM6iuWlt7SXXRCtGSn4kdUGvH5g7w+Xd00keeJFbFL+EiF8j4SAiR6vQEF1MMg5LC0y5fPIND3MUV9saS+ocdaldvcwLjy0W58JNPhLb8OyeZFgCeCh6EN3516q06D/YMXaxIbjHCYKwVIkm3ZfnuycED5Gwtq5ku9zGkjnUC/aG4wLXcjIceE+BaCthG/7DzagCmXws1DOKWQhGgJAJZFTOJs46+x2lS6e7+sDhuRjbLKg0MlMX+iqjfCA2UCVg9LfFZJtpWWKzLnKa9Iv8vw==",
+  "SigningCertURL" : "https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-eaea6120e66ea12e88dcd8bcbddca752.pem",
+  "UnsubscribeURL" : "https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-1:552908040772:EventProcessing-SuzanneJune2018-snsTopicSensorDataPart1-1GKYP5V52Q07X:7ed66a2d-a525-4f83-89b8-b8382fa08d9b"
+}
+[2018-06-25 15:15:02,518] INFO - ResponseService - responseObject: messageId: b9775a44-ff23-5ba4-b71b-09ee040652c7
+Message: NULL
+[2018-06-25 15:15:03,520] INFO - SqsClient - Destroying queue EventProcessing at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
