@@ -2,6 +2,7 @@ package eventprocessing.responseservices;
 
 import eventprocessing.models.Response;
 import eventprocessing.models.SensorList;
+import eventprocessing.storage.MessageLog;
 
 
 public class ResponseProcessor {
@@ -13,4 +14,7 @@ public class ResponseProcessor {
         return count > 0;
     }
 
+    public boolean isDuplicateMessage(Response response, MessageLog messageLog) {
+        return messageLog.getMessageHistory().contains(response.getMessageId());
+    }
 }

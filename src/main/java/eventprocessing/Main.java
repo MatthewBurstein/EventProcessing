@@ -9,6 +9,7 @@ import eventprocessing.models.Response;
 import eventprocessing.models.SensorList;
 import eventprocessing.responseservices.ResponseProcessor;
 import eventprocessing.responseservices.ResponseService;
+import eventprocessing.storage.MessageLog;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,6 +25,7 @@ public class Main {
         sensorList.getSensors().forEach(sensor -> System.out.println(sensor.getId()));
         ResponseService responseService = new ResponseService();
         ResponseProcessor responseProcessor = new ResponseProcessor();
+        MessageLog messageLog = new MessageLog();
 
         AmazonController amazonController = new AmazonController();
         SqsClient sqsClient = amazonController.getSqsClient();
@@ -36,9 +38,10 @@ public class Main {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
             for(Message msg : messageResult.getMessages()) {
                 Response response = responseService.parseResponse(msg.getBody());
-                if (responseProcessor.isWorkingSensor(response, sensorList)) {
+                if (responseProcessor.isWorkingSensor(response, sensorList) && responseProcessor.isDuplicateMessage(response, messageLog)) {
                     System.out.println("working sensor with id: " + response.getMessage().getLocationId());
                     System.out.println(msg.getBody());
+                    messageLog.getMessageHistory().add(response.messageId);
                 } else {
                     System.out.println("sensor not working with id: " + response.getMessage().getLocationId());
                 }

@@ -4,6 +4,7 @@ import eventprocessing.models.Response;
 import eventprocessing.models.Sensor;
 import eventprocessing.models.SensorList;
 import eventprocessing.responseservices.ResponseProcessor;
+import eventprocessing.storage.MessageLog;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -15,15 +16,11 @@ import static org.mockito.Mockito.when;
 
 public class ResponseProcessorTest {
 
-    //SensorList.getSensors -> List<Sensor>
-    //Sensor.getId() -> return validId
-    //response.getMessage() -> message
-    //message.getLocationId() -> validLocation, invalidLocation
-
     private Sensor mockSensor;
     private SensorList mockSensorList;
     private Message mockMessage;
     private Response mockResponse;
+    private MessageLog mockMessageLog;
     private ResponseProcessor responseProcessor;
 
     @Before
@@ -36,9 +33,11 @@ public class ResponseProcessorTest {
         mockResponse = Mockito.mock(Response.class);
         when(mockResponse.getMessage()).thenReturn(mockMessage);
 
+        mockMessageLog = Mockito.mock(MessageLog.class);
+        when(mockMessageLog.getMessageHistory()).thenReturn(Lists.newArrayList("messageId1", "messageId2"));
+
         responseProcessor = new ResponseProcessor();
     }
-
 
     @Test
     public void isWorkingSensor_returnsTrue() {
@@ -50,5 +49,17 @@ public class ResponseProcessorTest {
     public void isNotWorkingSensor_returnsFalse() {
         when(mockMessage.getLocationId()).thenReturn("invalidId");
         assertFalse(responseProcessor.isWorkingSensor(mockResponse, mockSensorList));
+    }
+
+    @Test
+    public void isDuplicateMessage_whenDuplicate_returnsTrue() {
+        when(mockResponse.getMessageId()).thenReturn("messageId1");
+        assertTrue(responseProcessor.isDuplicateMessage(mockResponse, mockMessageLog));
+    }
+
+    @Test
+    public void isDuplicateMessage_whenNotDuplicate_returnsFalse() {
+        when(mockResponse.getMessageId()).thenReturn("newMessageId");
+        assertFalse(responseProcessor.isDuplicateMessage(mockResponse, mockMessageLog));
     }
 }

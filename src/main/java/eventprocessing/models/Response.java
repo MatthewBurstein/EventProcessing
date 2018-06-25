@@ -18,6 +18,10 @@ public class Response {
         }
     }
 
+    public String getMessageId() {
+        return messageId;
+    }
+
     public String getMessageString() {
         return messageString;
     }

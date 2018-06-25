@@ -1184,3 +1184,10 @@ Message: NULL
 [2018-06-25 16:10:57,764] INFO - SqsClient - Creating queue: EventProcessing
 [2018-06-25 16:10:57,791] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
 [2018-06-25 16:11:09,144] INFO - SqsClient - Destroying queue EventProcessing at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-25 16:33:26,522] DEBUG - Main - App launched
+[2018-06-25 16:33:27,737] DEBUG - S3Client - AWS S3 connection established
+[2018-06-25 16:33:28,198] INFO - SqsClient - Creating queue: EventProcessing
+[2018-06-25 16:33:28,390] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-25 16:33:28,428] INFO - SnSClient - SnsClient created
+[2018-06-25 16:33:28,726] INFO - SqsClient - Creating queue: EventProcessing
+[2018-06-25 16:33:28,751] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
