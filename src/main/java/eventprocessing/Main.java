@@ -1,19 +1,16 @@
 package eventprocessing;
 
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
-import com.amazonaws.services.sns.util.Topics;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import eventprocessing.amazonservices.*;
 import eventprocessing.fileservices.JSONParser;
-import eventprocessing.models.Sensor;
 import eventprocessing.models.SensorList;
+import eventprocessing.responseservices.ResponseService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.util.List;
 
 public class Main {
     static Logger logger = LogManager.getLogger(Main.class);
@@ -23,6 +20,7 @@ public class Main {
         JSONParser jsonParser = new JSONParser("locations.json");
         SensorList sensors = jsonParser.createSensorList();
         sensors.getSensors().forEach(sensor -> System.out.println(sensor.getId()));
+        ResponseService responseService = new ResponseService();
 
         AmazonController amazonController = new AmazonController();
         SqsClient sqsClient = amazonController.getSqsClient();
@@ -35,12 +33,13 @@ public class Main {
         while (true) {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
             for(Message msg : messageResult.getMessages()) {
-                System.out.println(msg);
+                responseService.parseResponse(msg.getBody());
+//                System.out.println(msg.getBody());
             }
             System.out.println("=================================================");
-            Thread.sleep(4000);
+            Thread.sleep(1000);
             counter++;
-            if (counter > 10) {
+            if (counter > 5) {
                 break;
             }
         }
