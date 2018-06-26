@@ -4,6 +4,7 @@ import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import eventprocessing.amazonservices.*;
+import eventprocessing.analysis.Analyser;
 import eventprocessing.fileservices.JSONParser;
 import eventprocessing.models.Response;
 import eventprocessing.models.ResponseList;
@@ -26,6 +27,7 @@ public class Main {
     private static Scanner scanner;
     private static AmazonController amazonController;
     private static ResponseList responseList;
+    private static Analyser analyser;
 
     public static void main(String[] args) throws IOException, InterruptedException {
         logger.debug("App launched");
@@ -59,6 +61,10 @@ public class Main {
             }
             System.out.println("=================================================");
             Thread.sleep(1000);
+
+            double averageValue = analyser.getAverageValue(responseList);
+            System.out.println("Cumulative average of sensor values: " + averageValue);
+
             counter++;
             if (counter > duration) {
                 sqsClient.destroyQueue();
@@ -75,5 +81,6 @@ public class Main {
         scanner = new Scanner(System.in);
         amazonController = new AmazonController();
         responseList = new ResponseList();
+        analyser = new Analyser();
     }
 }
