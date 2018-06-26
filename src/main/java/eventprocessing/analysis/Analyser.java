@@ -3,6 +3,8 @@ package eventprocessing.analysis;
 import eventprocessing.models.Response;
 import eventprocessing.models.ResponseList;
 
+import java.util.Optional;
+
 public class Analyser {
 
     private static double reduceValues(double currentValue, double accumulator) {
@@ -10,9 +12,11 @@ public class Analyser {
     }
 
     public double getAverageValue(ResponseList responseList) {
-        double total = responseList.getResponses().stream()
-                .map(response -> response.getMessage().getValue())
-                .reduce(Double.valueOf(0), Analyser::reduceValues);
+
+        double total = responseList.getMessageValues()
+                .stream()
+                .reduce(0.0, Double::sum);
+
         return total / responseList.getResponses().size();
     }
 

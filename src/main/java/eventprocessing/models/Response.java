@@ -30,6 +30,8 @@ public class Response {
         return message;
     }
 
+    public double getValue() { return message.getValue(); }
+
     public void setMessage(Message message) {
         this.message = message;
     }
