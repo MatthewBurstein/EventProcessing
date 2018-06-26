@@ -19,29 +19,30 @@ import java.util.Scanner;
 
 public class Main {
     static Logger logger = LogManager.getLogger(Main.class);
+
+    private static ResponseService responseService;
+    private static ResponseProcessor responseProcessor;
+    private static MessageLog messageLog;
+    private static Scanner scanner;
+    private static AmazonController amazonController;
+    private static ResponseList responseList;
+
     public static void main(String[] args) throws IOException, InterruptedException {
         logger.debug("App launched");
-
-        int MAX_SIZE = 300;
+        createObjects();
         JSONParser jsonParser = new JSONParser("locations.json");
         SensorList sensorList = jsonParser.createSensorList();
         sensorList.getSensors().forEach(sensor -> System.out.println(sensor.getId()));
-        ResponseService responseService = new ResponseService();
-        ResponseProcessor responseProcessor = new ResponseProcessor();
-        MessageLog messageLog = new MessageLog(MAX_SIZE);
 
-        AmazonController amazonController = new AmazonController();
         SqsClient sqsClient = amazonController.getSqsClient();
         String queueUrl = amazonController.getQueueUrl();
 
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
         int counter = 0;
 
-        Scanner scanner = new Scanner(System.in);
         System.out.println("For how long do you want to run the event processor(seconds)?");
         int duration = scanner.nextInt();
 
-        ResponseList responseList = new ResponseList();
         while (true) {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
             for(Message msg : messageResult.getMessages()) {
@@ -64,5 +65,15 @@ public class Main {
                 break;
             }
         }
+    }
+
+    private static void createObjects() throws IOException {
+        int MAX_SIZE = 300;
+        responseService = new ResponseService();
+        responseProcessor = new ResponseProcessor();
+        messageLog = new MessageLog(MAX_SIZE);
+        scanner = new Scanner(System.in);
+        amazonController = new AmazonController();
+        responseList = new ResponseList();
     }
 }
