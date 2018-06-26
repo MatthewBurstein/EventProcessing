@@ -17,4 +17,8 @@ public class ResponseProcessor {
     public boolean isDuplicateMessage(Response response, MessageLog messageLog) {
         return messageLog.getMessageHistory().contains(response.getMessageId());
     }
+
+    public boolean isValidMessage(Response response, SensorList sensorList, MessageLog messageLog) {
+        return isWorkingSensor(response, sensorList) && !isDuplicateMessage(response, messageLog);
+    }
 }

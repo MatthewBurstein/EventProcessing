@@ -20,12 +20,13 @@ public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
         logger.debug("App launched");
 
+        int MAX_SIZE = 300;
         JSONParser jsonParser = new JSONParser("locations.json");
         SensorList sensorList = jsonParser.createSensorList();
         sensorList.getSensors().forEach(sensor -> System.out.println(sensor.getId()));
         ResponseService responseService = new ResponseService();
         ResponseProcessor responseProcessor = new ResponseProcessor();
-        MessageLog messageLog = new MessageLog();
+        MessageLog messageLog = new MessageLog(MAX_SIZE);
 
         AmazonController amazonController = new AmazonController();
         SqsClient sqsClient = amazonController.getSqsClient();
@@ -38,10 +39,11 @@ public class Main {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
             for(Message msg : messageResult.getMessages()) {
                 Response response = responseService.parseResponse(msg.getBody());
-                if (responseProcessor.isWorkingSensor(response, sensorList) && responseProcessor.isDuplicateMessage(response, messageLog)) {
+                if (responseProcessor.isValidMessage(response, sensorList, messageLog)) {
                     System.out.println("working sensor with id: " + response.getMessage().getLocationId());
                     System.out.println(msg.getBody());
                     messageLog.getMessageHistory().add(response.messageId);
+                    messageLog.truncateIfExceedsMaxSize();
                 } else {
                     System.out.println("sensor not working with id: " + response.getMessage().getLocationId());
                 }
@@ -49,12 +51,19 @@ public class Main {
             System.out.println("=================================================");
             Thread.sleep(1000);
             counter++;
-            if (counter > 10) {
+            if (counter > 3600) {
+                sqsClient.destroyQueue();
                 break;
             }
         }
 
-        sqsClient.destroyQueue();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                sqsClient.destroyQueue();
+                System.out.println("Finished destroying queue");
+            }
+        });
     }
+
 
 }
