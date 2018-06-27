@@ -26,7 +26,7 @@ public class Main {
     private static MessageLog messageLog;
     private static Scanner scanner;
     private static AmazonController amazonController;
-    private static ResponseList responseList;
+//    private static ResponseList responseList;
     private static Analyser analyser;
 
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -52,7 +52,7 @@ public class Main {
                 if (responseProcessor.isValidMessage(response, sensorList, messageLog)) {
                     System.out.println("working sensor with id: " + response.getMessage().getLocationId());
                     System.out.println(msg.getBody());
-                    responseList.getResponses().add(response);
+//                    responseList.getResponses().add(response);
                     messageLog.getMessageHistory().add(response.messageId);
                     messageLog.truncateIfExceedsMaxSize();
                 } else {
@@ -62,8 +62,8 @@ public class Main {
             System.out.println("=================================================");
             Thread.sleep(1000);
 
-            double averageValue = analyser.getAverageValue(responseList);
-            System.out.println("Cumulative average of sensor values: " + averageValue);
+//            double averageValue = analyser.getAverageValue(responseList);
+//            System.out.println("Cumulative average of sensor values: " + averageValue);
 
             counter++;
             if (counter > duration) {
@@ -80,7 +80,7 @@ public class Main {
         messageLog = new MessageLog(MAX_SIZE);
         scanner = new Scanner(System.in);
         amazonController = new AmazonController();
-        responseList = new ResponseList();
+//        responseList = new ResponseList(timeRange);
         analyser = new Analyser();
     }
 }
