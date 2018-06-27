@@ -41,9 +41,16 @@ public class BucketManager {
         });
     }
 
+    public ResponseList remove(ResponseList responseList) {
+        buckets.remove(responseList);
+        return responseList;
+    }
+
     public void addMultipleResponsesToBucket(ResponseList responseList) {
         for (Response response : responseList.getResponses()) {
             addResponseToBucket(response);
         }
     }
+
+
 }

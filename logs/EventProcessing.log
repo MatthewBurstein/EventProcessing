@@ -1448,3 +1448,13 @@ Message: NULL
 [2018-06-27 13:45:48,581] INFO - Main - Finding earliest timestamp...
 [2018-06-27 13:45:48,592] INFO - Main - Creating bucket...
 [2018-06-27 13:45:54,864] INFO - SqsClient - Destroying queue EventProcessing at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-27 14:50:43,492] DEBUG - Main - App launched
+[2018-06-27 14:50:44,751] DEBUG - S3Client - AWS S3 connection established
+[2018-06-27 14:50:45,231] INFO - SqsClient - Creating queue: EventProcessing
+[2018-06-27 14:50:45,514] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-27 14:50:45,543] INFO - SnSClient - SnsClient created
+[2018-06-27 14:50:45,933] INFO - SqsClient - Creating queue: EventProcessing
+[2018-06-27 14:50:45,956] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-27 14:55:45,885] INFO - Main - Finding earliest timestamp...
+[2018-06-27 14:55:45,900] INFO - Main - Creating bucket...
+[2018-06-27 14:55:57,810] INFO - SqsClient - Destroying queue EventProcessing at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing

@@ -3,6 +3,7 @@ import eventprocessing.models.BucketManager;
 import eventprocessing.models.InitialResponseList;
 import eventprocessing.models.Response;
 import eventprocessing.models.ResponseList;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class BucketManagerTest {
@@ -20,6 +22,11 @@ public class BucketManagerTest {
     @Before
     public void createObjects() {
         bucketManager = new BucketManager(0);
+    }
+
+    @After
+    public void clearBucketManager() {
+        bucketManager.getBuckets().clear();
     }
 
     @Test
@@ -50,11 +57,12 @@ public class BucketManagerTest {
         when(mockResponse.getTimestamp()).thenReturn((long) 110);
         bucketManager.addResponseToBucket(mockResponse);
         List<ResponseList> responseList = bucketManager.getBuckets();
-        assertFalse(responseList.get(0).getResponses().contains(mockResponse));
-        assertTrue(responseList.get(1).getResponses().contains(mockResponse));
-        assertFalse(responseList.get(2).getResponses().contains(mockResponse));
-        assertFalse(responseList.get(3).getResponses().contains(mockResponse));
-        assertFalse(responseList.get(4).getResponses().contains(mockResponse));
+
+        assertThat(responseList.get(1).getResponses()).containsOnly(mockResponse);
+        assertThat(responseList.get(0).getResponses()).doesNotContain(mockResponse);
+        assertThat(responseList.get(2).getResponses()).doesNotContain(mockResponse);
+        assertThat(responseList.get(3).getResponses()).doesNotContain(mockResponse);
+        assertThat(responseList.get(4).getResponses()).doesNotContain(mockResponse);
     }
 
     @Test
@@ -74,12 +82,33 @@ public class BucketManagerTest {
         when(mockResponseList.getResponses()).thenReturn(Lists.newArrayList(mockResponse1, mockResponse2,
                 mockResponse3, mockResponse4, mockResponse5));
         bucketManager.addMultipleResponsesToBucket(mockResponseList);
+        List<ResponseList> buckets = bucketManager.getBuckets();
 
-        assertThat(bucketManager.getBuckets().get(0).getResponses()).containsOnly(mockResponse2);
-        assertThat(bucketManager.getBuckets().get(1).getResponses()).containsOnly(mockResponse1);
-        assertThat(bucketManager.getBuckets().get(2).getResponses()).containsOnly(mockResponse4);
-        assertThat(bucketManager.getBuckets().get(3).getResponses()).containsOnly(mockResponse5);
-        assertThat(bucketManager.getBuckets().get(4).getResponses()).containsOnly(mockResponse3);
+        assertThat(buckets.get(0).getResponses()).containsOnly(mockResponse2);
+        assertThat(buckets.get(1).getResponses()).containsOnly(mockResponse1);
+        assertThat(buckets.get(2).getResponses()).containsOnly(mockResponse4);
+        assertThat(buckets.get(3).getResponses()).containsOnly(mockResponse5);
+        assertThat(buckets.get(4).getResponses()).containsOnly(mockResponse3);
     }
+
+    @Test
+    public void remove_removesSpecifiedBucket() {
+        ResponseList mockResponseList1 = Mockito.mock(ResponseList.class);
+        ResponseList mockResponseList2 = Mockito.mock(ResponseList.class);
+        bucketManager.getBuckets().addAll(Lists.newArrayList(mockResponseList1, mockResponseList2));
+        bucketManager.remove(mockResponseList2);
+        assertThat(bucketManager.getBuckets()).contains(mockResponseList1);
+        assertThat(bucketManager.getBuckets()).doesNotContain(mockResponseList2);
+    }
+
+    @Test
+    public void remove_returnsRemovedBucket() {
+        ResponseList mockResponseList1 = Mockito.mock(ResponseList.class);
+        ResponseList mockResponseList2 = Mockito.mock(ResponseList.class);
+        bucketManager.getBuckets().addAll(Lists.newArrayList(mockResponseList1, mockResponseList2));
+        ResponseList responseList = bucketManager.remove(mockResponseList2);
+        assertEquals(responseList, mockResponseList2);
+    }
+
 
 }

@@ -45,13 +45,13 @@ public class Main {
         String queueUrl = amazonController.getQueueUrl();
 
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
-        int counter = 0;
 
         System.out.println("For how long do you want to run the event processor(seconds)?");
         int duration = scanner.nextInt();
 
         System.out.println("Please wait 5 minutes while the initial set of responses is compiled...");
         int messageCounter = 0;
+        //initial while loop stores five minutes of data with no buckets
         while (stopWatch.getTime() < 300000) {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
             for (Message msg : messageResult.getMessages()) {
@@ -69,13 +69,15 @@ public class Main {
             }
             messageCounter = initialResponseList.getResponses().size()/10;
         }
-
         logger.info("Finding earliest timestamp...");
         long earliestTimestamp = initialResponseList.getEarliestTimestamp();
 
+        //Initial responses are bucketed
         logger.info("Creating bucket...");
         bucketManager = new BucketManager(earliestTimestamp);
+        bucketManager.addMultipleResponsesToBucket(initialResponseList);
 
+        //Responses from here bucketed as they come in
         while (true) {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
             for (Message msg : messageResult.getMessages()) {
@@ -84,6 +86,7 @@ public class Main {
                     System.out.println("working sensor with id: " + response.getMessage().getLocationId());
                     System.out.println(msg.getBody());
 //                    responseList.getResponses().add(response);
+                    bucketManager.addResponseToBucket(response);
                     messageLog.getMessageHistory().add(response.messageId);
                     messageLog.truncateIfExceedsMaxSize();
                 } else {
@@ -96,8 +99,7 @@ public class Main {
 //            double averageValue = analyser.getAverageValue(responseList);
 //            System.out.println("Cumulative average of sensor values: " + averageValue);
 
-            counter++;
-            if (counter > duration) {
+            if (stopWatch.getTime() > duration) {
                 sqsClient.destroyQueue();
                 break;
             }
