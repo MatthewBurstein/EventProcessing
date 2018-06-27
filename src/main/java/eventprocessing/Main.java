@@ -6,6 +6,7 @@ import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import eventprocessing.amazonservices.*;
 import eventprocessing.analysis.Analyser;
 import eventprocessing.fileservices.JSONParser;
+import eventprocessing.models.BucketManager;
 import eventprocessing.models.Response;
 import eventprocessing.models.ResponseList;
 import eventprocessing.models.SensorList;
@@ -26,7 +27,7 @@ public class Main {
     private static MessageLog messageLog;
     private static Scanner scanner;
     private static AmazonController amazonController;
-//    private static ResponseList responseList;
+    private static BucketManager bucketManager;
     private static Analyser analyser;
 
     public static void main(String[] args) throws IOException, InterruptedException {

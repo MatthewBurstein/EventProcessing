@@ -18,6 +18,9 @@ public class ResponseList {
         this.timeRange = Range.between(startTime, endTime);
     }
 
+    public ResponseList() {
+    }
+
     public List<Response> getResponses() {
         return responses;
     }
