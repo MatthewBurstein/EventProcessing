@@ -8,9 +8,9 @@ import java.util.List;
 
 public class BucketManager {
     private List<ResponseList> buckets = new ArrayList<>();
-    private BigInteger nextStartTime;
+    private long nextStartTime;
 
-    public BucketManager(BigInteger initialTime) {
+    public BucketManager(long initialTime) {
         nextStartTime = initialTime;
 
         while (buckets.size() < 5) {
@@ -18,17 +18,32 @@ public class BucketManager {
         }
     }
 
-    public void createBucket(BigInteger thisBucketStartTime) {
+    public void createBucket(long thisBucketStartTime) {
         ResponseList bucket = new ResponseList(thisBucketStartTime);
         buckets.add(bucket);
-        nextStartTime = thisBucketStartTime.add(BigInteger.valueOf(60));
+        nextStartTime = thisBucketStartTime + 60;
     }
 
     public List<ResponseList> getBuckets() {
         return buckets;
     }
 
-    public BigInteger getNextStartTime() {
+    public long getNextStartTime() {
         return nextStartTime;
+    }
+
+    public void addResponseToBucket(Response response) {
+        long currentResponseTimestamp = response.getTimestamp();
+        buckets.forEach(bucket -> {
+            if (bucket.getTimeRange().contains(currentResponseTimestamp)) {
+                bucket.addResponse(response);
+            }
+        });
+    }
+
+    public void addMultipleResponsesToBucket(ResponseList responseList) {
+        for (Response response : responseList.getResponses()) {
+            addResponseToBucket(response);
+        }
     }
 }

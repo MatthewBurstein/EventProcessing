@@ -10,6 +10,7 @@ import eventprocessing.models.*;
 import eventprocessing.responseservices.ResponseProcessor;
 import eventprocessing.responseservices.ResponseService;
 import eventprocessing.storage.MessageLog;
+import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,6 +50,8 @@ public class Main {
         System.out.println("For how long do you want to run the event processor(seconds)?");
         int duration = scanner.nextInt();
 
+        System.out.println("Please wait 5 minutes while the initial set of responses is compiled...");
+        int messageCounter = 0;
         while (stopWatch.getTime() < 300000) {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
             for (Message msg : messageResult.getMessages()) {
@@ -61,47 +64,55 @@ public class Main {
                     messageLog.truncateIfExceedsMaxSize();
                 }
             }
+            if (initialResponseList.getResponses().size()/10 > messageCounter) {
+                System.out.println(initialResponseList.getResponses().size() + " messages stored");
+            }
+            messageCounter = initialResponseList.getResponses().size()/10;
         }
 
-                System.out.println("EXITED FIRST WHILE LOOP");
+        logger.info("Finding earliest timestamp...");
+        long earliestTimestamp = initialResponseList.getEarliestTimestamp();
 
-                while (true) {
-                    ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
-                    for (Message msg : messageResult.getMessages()) {
-                        Response response = responseService.parseResponse(msg.getBody());
-                        if (responseProcessor.isValidMessage(response, sensorList, messageLog)) {
-                            System.out.println("working sensor with id: " + response.getMessage().getLocationId());
-                            System.out.println(msg.getBody());
+        logger.info("Creating bucket...");
+        bucketManager = new BucketManager(earliestTimestamp);
+
+        while (true) {
+            ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
+            for (Message msg : messageResult.getMessages()) {
+                Response response = responseService.parseResponse(msg.getBody());
+                if (responseProcessor.isValidMessage(response, sensorList, messageLog)) {
+                    System.out.println("working sensor with id: " + response.getMessage().getLocationId());
+                    System.out.println(msg.getBody());
 //                    responseList.getResponses().add(response);
-                            messageLog.getMessageHistory().add(response.messageId);
-                            messageLog.truncateIfExceedsMaxSize();
-                        } else {
-                            System.out.println("sensor not working with id: " + response.getMessage().getLocationId());
-                        }
-                    }
-                    System.out.println("=================================================");
-                    Thread.sleep(1000);
+                    messageLog.getMessageHistory().add(response.messageId);
+                    messageLog.truncateIfExceedsMaxSize();
+                } else {
+                    System.out.println("sensor not working with id: " + response.getMessage().getLocationId());
+                }
+            }
+            System.out.println("=================================================");
+            Thread.sleep(1000);
 
 //            double averageValue = analyser.getAverageValue(responseList);
 //            System.out.println("Cumulative average of sensor values: " + averageValue);
 
-                    counter++;
-                    if (counter > duration) {
-                        sqsClient.destroyQueue();
-                        break;
-                    }
-                }
-            }
-
-            private static void createObjects () throws IOException {
-                int MAX_SIZE = 300;
-                responseService = new ResponseService();
-                responseProcessor = new ResponseProcessor();
-                messageLog = new MessageLog(MAX_SIZE);
-                scanner = new Scanner(System.in);
-                amazonController = new AmazonController();
-                initialResponseList = new InitialResponseList();
-                analyser = new Analyser();
-                stopWatch = new StopWatch();
+            counter++;
+            if (counter > duration) {
+                sqsClient.destroyQueue();
+                break;
             }
         }
+    }
+
+    private static void createObjects() throws IOException {
+        int MAX_SIZE = 300;
+        responseService = new ResponseService();
+        responseProcessor = new ResponseProcessor();
+        messageLog = new MessageLog(MAX_SIZE);
+        scanner = new Scanner(System.in);
+        amazonController = new AmazonController();
+        initialResponseList = new InitialResponseList();
+        analyser = new Analyser();
+        stopWatch = new StopWatch();
+    }
+}

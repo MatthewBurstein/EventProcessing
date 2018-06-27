@@ -2,8 +2,6 @@ package eventprocessing.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.math.BigInteger;
-
 public class Response {
     @SerializedName("MessageId")
     public String messageId;
@@ -34,7 +32,7 @@ public class Response {
 
     public double getValue() { return message.getValue(); }
 
-    public BigInteger getTimestamp() {
+    public long getTimestamp() {
         return message.getTimestamp();
     }
 

@@ -20,14 +20,14 @@ public class InitialResponseListTest {
         Response mockResponse1 = Mockito.mock(Response.class);
         Response mockResponse2 = Mockito.mock(Response.class);
         Response mockResponse3 = Mockito.mock(Response.class);
-        when(mockResponse1.getTimestamp()).thenReturn(BigInteger.valueOf(9999));
-        when(mockResponse2.getTimestamp()).thenReturn(BigInteger.valueOf(334));
-        when(mockResponse3.getTimestamp()).thenReturn(BigInteger.valueOf(22));
+        when(mockResponse1.getTimestamp()).thenReturn((long) 9999);
+        when(mockResponse2.getTimestamp()).thenReturn((long) 333);
+        when(mockResponse3.getTimestamp()).thenReturn((long) 22);
         initialResponseList.getResponses().addAll(Lists.newArrayList(mockResponse1, mockResponse2, mockResponse3));
     }
 
     @Test
     public void getEarliestTimestamp_returnsResponseWithEarliestTimestamp() {
-        assertEquals(initialResponseList.getEarliestTimestamp(), BigInteger.valueOf(22));
+        assertEquals(initialResponseList.getEarliestTimestamp(), 22);
     }
 }

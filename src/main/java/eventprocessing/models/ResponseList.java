@@ -10,11 +10,11 @@ import java.util.stream.Stream;
 
 public class ResponseList {
 
-    private Range<BigInteger> timeRange;
+    private Range<Long> timeRange;
     private List<Response> responses = new ArrayList<>();
 
-    public ResponseList(BigInteger startTime) {
-        BigInteger endTime = startTime.add(BigInteger.valueOf(59));
+    public ResponseList(long startTime) {
+        long endTime = startTime + 59;
         this.timeRange = Range.between(startTime, endTime);
     }
 
@@ -34,5 +34,9 @@ public class ResponseList {
 
     public void addResponse(Response response) {
         responses.add(response);
+    }
+
+    public Range<Long> getTimeRange() {
+        return timeRange;
     }
 }
