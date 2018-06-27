@@ -74,7 +74,7 @@ public class Main {
 
         //Initial responses are bucketed
         logger.info("Creating bucket...");
-        bucketManager = new BucketManager(earliestTimestamp);
+        bucketManager = new BucketManager(earliestTimestamp, stopWatch);
         bucketManager.addMultipleResponsesToBucket(initialResponseList);
 
         //Responses from here bucketed as they come in

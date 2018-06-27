@@ -39,4 +39,9 @@ public class ResponseList {
     public Range<Long> getTimeRange() {
         return timeRange;
     }
+
+    public boolean isExpiredAtTime(long time) {
+        return !timeRange.contains(time);
+    }
+
 }

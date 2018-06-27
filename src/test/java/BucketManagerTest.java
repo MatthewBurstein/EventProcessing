@@ -3,6 +3,7 @@ import eventprocessing.models.BucketManager;
 import eventprocessing.models.InitialResponseList;
 import eventprocessing.models.Response;
 import eventprocessing.models.ResponseList;
+import org.apache.commons.lang3.time.StopWatch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,10 +19,12 @@ import static org.mockito.Mockito.when;
 public class BucketManagerTest {
 
     private BucketManager bucketManager;
+    private StopWatch stopWatch;
 
     @Before
     public void createObjects() {
-        bucketManager = new BucketManager(0);
+        stopWatch = Mockito.mock(StopWatch.class);
+        bucketManager = new BucketManager(0, stopWatch);
     }
 
     @After
@@ -108,6 +111,26 @@ public class BucketManagerTest {
         bucketManager.getBuckets().addAll(Lists.newArrayList(mockResponseList1, mockResponseList2));
         ResponseList responseList = bucketManager.remove(mockResponseList2);
         assertEquals(responseList, mockResponseList2);
+    }
+
+    @Test
+    public void removeExpiredBucket_removesBucketIfExpired() {
+        ResponseList firstBucket = bucketManager.getBuckets().get(0);
+        when(stopWatch.getTime()).thenReturn((long) 60);
+
+        ResponseList removedBucket = bucketManager.removeExpiredBucket();
+
+        assertThat(bucketManager.getBuckets()).doesNotContain((firstBucket));
+    }
+
+    @Test
+    public void removeExpiredBucket_returnsRemovedBucket() {
+        ResponseList firstBucket = bucketManager.getBuckets().get(0);
+        when(stopWatch.getTime()).thenReturn((long) 60);
+
+        ResponseList removedBucket = bucketManager.removeExpiredBucket();
+
+        assertEquals(removedBucket, firstBucket);
     }
 
 
