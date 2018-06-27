@@ -31,4 +31,8 @@ public class ResponseList {
                 .map(response -> response.getValue())
                 .collect(Collectors.toList());
     }
+
+    public void addResponse(Response response) {
+        responses.add(response);
+    }
 }

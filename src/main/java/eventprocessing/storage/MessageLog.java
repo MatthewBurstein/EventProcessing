@@ -23,4 +23,8 @@ public class MessageLog {
             currentSize = messageHistory.size();
         }
     }
+
+    public void addMessageHistory(String messageId) {
+        messageHistory.add(messageId);
+    }
 }
