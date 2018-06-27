@@ -48,10 +48,10 @@ public class BucketManager {
         ResponseList removedBucket = null;
         for (ResponseList bucket : buckets) {
             if (bucket.isExpiredAtTime(stopWatch.getTime())) {
-                removedBucket = remove(bucket);
+                removedBucket = bucket;
             }
         }
-        return removedBucket;
+        return remove(removedBucket);
     }
 
     public void addMultipleResponsesToBucket(ResponseList responseList) {

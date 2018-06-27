@@ -1458,3 +1458,30 @@ Message: NULL
 [2018-06-27 14:55:45,885] INFO - Main - Finding earliest timestamp...
 [2018-06-27 14:55:45,900] INFO - Main - Creating bucket...
 [2018-06-27 14:55:57,810] INFO - SqsClient - Destroying queue EventProcessing at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-27 16:56:47,045] DEBUG - Main - App launched
+[2018-06-27 16:56:48,231] DEBUG - S3Client - AWS S3 connection established
+[2018-06-27 16:56:48,761] INFO - SqsClient - Creating queue: EventProcessing
+[2018-06-27 16:56:49,129] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-27 16:56:49,152] INFO - SnSClient - SnsClient created
+[2018-06-27 16:56:49,623] INFO - SqsClient - Creating queue: EventProcessing
+[2018-06-27 16:56:49,650] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-27 16:57:49,642] INFO - Main - Finding earliest timestamp...
+[2018-06-27 16:57:49,653] INFO - Main - Creating bucket...
+[2018-06-27 16:59:40,533] DEBUG - Main - App launched
+[2018-06-27 16:59:41,780] DEBUG - S3Client - AWS S3 connection established
+[2018-06-27 16:59:42,282] INFO - SqsClient - Creating queue: EventProcessing
+[2018-06-27 16:59:42,398] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-27 16:59:42,430] INFO - SnSClient - SnsClient created
+[2018-06-27 16:59:42,785] INFO - SqsClient - Creating queue: EventProcessing
+[2018-06-27 16:59:42,808] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-27 17:04:42,765] INFO - Main - Finding earliest timestamp...
+[2018-06-27 17:04:42,780] INFO - Main - Creating bucket...
+[2018-06-27 17:06:53,525] DEBUG - Main - App launched
+[2018-06-27 17:06:54,686] DEBUG - S3Client - AWS S3 connection established
+[2018-06-27 17:06:55,049] INFO - SqsClient - Creating queue: EventProcessing
+[2018-06-27 17:06:55,197] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-27 17:06:55,219] INFO - SnSClient - SnsClient created
+[2018-06-27 17:06:55,496] INFO - SqsClient - Creating queue: EventProcessing
+[2018-06-27 17:06:55,521] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
+[2018-06-27 17:11:55,468] INFO - Main - Finding earliest timestamp...
+[2018-06-27 17:11:55,494] INFO - Main - Creating bucket...

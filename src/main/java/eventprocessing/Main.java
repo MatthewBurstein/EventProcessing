@@ -5,6 +5,7 @@ import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import eventprocessing.amazonservices.*;
 import eventprocessing.analysis.Analyser;
+import eventprocessing.fileservices.CSVFileService;
 import eventprocessing.fileservices.JSONParser;
 import eventprocessing.models.*;
 import eventprocessing.responseservices.ResponseProcessor;
@@ -30,6 +31,7 @@ public class Main {
     private static BucketManager bucketManager;
     private static Analyser analyser;
     private static StopWatch stopWatch;
+    private static CSVFileService csvFileService;
 
     public static void main(String[] args) throws IOException, InterruptedException {
         logger.debug("App launched");
@@ -77,33 +79,43 @@ public class Main {
         bucketManager = new BucketManager(earliestTimestamp, stopWatch);
         bucketManager.addMultipleResponsesToBucket(initialResponseList);
 
-        //Responses from here bucketed as they come in
-        while (true) {
-            ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
-            for (Message msg : messageResult.getMessages()) {
-                Response response = responseService.parseResponse(msg.getBody());
-                if (responseProcessor.isValidMessage(response, sensorList, messageLog)) {
-                    System.out.println("working sensor with id: " + response.getMessage().getLocationId());
-                    System.out.println(msg.getBody());
-//                    responseList.getResponses().add(response);
-                    bucketManager.addResponseToBucket(response);
-                    messageLog.getMessageHistory().add(response.messageId);
-                    messageLog.truncateIfExceedsMaxSize();
-                } else {
-                    System.out.println("sensor not working with id: " + response.getMessage().getLocationId());
-                }
-            }
-            System.out.println("=================================================");
-            Thread.sleep(1000);
+        ResponseList removedBucket = bucketManager.removeExpiredBucket();
 
-//            double averageValue = analyser.getAverageValue(responseList);
-//            System.out.println("Cumulative average of sensor values: " + averageValue);
-
-            if (stopWatch.getTime() > duration) {
-                sqsClient.destroyQueue();
-                break;
-            }
+        if (removedBucket != null) {
+            csvFileService.writeToFile(removedBucket);
         }
+
+        //Responses from here bucketed as they come in
+//        while (true) {
+//            ResponseList removedBucket = bucketManager.removeExpiredBucket();
+//
+//            csvFileService.writeToFile(removedBucket);
+//
+//            ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
+//            for (Message msg : messageResult.getMessages()) {
+//                Response response = responseService.parseResponse(msg.getBody());
+//                if (responseProcessor.isValidMessage(response, sensorList, messageLog)) {
+//                    System.out.println("working sensor with id: " + response.getMessage().getLocationId());
+//                    System.out.println(msg.getBody());
+////                    responseList.getResponses().add(response);
+//                    bucketManager.addResponseToBucket(response);
+//                    messageLog.getMessageHistory().add(response.messageId);
+//                    messageLog.truncateIfExceedsMaxSize();
+//                } else {
+//                    System.out.println("sensor not working with id: " + response.getMessage().getLocationId());
+//                }
+//            }
+//            System.out.println("=================================================");
+//            Thread.sleep(1000);
+//
+////            double averageValue = analyser.getAverageValue(responseList);
+////            System.out.println("Cumulative average of sensor values: " + averageValue);
+//
+//            if (stopWatch.getTime() > duration) {
+//                sqsClient.destroyQueue();
+//                break;
+//            }
+//        }
     }
 
     private static void createObjects() throws IOException {
@@ -116,5 +128,6 @@ public class Main {
         initialResponseList = new InitialResponseList();
         analyser = new Analyser();
         stopWatch = new StopWatch();
+        csvFileService = new CSVFileService();
     }
 }
