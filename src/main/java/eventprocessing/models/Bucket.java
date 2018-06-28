@@ -47,8 +47,9 @@ public class Bucket {
     }
 
     public boolean isExpiredAtTime(long time) {
-        long maxMsgDelayInSecs = GlobalConstants.BUCKET_UPPER_BOUND * GlobalConstants.MAX_MESSAGE_DELAY_MINS;
-        long expirationTime = timeRange.getMaximum() + maxMsgDelayInSecs;
+
+        long maxMsgOffset = GlobalConstants.BUCKET_UPPER_BOUND * (GlobalConstants.MAX_MESSAGE_DELAY_MINS);
+        long expirationTime = timeRange.getMaximum() + maxMsgOffset;
         return time > expirationTime;
     }
 

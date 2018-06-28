@@ -17,7 +17,7 @@ public class BucketManager {
         this.stopWatch = stopWatch;
 
         nextStartTime = initialTime;
-        while (buckets.size() < GlobalConstants.MAX_MESSAGE_DELAY_MINS) {
+        while (buckets.size() <= GlobalConstants.MAX_MESSAGE_DELAY_MINS) {
             createBucket(nextStartTime);
         }
     }
@@ -51,11 +51,10 @@ public class BucketManager {
         }
     }
 
-    public Bucket removeExpiredBucket(long earliestTimestamp) {
+    public Bucket removeExpiredBucket(long expiryTime) {
         Bucket removedBucket = null;
         for (Bucket bucket : buckets) {
-            if (bucket.isExpiredAtTime(stopWatch.getTime() + earliestTimestamp)) {
-                System.out.println("Removed bucket time: " + stopWatch.getTime() + earliestTimestamp);
+            if (bucket.isExpiredAtTime(expiryTime)) {
                 removedBucket = bucket;
             }
         }

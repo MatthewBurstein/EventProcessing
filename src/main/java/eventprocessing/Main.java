@@ -45,14 +45,14 @@ public class Main {
 
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
 
-//        System.out.println("For how long do you want to run the event processor(seconds)?");
-//        int duration = scanner.nextInt();
+        System.out.println("How many minutes to run for?\nMUST be at least 1 minute longer than " + GlobalConstants.MAX_MESSAGE_DELAY_MINS + " mins");
+        int duration = scanner.nextInt();
 
-        System.out.println("Please wait " + GlobalConstants.MAX_MESSAGE_DELAY_MINS + " minutes while the initial set of responses is compiled...");
+//        System.out.println("Please wait " + GlobalConstants.MAX_MESSAGE_DELAY_MINS + " minutes while the initial set of responses is compiled...");
         int messageCounter = 0;
 
         //initial while loop stores five minutes of data with no buckets
-        while (stopWatch.getTime() < GlobalConstants.FIRST_LOOP_DURATION) {
+        while (stopWatch.getTime() < (duration*60000 + 1000)) {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
             for (Message msg : messageResult.getMessages()) {
                 Response response = responseService.parseResponse(msg.getBody());
@@ -66,16 +66,18 @@ public class Main {
             messageCounter = initialBucket.getResponses().size() / GlobalConstants.MULTIPLES_OF_MESSAGES;
         }
 
-        System.out.println("Out of loop at (stopwatch time): " + stopWatch.getTime());
-
+        System.out.println("RESPONSE TIMESTAMPS");
         initialBucket.getResponses().forEach(response -> {
-            System.out.println("Initial Bucket Response IDs: " + response.getTimestamp());
+            System.out.println(response.getTimestamp());
 //            System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         });
+        System.out.println("++++++++++++++++++++++++++++++++++++++++");
 
         logger.info("Finding earliest timestamp...");
         long earliestTimestamp = initialBucket.getEarliestTimestamp();
+        long expiryTime = earliestTimestamp + GlobalConstants.MAX_MESSAGE_DELAY_MINS * GlobalConstants.BUCKET_UPPER_BOUND;
 
+        System.out.println("stopwatch.getStartTime = " + stopWatch.getStartTime());
         System.out.println("earliest Time stamp " + earliestTimestamp);
 
         //Initial responses are bucketed
@@ -86,6 +88,7 @@ public class Main {
         bucketManager.addMultipleResponsesToBucket(initialBucket);
 
         bucketManager.getBuckets().forEach(bucket -> {
+            System.out.println("BucketManager bucket isExpiredAtTime" + bucket.isExpiredAtTime(expiryTime));
             System.out.println("BucketManager bucket message IDs" + bucket.getMessageIds());
             System.out.println("BucketManager bucket timerange " + bucket.getTimeRange());
             System.out.println("BucketManager bucket number of responses " + bucket.getResponses().size());
@@ -93,7 +96,7 @@ public class Main {
         });
 
 
-        Bucket removedBucket = bucketManager.removeExpiredBucket(earliestTimestamp);
+        Bucket removedBucket = bucketManager.removeExpiredBucket(expiryTime);
         System.out.println("Removed bucket " + removedBucket);
 
         if (removedBucket != null) {
