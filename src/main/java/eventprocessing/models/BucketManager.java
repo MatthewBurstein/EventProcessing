@@ -45,21 +45,23 @@ public class BucketManager {
         });
     }
 
-    public Bucket removeExpiredBucket() {
+    public void addMultipleResponsesToBucket(Bucket bucket) {
+        for (Response response : bucket.getResponses()) {
+            addResponseToBucket(response);
+        }
+    }
+
+    public Bucket removeExpiredBucket(long earliestTimestamp) {
         Bucket removedBucket = null;
         for (Bucket bucket : buckets) {
-            if (bucket.isExpiredAtTime(stopWatch.getTime())) {
+            if (bucket.isExpiredAtTime(stopWatch.getTime() + earliestTimestamp)) {
+                System.out.println("Removed bucket time: " + stopWatch.getTime() + earliestTimestamp);
                 removedBucket = bucket;
             }
         }
         return remove(removedBucket);
     }
 
-    public void addMultipleResponsesToBucket(Bucket bucket) {
-        for (Response response : bucket.getResponses()) {
-            addResponseToBucket(response);
-        }
-    }
 
     public Bucket remove(Bucket bucket) {
         buckets.remove(bucket);

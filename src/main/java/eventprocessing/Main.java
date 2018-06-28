@@ -45,10 +45,10 @@ public class Main {
 
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
 
-        System.out.println("For how long do you want to run the event processor(seconds)?");
-        int duration = scanner.nextInt();
+//        System.out.println("For how long do you want to run the event processor(seconds)?");
+//        int duration = scanner.nextInt();
 
-        System.out.println("Please wait 5 minutes while the initial set of responses is compiled...");
+        System.out.println("Please wait " + GlobalConstants.MAX_MESSAGE_DELAY_MINS + " minutes while the initial set of responses is compiled...");
         int messageCounter = 0;
 
         //initial while loop stores five minutes of data with no buckets
@@ -65,15 +65,36 @@ public class Main {
             }
             messageCounter = initialBucket.getResponses().size() / GlobalConstants.MULTIPLES_OF_MESSAGES;
         }
+
+        System.out.println("Out of loop at (stopwatch time): " + stopWatch.getTime());
+
+        initialBucket.getResponses().forEach(response -> {
+            System.out.println("Initial Bucket Response IDs: " + response.getTimestamp());
+//            System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        });
+
         logger.info("Finding earliest timestamp...");
         long earliestTimestamp = initialBucket.getEarliestTimestamp();
 
+        System.out.println("earliest Time stamp " + earliestTimestamp);
+
         //Initial responses are bucketed
         logger.info("Creating bucket...");
+
         bucketManager = new BucketManager(earliestTimestamp, stopWatch);
+
         bucketManager.addMultipleResponsesToBucket(initialBucket);
 
-        Bucket removedBucket = bucketManager.removeExpiredBucket();
+        bucketManager.getBuckets().forEach(bucket -> {
+            System.out.println("BucketManager bucket message IDs" + bucket.getMessageIds());
+            System.out.println("BucketManager bucket timerange " + bucket.getTimeRange());
+            System.out.println("BucketManager bucket number of responses " + bucket.getResponses().size());
+            System.out.println("--------------------------------------------------------------------------");
+        });
+
+
+        Bucket removedBucket = bucketManager.removeExpiredBucket(earliestTimestamp);
+        System.out.println("Removed bucket " + removedBucket);
 
         if (removedBucket != null) {
             csvFileService.writeToFile(removedBucket);
