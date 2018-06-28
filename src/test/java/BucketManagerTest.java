@@ -13,7 +13,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class BucketManagerTest {
@@ -116,15 +115,15 @@ public class BucketManagerTest {
     @Test
     public void removeExpiredBucket_removesBucketIfExpired() {
         ResponseList firstBucket = bucketManager.getBuckets().get(0);
-        when(stopWatch.getTime()).thenReturn((long) 60);
-        ResponseList removedBucket = bucketManager.removeExpiredBucket();
+        when(stopWatch.getTime()).thenReturn((long) 360);
+        bucketManager.removeExpiredBucket();
         assertThat(bucketManager.getBuckets()).doesNotContain((firstBucket));
     }
 
     @Test
     public void removeExpiredBucket_returnsRemovedBucket() {
         ResponseList firstBucket = bucketManager.getBuckets().get(0);
-        when(stopWatch.getTime()).thenReturn((long) 60);
+        when(stopWatch.getTime()).thenReturn((long) 360);
         ResponseList removedBucket = bucketManager.removeExpiredBucket();
         assertEquals(removedBucket, firstBucket);
     }

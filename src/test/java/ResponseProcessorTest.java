@@ -1,9 +1,7 @@
 import com.google.common.collect.Lists;
 import eventprocessing.models.*;
 import eventprocessing.responseservices.ResponseProcessor;
-import eventprocessing.storage.MessageLog;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 

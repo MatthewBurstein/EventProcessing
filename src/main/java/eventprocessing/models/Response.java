@@ -2,8 +2,6 @@ package eventprocessing.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 public class Response {
     @SerializedName("MessageId")
     public String messageId;
@@ -20,6 +18,14 @@ public class Response {
         }
     }
 
+    public void setMessage(Message message) {
+        this.message = message;
+    }
+
+    public Message getMessage() {
+        return message;
+    }
+
     public String getMessageId() {
         return messageId;
     }
@@ -28,17 +34,12 @@ public class Response {
         return messageString;
     }
 
-    public Message getMessage() {
-        return message;
+    public double getValue() {
+        return message.getValue();
     }
-
-    public double getValue() { return message.getValue(); }
 
     public long getTimestamp() {
         return message.getTimestamp();
     }
 
-    public void setMessage(Message message) {
-        this.message = message;
-    }
 }

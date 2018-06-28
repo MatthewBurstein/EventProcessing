@@ -1,9 +1,8 @@
 package eventprocessing.models;
 
-import org.apache.commons.lang3.Range;
+import eventprocessing.GlobalConstants;
 import org.apache.commons.lang3.time.StopWatch;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -18,7 +17,7 @@ public class BucketManager {
         this.stopWatch = stopWatch;
 
         nextStartTime = initialTime;
-        while (buckets.size() < 5) {
+        while (buckets.size() < GlobalConstants.MAX_MESSAGE_DELAY_MINS) {
             createBucket(nextStartTime);
         }
     }
@@ -26,7 +25,7 @@ public class BucketManager {
     public void createBucket(long thisBucketStartTime) {
         ResponseList bucket = new ResponseList(thisBucketStartTime);
         buckets.add(bucket);
-        nextStartTime = thisBucketStartTime + 60;
+        nextStartTime = thisBucketStartTime + GlobalConstants.BUCKET_UPPER_BOUND;
     }
 
     public List<ResponseList> getBuckets() {

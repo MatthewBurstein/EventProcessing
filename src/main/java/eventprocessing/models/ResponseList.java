@@ -1,12 +1,11 @@
 package eventprocessing.models;
 
+import eventprocessing.GlobalConstants;
 import org.apache.commons.lang3.Range;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ResponseList {
 
@@ -14,11 +13,16 @@ public class ResponseList {
     private List<Response> responses = new ArrayList<>();
 
     public ResponseList(long startTime) {
-        long endTime = startTime + 59;
+        long endTime = startTime + GlobalConstants.THIS_BUCKET_RANGE;
         this.timeRange = Range.between(startTime, endTime);
     }
 
     public ResponseList() {
+        //Constructor for InitialResponseList
+    }
+
+    public void addResponse(Response response) {
+        responses.add(response);
     }
 
     public List<Response> getResponses() {
@@ -32,8 +36,10 @@ public class ResponseList {
                 .collect(Collectors.toList());
     }
 
-    public void addResponse(Response response) {
-        responses.add(response);
+    public List<String> getMessageIds() {
+        return responses.stream()
+                .map(response -> response.getMessageId())
+                .collect(Collectors.toList());
     }
 
     public Range<Long> getTimeRange() {
@@ -41,13 +47,9 @@ public class ResponseList {
     }
 
     public boolean isExpiredAtTime(long time) {
-        return !timeRange.contains(time);
-    }
-
-    public List<String> getMessageIds() {
-        return responses.stream()
-                .map(response -> response.getMessageId())
-                .collect(Collectors.toList());
+        long maxMsgDelayInSecs = GlobalConstants.BUCKET_UPPER_BOUND * GlobalConstants.MAX_MESSAGE_DELAY_MINS;
+        long expirationTime = timeRange.getMaximum() + maxMsgDelayInSecs;
+        return time > expirationTime;
     }
 
 }

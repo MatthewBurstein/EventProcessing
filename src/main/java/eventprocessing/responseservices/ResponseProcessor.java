@@ -23,7 +23,7 @@ public class ResponseProcessor {
 
     public boolean isDuplicateMessage(Response response, ResponseList responseList) {
         boolean result = responseList.getMessageIds().contains(response.getMessageId());
-        if (result == true) { logger.info("Removed duplicate message with ID: " + response.getMessageId()); }
+        if (result) { logger.info("Removed duplicate message with ID: " + response.getMessageId()); }
         return result;
     }
 }

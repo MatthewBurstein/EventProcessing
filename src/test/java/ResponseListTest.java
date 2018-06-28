@@ -1,7 +1,5 @@
-import eventprocessing.models.Message;
 import eventprocessing.models.Response;
 import eventprocessing.models.ResponseList;
-import junit.framework.TestCase;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +9,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 public class ResponseListTest {
@@ -24,13 +22,23 @@ public class ResponseListTest {
     }
 
     @Test
-    public void isExpiredAtTime_returnsFalseWhenPassedArgumentInRange() {
+    public void isExpiredAtTime_returnsTrueWhenPassedArgumentIsBeforeRange() {
+        assertFalse(responseList.isExpiredAtTime(90));
+    }
+
+    @Test
+    public void isExpiredAtTime_returnsFalseWhenPassedArgumentIsInRange() {
         assertFalse(responseList.isExpiredAtTime(101));
     }
 
     @Test
-    public void isExpiredAtTime_returnsTrueWhenPassedArgumentOutsideRange() {
-        TestCase.assertTrue(responseList.isExpiredAtTime(160));
+    public void isExpiredAtTime_returnsFalseWhenPassedArgumentIsWithinFiveMins() {
+        assertFalse(responseList.isExpiredAtTime(200));
+    }
+
+    @Test
+    public void isExpiredAtTime_returnsFalseWhenPassedArgumentIsAfterFiveMins() {
+        assertTrue(responseList.isExpiredAtTime(461));
     }
     
     @Test

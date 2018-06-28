@@ -1485,3 +1485,8 @@ Message: NULL
 [2018-06-27 17:06:55,521] INFO - SqsClient - Queue EventProcessing created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing
 [2018-06-27 17:11:55,468] INFO - Main - Finding earliest timestamp...
 [2018-06-27 17:11:55,494] INFO - Main - Creating bucket...
+[2018-06-28 11:34:06,003] INFO - ResponseProcessor - Removed duplicate message with ID: messageId1
+[2018-06-28 11:45:29,122] INFO - ResponseProcessor - Removed duplicate message with ID: messageId1
+[2018-06-28 12:13:22,190] INFO - ResponseProcessor - Removed duplicate message with ID: messageId1
+[2018-06-28 12:14:39,576] INFO - ResponseProcessor - Removed duplicate message with ID: messageId1
+[2018-06-28 12:15:29,803] INFO - ResponseProcessor - Removed duplicate message with ID: messageId1

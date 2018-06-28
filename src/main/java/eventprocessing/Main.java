@@ -50,21 +50,20 @@ public class Main {
 
         System.out.println("Please wait 5 minutes while the initial set of responses is compiled...");
         int messageCounter = 0;
+
         //initial while loop stores five minutes of data with no buckets
-        while (stopWatch.getTime() < 300000) {
+        while (stopWatch.getTime() < GlobalConstants.FIRST_LOOP_DURATION) {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
             for (Message msg : messageResult.getMessages()) {
                 Response response = responseService.parseResponse(msg.getBody());
                 if (responseProcessor.isValidMessage(response, sensorList, initialResponseList)) {
-//                    System.out.println("working sensor with id: " + response.getMessage().getLocationId());
-//                    System.out.println(msg.getBody());
                     initialResponseList.addResponse(response);
                 }
             }
-            if (initialResponseList.getResponses().size()/10 > messageCounter) {
+            if (initialResponseList.getResponses().size() / GlobalConstants.MULTIPLES_OF_MESSAGES > messageCounter) {
                 System.out.println(initialResponseList.getResponses().size() + " messages stored");
             }
-            messageCounter = initialResponseList.getResponses().size()/10;
+            messageCounter = initialResponseList.getResponses().size() / GlobalConstants.MULTIPLES_OF_MESSAGES;
         }
         logger.info("Finding earliest timestamp...");
         long earliestTimestamp = initialResponseList.getEarliestTimestamp();
@@ -114,10 +113,8 @@ public class Main {
     }
 
     private static void createObjects() throws IOException {
-        int MAX_SIZE = 300;
         responseService = new ResponseService();
         responseProcessor = new ResponseProcessor();
-        messageLog = new MessageLog(MAX_SIZE);
         scanner = new Scanner(System.in);
         amazonController = new AmazonController();
         initialResponseList = new InitialResponseList();
