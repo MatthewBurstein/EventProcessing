@@ -10,8 +10,6 @@ import eventprocessing.fileservices.JSONParser;
 import eventprocessing.models.*;
 import eventprocessing.responseservices.ResponseProcessor;
 import eventprocessing.responseservices.ResponseService;
-import eventprocessing.storage.MessageLog;
-import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +22,6 @@ public class Main {
 
     private static ResponseService responseService;
     private static ResponseProcessor responseProcessor;
-    private static MessageLog messageLog;
     private static Scanner scanner;
     private static AmazonController amazonController;
     private static InitialResponseList initialResponseList;
