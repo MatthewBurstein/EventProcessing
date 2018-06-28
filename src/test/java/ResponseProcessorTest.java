@@ -15,7 +15,7 @@ public class ResponseProcessorTest {
     private SensorList mockSensorList;
     private Message mockMessage;
     private Response mockResponse;
-    private ResponseList mockResponseList;
+    private Bucket mockBucket;
     private ResponseProcessor responseProcessor;
 
     @Before
@@ -28,8 +28,8 @@ public class ResponseProcessorTest {
         mockResponse = Mockito.mock(Response.class);
         when(mockResponse.getMessage()).thenReturn(mockMessage);
 
-        mockResponseList = Mockito.mock(ResponseList.class);
-        when(mockResponseList.getMessageIds()).thenReturn(Lists.newArrayList("messageId1", "messageId2"));
+        mockBucket = Mockito.mock(Bucket.class);
+        when(mockBucket.getMessageIds()).thenReturn(Lists.newArrayList("messageId1", "messageId2"));
 
         responseProcessor = new ResponseProcessor();
     }
@@ -49,12 +49,12 @@ public class ResponseProcessorTest {
     @Test
     public void isDuplicateMessage_whenDuplicate_returnsTrue() {
         when(mockResponse.getMessageId()).thenReturn("messageId1");
-        assertTrue(responseProcessor.isDuplicateMessage(mockResponse, mockResponseList));
+        assertTrue(responseProcessor.isDuplicateMessage(mockResponse, mockBucket));
     }
 
     @Test
     public void isDuplicateMessage_whenNotDuplicate_returnsFalse() {
         when(mockResponse.getMessageId()).thenReturn("newMessageId");
-        assertFalse(responseProcessor.isDuplicateMessage(mockResponse, mockResponseList));
+        assertFalse(responseProcessor.isDuplicateMessage(mockResponse, mockBucket));
     }
 }

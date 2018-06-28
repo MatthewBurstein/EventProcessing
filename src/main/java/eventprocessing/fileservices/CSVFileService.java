@@ -1,7 +1,7 @@
 package eventprocessing.fileservices;
 
 import eventprocessing.analysis.Analyser;
-import eventprocessing.models.ResponseList;
+import eventprocessing.models.Bucket;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 public class CSVFileService {
     private static final String outputCsvFile = "ResponseData.csv";
 
-    public void writeToFile(ResponseList bucketToWriteToFile) throws IOException {
+    public void writeToFile(Bucket bucketToWriteToFile) throws IOException {
         Analyser analyser = new Analyser();
 
         try (

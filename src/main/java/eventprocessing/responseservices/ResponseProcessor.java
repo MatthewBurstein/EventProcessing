@@ -1,7 +1,7 @@
 package eventprocessing.responseservices;
 
 import eventprocessing.models.Response;
-import eventprocessing.models.ResponseList;
+import eventprocessing.models.Bucket;
 import eventprocessing.models.SensorList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,12 +17,12 @@ public class ResponseProcessor {
         return count > 0;
     }
 
-    public boolean isValidMessage(Response response, SensorList sensorList, ResponseList responseList) {
-        return isWorkingSensor(response, sensorList) && !isDuplicateMessage(response, responseList);
+    public boolean isValidMessage(Response response, SensorList sensorList, Bucket bucket) {
+        return isWorkingSensor(response, sensorList) && !isDuplicateMessage(response, bucket);
     }
 
-    public boolean isDuplicateMessage(Response response, ResponseList responseList) {
-        boolean result = responseList.getMessageIds().contains(response.getMessageId());
+    public boolean isDuplicateMessage(Response response, Bucket bucket) {
+        boolean result = bucket.getMessageIds().contains(response.getMessageId());
         if (result) { logger.info("Removed duplicate message with ID: " + response.getMessageId()); }
         return result;
     }

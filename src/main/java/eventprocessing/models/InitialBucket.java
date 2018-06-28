@@ -3,9 +3,9 @@ package eventprocessing.models;
 import java.util.Comparator;
 import java.util.Optional;
 
-public class InitialResponseList extends ResponseList {
+public class InitialBucket extends Bucket {
 
-    public InitialResponseList() {
+    public InitialBucket() {
         super();
     }
 

@@ -24,7 +24,7 @@ public class Main {
     private static ResponseProcessor responseProcessor;
     private static Scanner scanner;
     private static AmazonController amazonController;
-    private static InitialResponseList initialResponseList;
+    private static InitialBucket initialBucket;
     private static BucketManager bucketManager;
     private static Analyser analyser;
     private static StopWatch stopWatch;
@@ -56,24 +56,24 @@ public class Main {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
             for (Message msg : messageResult.getMessages()) {
                 Response response = responseService.parseResponse(msg.getBody());
-                if (responseProcessor.isValidMessage(response, sensorList, initialResponseList)) {
-                    initialResponseList.addResponse(response);
+                if (responseProcessor.isValidMessage(response, sensorList, initialBucket)) {
+                    initialBucket.addResponse(response);
                 }
             }
-            if (initialResponseList.getResponses().size() / GlobalConstants.MULTIPLES_OF_MESSAGES > messageCounter) {
-                System.out.println(initialResponseList.getResponses().size() + " messages stored");
+            if (initialBucket.getResponses().size() / GlobalConstants.MULTIPLES_OF_MESSAGES > messageCounter) {
+                System.out.println(initialBucket.getResponses().size() + " messages stored");
             }
-            messageCounter = initialResponseList.getResponses().size() / GlobalConstants.MULTIPLES_OF_MESSAGES;
+            messageCounter = initialBucket.getResponses().size() / GlobalConstants.MULTIPLES_OF_MESSAGES;
         }
         logger.info("Finding earliest timestamp...");
-        long earliestTimestamp = initialResponseList.getEarliestTimestamp();
+        long earliestTimestamp = initialBucket.getEarliestTimestamp();
 
         //Initial responses are bucketed
         logger.info("Creating bucket...");
         bucketManager = new BucketManager(earliestTimestamp, stopWatch);
-        bucketManager.addMultipleResponsesToBucket(initialResponseList);
+        bucketManager.addMultipleResponsesToBucket(initialBucket);
 
-        ResponseList removedBucket = bucketManager.removeExpiredBucket();
+        Bucket removedBucket = bucketManager.removeExpiredBucket();
 
         if (removedBucket != null) {
             csvFileService.writeToFile(removedBucket);
@@ -81,7 +81,7 @@ public class Main {
 
         //Responses from here bucketed as they come in
 //        while (true) {
-//            ResponseList removedBucket = bucketManager.removeExpiredBucket();
+//            Bucket removedBucket = bucketManager.removeExpiredBucket();
 //
 //            csvFileService.writeToFile(removedBucket);
 //
@@ -117,7 +117,7 @@ public class Main {
         responseProcessor = new ResponseProcessor();
         scanner = new Scanner(System.in);
         amazonController = new AmazonController();
-        initialResponseList = new InitialResponseList();
+        initialBucket = new InitialBucket();
         analyser = new Analyser();
         stopWatch = new StopWatch();
         csvFileService = new CSVFileService();

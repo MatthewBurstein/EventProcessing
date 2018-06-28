@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class BucketManager {
-    private List<ResponseList> buckets = new ArrayList<>();
+    private List<Bucket> buckets = new ArrayList<>();
     private long nextStartTime;
     private StopWatch stopWatch;
 
@@ -23,12 +23,12 @@ public class BucketManager {
     }
 
     public void createBucket(long thisBucketStartTime) {
-        ResponseList bucket = new ResponseList(thisBucketStartTime);
+        Bucket bucket = new Bucket(thisBucketStartTime);
         buckets.add(bucket);
         nextStartTime = thisBucketStartTime + GlobalConstants.BUCKET_UPPER_BOUND;
     }
 
-    public List<ResponseList> getBuckets() {
+    public List<Bucket> getBuckets() {
         return buckets;
     }
 
@@ -45,9 +45,9 @@ public class BucketManager {
         });
     }
 
-    public ResponseList removeExpiredBucket() {
-        ResponseList removedBucket = null;
-        for (ResponseList bucket : buckets) {
+    public Bucket removeExpiredBucket() {
+        Bucket removedBucket = null;
+        for (Bucket bucket : buckets) {
             if (bucket.isExpiredAtTime(stopWatch.getTime())) {
                 removedBucket = bucket;
             }
@@ -55,15 +55,15 @@ public class BucketManager {
         return remove(removedBucket);
     }
 
-    public void addMultipleResponsesToBucket(ResponseList responseList) {
-        for (Response response : responseList.getResponses()) {
+    public void addMultipleResponsesToBucket(Bucket bucket) {
+        for (Response response : bucket.getResponses()) {
             addResponseToBucket(response);
         }
     }
 
-    public ResponseList remove(ResponseList responseList) {
-        buckets.remove(responseList);
-        return responseList;
+    public Bucket remove(Bucket bucket) {
+        buckets.remove(bucket);
+        return bucket;
     }
 
     public List<String> getMessageIds() {

@@ -1,7 +1,7 @@
 import com.google.common.collect.Lists;
 import eventprocessing.analysis.Analyser;
+import eventprocessing.models.Bucket;
 import eventprocessing.models.Response;
-import eventprocessing.models.ResponseList;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -15,14 +15,14 @@ public class AnalyserTest {
     @Test
     public void getAverageValue_returnsAverageOfMessageValues() {
         Analyser analyser = new Analyser();
-        ResponseList mockResponseList = Mockito.mock(ResponseList.class);
+        Bucket mockBucket = Mockito.mock(Bucket.class);
         Response mockResponse = Mockito.mock(Response.class);
         List<Response> mockResponses = Lists.newArrayList(mockResponse, mockResponse, mockResponse);
         ArrayList<Double> mockValues = Lists.newArrayList(1.0,2.0,3.0);
-        when(mockResponseList.getMessageValues()).thenReturn(mockValues);
-        when(mockResponseList.getResponses()).thenReturn(mockResponses);
+        when(mockBucket.getMessageValues()).thenReturn(mockValues);
+        when(mockBucket.getResponses()).thenReturn(mockResponses);
 
         double expectedValue = 2.0;
-        assertEquals(expectedValue, analyser.getAverageValue(mockResponseList), 0);
+        assertEquals(expectedValue, analyser.getAverageValue(mockBucket), 0);
     }
 }

@@ -1,9 +1,6 @@
 package eventprocessing.analysis;
 
-import eventprocessing.models.Response;
-import eventprocessing.models.ResponseList;
-
-import java.util.Optional;
+import eventprocessing.models.Bucket;
 
 public class Analyser {
 
@@ -11,13 +8,13 @@ public class Analyser {
         return accumulator + currentValue;
     }
 
-    public double getAverageValue(ResponseList responseList) {
+    public double getAverageValue(Bucket bucket) {
 
-        double total = responseList.getMessageValues()
+        double total = bucket.getMessageValues()
                 .stream()
                 .reduce(0.0, Double::sum);
 
-        return total / responseList.getResponses().size();
+        return total / bucket.getResponses().size();
     }
 
 }

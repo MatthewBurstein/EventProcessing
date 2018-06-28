@@ -1,8 +1,8 @@
 import com.google.common.collect.Lists;
+import eventprocessing.models.Bucket;
 import eventprocessing.models.BucketManager;
-import eventprocessing.models.InitialResponseList;
+import eventprocessing.models.InitialBucket;
 import eventprocessing.models.Response;
-import eventprocessing.models.ResponseList;
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.After;
 import org.junit.Before;
@@ -58,13 +58,13 @@ public class BucketManagerTest {
         Response mockResponse = Mockito.mock(Response.class);
         when(mockResponse.getTimestamp()).thenReturn((long) 110);
         bucketManager.addResponseToBucket(mockResponse);
-        List<ResponseList> responseList = bucketManager.getBuckets();
+        List<Bucket> bucket = bucketManager.getBuckets();
 
-        assertThat(responseList.get(1).getResponses()).containsOnly(mockResponse);
-        assertThat(responseList.get(0).getResponses()).doesNotContain(mockResponse);
-        assertThat(responseList.get(2).getResponses()).doesNotContain(mockResponse);
-        assertThat(responseList.get(3).getResponses()).doesNotContain(mockResponse);
-        assertThat(responseList.get(4).getResponses()).doesNotContain(mockResponse);
+        assertThat(bucket.get(1).getResponses()).containsOnly(mockResponse);
+        assertThat(bucket.get(0).getResponses()).doesNotContain(mockResponse);
+        assertThat(bucket.get(2).getResponses()).doesNotContain(mockResponse);
+        assertThat(bucket.get(3).getResponses()).doesNotContain(mockResponse);
+        assertThat(bucket.get(4).getResponses()).doesNotContain(mockResponse);
     }
 
     @Test
@@ -80,11 +80,11 @@ public class BucketManagerTest {
         Response mockResponse5 = Mockito.mock(Response.class);
         when(mockResponse5.getTimestamp()).thenReturn((long) 200);
 
-        InitialResponseList mockResponseList = Mockito.mock(InitialResponseList.class);
+        InitialBucket mockResponseList = Mockito.mock(InitialBucket.class);
         when(mockResponseList.getResponses()).thenReturn(Lists.newArrayList(mockResponse1, mockResponse2,
                 mockResponse3, mockResponse4, mockResponse5));
         bucketManager.addMultipleResponsesToBucket(mockResponseList);
-        List<ResponseList> buckets = bucketManager.getBuckets();
+        List<Bucket> buckets = bucketManager.getBuckets();
 
         assertThat(buckets.get(0).getResponses()).containsOnly(mockResponse2);
         assertThat(buckets.get(1).getResponses()).containsOnly(mockResponse1);
@@ -95,26 +95,26 @@ public class BucketManagerTest {
 
     @Test
     public void remove_removesSpecifiedBucket() {
-        ResponseList mockResponseList1 = Mockito.mock(ResponseList.class);
-        ResponseList mockResponseList2 = Mockito.mock(ResponseList.class);
-        bucketManager.getBuckets().addAll(Lists.newArrayList(mockResponseList1, mockResponseList2));
-        bucketManager.remove(mockResponseList2);
-        assertThat(bucketManager.getBuckets()).contains(mockResponseList1);
-        assertThat(bucketManager.getBuckets()).doesNotContain(mockResponseList2);
+        Bucket mockBucket1 = Mockito.mock(Bucket.class);
+        Bucket mockBucket2 = Mockito.mock(Bucket.class);
+        bucketManager.getBuckets().addAll(Lists.newArrayList(mockBucket1, mockBucket2));
+        bucketManager.remove(mockBucket2);
+        assertThat(bucketManager.getBuckets()).contains(mockBucket1);
+        assertThat(bucketManager.getBuckets()).doesNotContain(mockBucket2);
     }
 
     @Test
     public void remove_returnsRemovedBucket() {
-        ResponseList mockResponseList1 = Mockito.mock(ResponseList.class);
-        ResponseList mockResponseList2 = Mockito.mock(ResponseList.class);
-        bucketManager.getBuckets().addAll(Lists.newArrayList(mockResponseList1, mockResponseList2));
-        ResponseList responseList = bucketManager.remove(mockResponseList2);
-        assertEquals(responseList, mockResponseList2);
+        Bucket mockBucket1 = Mockito.mock(Bucket.class);
+        Bucket mockBucket2 = Mockito.mock(Bucket.class);
+        bucketManager.getBuckets().addAll(Lists.newArrayList(mockBucket1, mockBucket2));
+        Bucket bucket = bucketManager.remove(mockBucket2);
+        assertEquals(bucket, mockBucket2);
     }
 
     @Test
     public void removeExpiredBucket_removesBucketIfExpired() {
-        ResponseList firstBucket = bucketManager.getBuckets().get(0);
+        Bucket firstBucket = bucketManager.getBuckets().get(0);
         when(stopWatch.getTime()).thenReturn((long) 360);
         bucketManager.removeExpiredBucket();
         assertThat(bucketManager.getBuckets()).doesNotContain((firstBucket));
@@ -122,17 +122,17 @@ public class BucketManagerTest {
 
     @Test
     public void removeExpiredBucket_returnsRemovedBucket() {
-        ResponseList firstBucket = bucketManager.getBuckets().get(0);
+        Bucket firstBucket = bucketManager.getBuckets().get(0);
         when(stopWatch.getTime()).thenReturn((long) 360);
-        ResponseList removedBucket = bucketManager.removeExpiredBucket();
+        Bucket removedBucket = bucketManager.removeExpiredBucket();
         assertEquals(removedBucket, firstBucket);
     }
 
     @Test
     public void getMessageIds_returnsListOfMessageIds() {
-        ResponseList mockBucket1 = Mockito.mock(ResponseList.class);
+        Bucket mockBucket1 = Mockito.mock(Bucket.class);
         when(mockBucket1.getMessageIds()).thenReturn(Lists.newArrayList("bucket1 id1", "bucket1 id2"));
-        ResponseList mockBucket2 = Mockito.mock(ResponseList.class);
+        Bucket mockBucket2 = Mockito.mock(Bucket.class);
         when(mockBucket2.getMessageIds()).thenReturn(Lists.newArrayList("bucket2 id1"));
         bucketManager.getBuckets().addAll(Lists.newArrayList(mockBucket1, mockBucket2));
         List<String> expected = Lists.newArrayList("bucket1 id1", "bucket1 id2", "bucket2 id1");
