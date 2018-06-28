@@ -117,9 +117,7 @@ public class BucketManagerTest {
     public void removeExpiredBucket_removesBucketIfExpired() {
         ResponseList firstBucket = bucketManager.getBuckets().get(0);
         when(stopWatch.getTime()).thenReturn((long) 60);
-
         ResponseList removedBucket = bucketManager.removeExpiredBucket();
-
         assertThat(bucketManager.getBuckets()).doesNotContain((firstBucket));
     }
 
@@ -127,11 +125,21 @@ public class BucketManagerTest {
     public void removeExpiredBucket_returnsRemovedBucket() {
         ResponseList firstBucket = bucketManager.getBuckets().get(0);
         when(stopWatch.getTime()).thenReturn((long) 60);
-
         ResponseList removedBucket = bucketManager.removeExpiredBucket();
-
         assertEquals(removedBucket, firstBucket);
     }
+
+    @Test
+    public void getMessageIds_returnsListOfMessageIds() {
+        ResponseList mockBucket1 = Mockito.mock(ResponseList.class);
+        when(mockBucket1.getMessageIds()).thenReturn(Lists.newArrayList("bucket1 id1", "bucket1 id2"));
+        ResponseList mockBucket2 = Mockito.mock(ResponseList.class);
+        when(mockBucket2.getMessageIds()).thenReturn(Lists.newArrayList("bucket2 id1"));
+        bucketManager.getBuckets().addAll(Lists.newArrayList(mockBucket1, mockBucket2));
+        List<String> expected = Lists.newArrayList("bucket1 id1", "bucket1 id2", "bucket2 id1");
+        assertEquals(bucketManager.getMessageIds(), expected);
+    }
+
 
 
 }

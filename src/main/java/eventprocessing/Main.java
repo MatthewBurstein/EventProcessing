@@ -58,12 +58,10 @@ public class Main {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
             for (Message msg : messageResult.getMessages()) {
                 Response response = responseService.parseResponse(msg.getBody());
-                if (responseProcessor.isValidMessage(response, sensorList, messageLog)) {
+                if (responseProcessor.isValidMessage(response, sensorList, initialResponseList)) {
 //                    System.out.println("working sensor with id: " + response.getMessage().getLocationId());
 //                    System.out.println(msg.getBody());
                     initialResponseList.addResponse(response);
-                    messageLog.addMessageHistory(response.messageId);
-                    messageLog.truncateIfExceedsMaxSize();
                 }
             }
             if (initialResponseList.getResponses().size()/10 > messageCounter) {

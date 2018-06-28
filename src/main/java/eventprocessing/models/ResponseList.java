@@ -44,4 +44,10 @@ public class ResponseList {
         return !timeRange.contains(time);
     }
 
+    public List<String> getMessageIds() {
+        return responses.stream()
+                .map(response -> response.getMessageId())
+                .collect(Collectors.toList());
+    }
+
 }

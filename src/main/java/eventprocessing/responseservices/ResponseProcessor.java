@@ -1,6 +1,7 @@
 package eventprocessing.responseservices;
 
 import eventprocessing.models.Response;
+import eventprocessing.models.ResponseList;
 import eventprocessing.models.SensorList;
 import eventprocessing.storage.MessageLog;
 
@@ -14,11 +15,15 @@ public class ResponseProcessor {
         return count > 0;
     }
 
-    public boolean isDuplicateMessage(Response response, MessageLog messageLog) {
-        return messageLog.getMessageHistory().contains(response.getMessageId());
+//    public boolean isDuplicateMessage(Response response, MessageLog messageLog) {
+//        return messageLog.getMessageHistory().contains(response.getMessageId());
+//    }
+
+    public boolean isValidMessage(Response response, SensorList sensorList, ResponseList responseList) {
+        return isWorkingSensor(response, sensorList) && !isDuplicateMessage(response, responseList);
     }
 
-    public boolean isValidMessage(Response response, SensorList sensorList, MessageLog messageLog) {
-        return isWorkingSensor(response, sensorList) && !isDuplicateMessage(response, messageLog);
+    public boolean isDuplicateMessage(Response response, ResponseList responseList) {
+        return responseList.getMessageIds().contains(response.getMessageId());
     }
 }

@@ -5,7 +5,9 @@ import org.apache.commons.lang3.time.StopWatch;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BucketManager {
     private List<ResponseList> buckets = new ArrayList<>();
@@ -63,5 +65,12 @@ public class BucketManager {
     public ResponseList remove(ResponseList responseList) {
         buckets.remove(responseList);
         return responseList;
+    }
+
+    public List<String> getMessageIds() {
+        return buckets.stream()
+                .map(bucket -> bucket.getMessageIds())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
 }

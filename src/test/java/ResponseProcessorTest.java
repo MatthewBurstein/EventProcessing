@@ -1,8 +1,5 @@
 import com.google.common.collect.Lists;
-import eventprocessing.models.Message;
-import eventprocessing.models.Response;
-import eventprocessing.models.Sensor;
-import eventprocessing.models.SensorList;
+import eventprocessing.models.*;
 import eventprocessing.responseservices.ResponseProcessor;
 import eventprocessing.storage.MessageLog;
 import org.junit.Before;
@@ -20,7 +17,7 @@ public class ResponseProcessorTest {
     private SensorList mockSensorList;
     private Message mockMessage;
     private Response mockResponse;
-    private MessageLog mockMessageLog;
+    private ResponseList mockResponseList;
     private ResponseProcessor responseProcessor;
 
     @Before
@@ -33,8 +30,8 @@ public class ResponseProcessorTest {
         mockResponse = Mockito.mock(Response.class);
         when(mockResponse.getMessage()).thenReturn(mockMessage);
 
-        mockMessageLog = Mockito.mock(MessageLog.class);
-        when(mockMessageLog.getMessageHistory()).thenReturn(Lists.newArrayList("messageId1", "messageId2"));
+        mockResponseList = Mockito.mock(ResponseList.class);
+        when(mockResponseList.getMessageIds()).thenReturn(Lists.newArrayList("messageId1", "messageId2"));
 
         responseProcessor = new ResponseProcessor();
     }
@@ -54,12 +51,12 @@ public class ResponseProcessorTest {
     @Test
     public void isDuplicateMessage_whenDuplicate_returnsTrue() {
         when(mockResponse.getMessageId()).thenReturn("messageId1");
-        assertTrue(responseProcessor.isDuplicateMessage(mockResponse, mockMessageLog));
+        assertTrue(responseProcessor.isDuplicateMessage(mockResponse, mockResponseList));
     }
 
     @Test
     public void isDuplicateMessage_whenNotDuplicate_returnsFalse() {
         when(mockResponse.getMessageId()).thenReturn("newMessageId");
-        assertFalse(responseProcessor.isDuplicateMessage(mockResponse, mockMessageLog));
+        assertFalse(responseProcessor.isDuplicateMessage(mockResponse, mockResponseList));
     }
 }
