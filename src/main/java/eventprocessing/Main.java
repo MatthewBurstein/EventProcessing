@@ -15,6 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
 
@@ -34,12 +36,9 @@ public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
         logger.debug("App launched");
         createObjects();
-        stopWatch.start();
-
 
         JSONParser jsonParser = new JSONParser("locations.json");
         SensorList sensorList = jsonParser.createSensorList();
-        sensorList.getSensors().forEach(sensor -> System.out.println(sensor.getId()));
 
         SqsClient sqsClient = amazonController.getSqsClient();
         String queueUrl = amazonController.getQueueUrl();
@@ -50,7 +49,8 @@ public class Main {
         int duration = scanner.nextInt();
 
         //initial while loop stores five minutes of data with no buckets
-        while (stopWatch.getTime() < (duration*60000 + 1000)) {
+        stopWatch.start();
+        while (stopWatch.getTime() < GlobalConstants.FIRST_LOOP_DURATION) {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
 
             for (Message msg : messageResult.getMessages()) {
@@ -58,7 +58,6 @@ public class Main {
 
                 if (responseProcessor.isValidMessage(response, sensorList, initialBucket)) {
                     initialBucket.addResponse(response);
-                    System.out.println(response.getMessageTimestamp() + "," + response.getResponseTimestamp());
                 }
             }
         }
@@ -69,10 +68,6 @@ public class Main {
                 + (GlobalConstants.BUCKET_UPPER_BOUND * (duration - GlobalConstants.MAX_MESSAGE_DELAY_MINS + 1))
                 + GlobalConstants.MAX_MESSAGE_DELAY_MINS * GlobalConstants.BUCKET_UPPER_BOUND;
 
-        System.out.println("stopwatch.getStartTime = " + stopWatch.getStartTime());
-        System.out.println("earliest Time stamp " + earliestTimestamp);
-        System.out.println(expiryTime);
-
         //Initial responses are bucketed
         logger.info("Creating bucket...");
 
@@ -80,36 +75,29 @@ public class Main {
 
         bucketManager.addMultipleResponsesToBucket(initialBucket);
 
-//        bucketManager.getBuckets().forEach(bucket -> {
-//            System.out.println("BucketManager bucket isExpiredAtTime" + bucket.isExpiredAtTime(expiryTime));
-//            System.out.println("BucketManager bucket message IDs" + bucket.getMessageIds());
-//            System.out.println("BucketManager bucket number of responses " + bucket.getResponses().size());
-//            System.out.println("--------------------------------------------------------------------------");
-//        });
-
-//        bucketManager.getBuckets().forEach(bucket -> {
-//            System.out.println(bucket.getTimeRange().getMinimum());
-//            System.out.println(bucket.getTimeRange().getMaximum());
-//        });
-
-
         List<Bucket> removedBuckets = bucketManager.removeMultipleExpiredBuckets(expiryTime);
-        System.out.println("Removed buckets " + removedBuckets);
+
+        logger.info("Removed buckets: " + removedBuckets);
 
         csvFileService.writeBucketDataToFile(removedBuckets);
 
-//        if (removedBuckets != null) {
-//            removedBuckets.forEach(bucket -> {
-//                try {
-//                    csvFileService.writeBucketDataToFile(bucket);
-//                } catch (IOException e) {
-//                    logger.error(e.getMessage());
-//                }
-//            });
-//
-//        }
-
+//        long lastBucketEndTime = bucketManager.getLastBucketEndTime();
+//        bucketManager.createBucket();
         //Responses from here bucketed as they come in
+        while (stopWatch.getTime() < (duration*60000 - GlobalConstants.FIRST_LOOP_DURATION)) {
+            ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
+
+            for (Message msg : messageResult.getMessages()) {
+                Response response = responseService.parseResponse(msg.getBody());
+
+                if (responseProcessor.isValidMessage(response, sensorList, initialBucket)) {
+                    initialBucket.addResponse(response);
+                }
+            }
+        }
+
+
+
 //        while (true) {
 //            Bucket removedBucket = bucketManager.removeExpiredBucket();
 //

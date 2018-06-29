@@ -16,9 +16,13 @@ public class BucketManager {
     public BucketManager(long initialTime) {
 
         nextStartTime = initialTime;
-        while (buckets.size() <= (2 * GlobalConstants.MAX_MESSAGE_DELAY_MINS)) {
+        while (buckets.size() < (2 * GlobalConstants.MAX_MESSAGE_DELAY_MINS)) {
             createBucket(nextStartTime);
         }
+    }
+
+    public long getNextStartTime() {
+        return nextStartTime;
     }
 
     public void createBucket(long thisBucketStartTime) {

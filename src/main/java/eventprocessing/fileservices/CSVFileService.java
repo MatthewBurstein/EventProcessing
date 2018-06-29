@@ -26,7 +26,6 @@ public class CSVFileService {
                      .withHeader("Start Time", "End Time", "Number of Responses", "Average Value"));
         ) {
             bucketToWriteToFile.forEach(bucket -> {
-                System.out.println(bucket);
                 String startTime = bucket.getTimeRange().getMinimum().toString();
                 String endTime = bucket.getTimeRange().getMaximum().toString();
                 String numberOfResponses = String.valueOf(bucket.getResponses().size());
