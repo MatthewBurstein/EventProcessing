@@ -1,3 +1,4 @@
+import eventprocessing.GlobalConstants;
 import eventprocessing.models.Response;
 import eventprocessing.models.Bucket;
 import org.assertj.core.util.Lists;
@@ -15,30 +16,36 @@ import static org.mockito.Mockito.when;
 public class BucketTest {
 
     private Bucket bucket;
+    private long bucketStart;
 
     @Before
     public void createResponseList() {
-        bucket = new Bucket(100);
+        bucketStart = 100000;
+        bucket = new Bucket(bucketStart);
     }
 
     @Test
     public void isExpiredAtTime_returnsTrueWhenPassedArgumentIsBeforeRange() {
-        assertFalse(bucket.isExpiredAtTime(90));
+        long timeStampBeforeBucket = bucketStart - 1000;
+        assertFalse(bucket.isExpiredAtTime(timeStampBeforeBucket));
     }
 
     @Test
     public void isExpiredAtTime_returnsFalseWhenPassedArgumentIsInRange() {
-        assertFalse(bucket.isExpiredAtTime(101));
+        long timeStampDuringBucket = bucketStart + GlobalConstants.THIS_BUCKET_RANGE;
+        assertFalse(bucket.isExpiredAtTime(timeStampDuringBucket));
     }
 
     @Test
-    public void isExpiredAtTime_returnsFalseWhenPassedArgumentIsWithinFiveMins() {
-        assertFalse(bucket.isExpiredAtTime(200));
+    public void isExpiredAtTime_returnsFalseWhenPassedArgumentIsWithinDelayTime() {
+        long timeStampAfterBucketWithinDelayPeriod = bucketStart + GlobalConstants.THIS_BUCKET_RANGE * GlobalConstants.MAX_MESSAGE_DELAY_MINS;
+        assertFalse(bucket.isExpiredAtTime(timeStampAfterBucketWithinDelayPeriod));
     }
 
     @Test
     public void isExpiredAtTime_returnsFalseWhenPassedArgumentIsAfterFiveMins() {
-        assertTrue(bucket.isExpiredAtTime(461));
+        long timeStampAfterDelayPeriod = bucketStart + GlobalConstants.THIS_BUCKET_RANGE + GlobalConstants.BUCKET_UPPER_BOUND * GlobalConstants.MAX_MESSAGE_DELAY_MINS;
+        assertTrue(bucket.isExpiredAtTime(timeStampAfterDelayPeriod));
     }
     
     @Test

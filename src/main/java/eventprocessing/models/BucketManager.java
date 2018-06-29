@@ -17,7 +17,7 @@ public class BucketManager {
         this.stopWatch = stopWatch;
 
         nextStartTime = initialTime;
-        while (buckets.size() <= GlobalConstants.MAX_MESSAGE_DELAY_MINS) {
+        while (buckets.size() <= (2 * GlobalConstants.MAX_MESSAGE_DELAY_MINS + 1)) {
             createBucket(nextStartTime);
         }
     }

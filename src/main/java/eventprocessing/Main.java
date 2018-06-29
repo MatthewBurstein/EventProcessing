@@ -58,6 +58,7 @@ public class Main {
                 Response response = responseService.parseResponse(msg.getBody());
                 if (responseProcessor.isValidMessage(response, sensorList, initialBucket)) {
                     initialBucket.addResponse(response);
+                    System.out.println(msg.getBody());
                 }
             }
             if (initialBucket.getResponses().size() / GlobalConstants.MULTIPLES_OF_MESSAGES > messageCounter) {
@@ -79,6 +80,7 @@ public class Main {
 
         System.out.println("stopwatch.getStartTime = " + stopWatch.getStartTime());
         System.out.println("earliest Time stamp " + earliestTimestamp);
+        System.out.println(expiryTime);
 
         //Initial responses are bucketed
         logger.info("Creating bucket...");
@@ -90,9 +92,13 @@ public class Main {
         bucketManager.getBuckets().forEach(bucket -> {
             System.out.println("BucketManager bucket isExpiredAtTime" + bucket.isExpiredAtTime(expiryTime));
             System.out.println("BucketManager bucket message IDs" + bucket.getMessageIds());
-            System.out.println("BucketManager bucket timerange " + bucket.getTimeRange());
             System.out.println("BucketManager bucket number of responses " + bucket.getResponses().size());
             System.out.println("--------------------------------------------------------------------------");
+        });
+
+        bucketManager.getBuckets().forEach(bucket -> {
+            System.out.println("BucketManager bucket timerange " + bucket.getTimeRange().getMinimum());
+            System.out.println("BucketManager bucket timerange " + bucket.getTimeRange().getMaximum());
         });
 
 
