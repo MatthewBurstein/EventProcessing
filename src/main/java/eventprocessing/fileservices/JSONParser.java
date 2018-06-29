@@ -1,5 +1,6 @@
 package eventprocessing.fileservices;
 
+import com.google.gson.JsonDeserializer;
 import eventprocessing.models.Sensor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -12,6 +13,8 @@ import org.apache.logging.log4j.Logger;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 

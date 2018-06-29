@@ -37,7 +37,7 @@ public class BucketManager {
     }
 
     public void addResponseToBucket(Response response) {
-        long currentResponseTimestamp = response.getTimestamp();
+        long currentResponseTimestamp = response.getMessageTimestamp();
         buckets.forEach(bucket -> {
             if (bucket.getTimeRange().contains(currentResponseTimestamp)) {
                 bucket.addResponse(response);

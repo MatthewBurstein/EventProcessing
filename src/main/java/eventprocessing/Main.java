@@ -58,6 +58,7 @@ public class Main {
                 Response response = responseService.parseResponse(msg.getBody());
                 if (responseProcessor.isValidMessage(response, sensorList, initialBucket)) {
                     initialBucket.addResponse(response);
+                    System.out.println("TIMESTAMP FOR RESPONSE: " + response.getResponseTimestamp());
                     System.out.println(msg.getBody());
                 }
             }
@@ -69,7 +70,7 @@ public class Main {
 
         System.out.println("RESPONSE TIMESTAMPS");
         initialBucket.getResponses().forEach(response -> {
-            System.out.println(response.getTimestamp());
+            System.out.println(response.getMessageTimestamp());
 //            System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         });
         System.out.println("++++++++++++++++++++++++++++++++++++++++");

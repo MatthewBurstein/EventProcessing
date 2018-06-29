@@ -56,7 +56,7 @@
 //    @Test
 //    public void addResponseToBucket_addsResponseToCorrectBucket() {
 //        Response mockResponse = Mockito.mock(Response.class);
-//        when(mockResponse.getTimestamp()).thenReturn((long) 110);
+//        when(mockResponse.getMessageTimestamp()).thenReturn((long) 110);
 //        bucketManager.addResponseToBucket(mockResponse);
 //        List<Bucket> bucket = bucketManager.getBuckets();
 //
@@ -70,15 +70,15 @@
 //    @Test
 //    public void addMultipleResponsesToBucket_addsResponsesToCorrectBuckets() {
 //        Response mockResponse1 = Mockito.mock(Response.class);
-//        when(mockResponse1.getTimestamp()).thenReturn((long) 110);
+//        when(mockResponse1.getMessageTimestamp()).thenReturn((long) 110);
 //        Response mockResponse2 = Mockito.mock(Response.class);
-//        when(mockResponse2.getTimestamp()).thenReturn((long) 10);
+//        when(mockResponse2.getMessageTimestamp()).thenReturn((long) 10);
 //        Response mockResponse3 = Mockito.mock(Response.class);
-//        when(mockResponse3.getTimestamp()).thenReturn((long) 288);
+//        when(mockResponse3.getMessageTimestamp()).thenReturn((long) 288);
 //        Response mockResponse4 = Mockito.mock(Response.class);
-//        when(mockResponse4.getTimestamp()).thenReturn((long) 120);
+//        when(mockResponse4.getMessageTimestamp()).thenReturn((long) 120);
 //        Response mockResponse5 = Mockito.mock(Response.class);
-//        when(mockResponse5.getTimestamp()).thenReturn((long) 200);
+//        when(mockResponse5.getMessageTimestamp()).thenReturn((long) 200);
 //
 //        InitialBucket mockResponseList = Mockito.mock(InitialBucket.class);
 //        when(mockResponseList.getResponses()).thenReturn(Lists.newArrayList(mockResponse1, mockResponse2,

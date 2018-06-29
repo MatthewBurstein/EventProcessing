@@ -11,8 +11,8 @@ public class InitialBucket extends Bucket {
 
     public long getEarliestTimestamp() {
         Optional<Response> earliestResponse = getResponses().stream()
-                .min(Comparator.comparing(Response::getTimestamp));
+                .min(Comparator.comparing(Response::getMessageTimestamp));
 
-        return earliestResponse.get().getTimestamp();
+        return earliestResponse.get().getMessageTimestamp();
     }
 }
