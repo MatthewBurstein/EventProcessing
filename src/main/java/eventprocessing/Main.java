@@ -74,7 +74,7 @@ public class Main {
         logger.info("Finding earliest timestamp...");
         long earliestTimestamp = initialBucket.getEarliestTimestamp();
         long expiryTime = earliestTimestamp
-                + GlobalConstants.BUCKET_UPPER_BOUND
+                + (GlobalConstants.BUCKET_UPPER_BOUND * (duration - GlobalConstants.MAX_MESSAGE_DELAY_MINS + 1))
                 + GlobalConstants.MAX_MESSAGE_DELAY_MINS * GlobalConstants.BUCKET_UPPER_BOUND;
 
         System.out.println("stopwatch.getStartTime = " + stopWatch.getStartTime());
@@ -102,7 +102,7 @@ public class Main {
 
 
         List<Bucket> removedBuckets = bucketManager.removeMultipleExpiredBuckets(expiryTime);
-        System.out.println("Removed buckets " + removedBuckets);
+        System.out.println("Removed bucketsg " + removedBuckets);
 
 //        if (removedBuckets != null) {
 //            csvFileService.writeToFile(removedBuckets);
