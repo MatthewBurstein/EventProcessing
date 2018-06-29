@@ -36,7 +36,7 @@ public class CsvFileServiceTest {
         when(mockAnalyser.getAverageValue(mockBucket3)).thenReturn(3.0);
 
         List<Bucket> mockBuckets = Lists.newArrayList(mockBucket1, mockBucket2, mockBucket3);
-        csvFileService.writeBucketDataToFile(mockBuckets);
+        csvFileService.writeMultipleBucketDataToFile(mockBuckets);
         /*No assertions for this test - please open TestResponseData.csv for results.
         Expected outputs are as follows:
 
