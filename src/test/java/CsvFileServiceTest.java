@@ -16,7 +16,7 @@ public class CsvFileServiceTest {
 
     @Test
     public void writeRemovedBucketsToFile_createsFileWithCalculatedAveragesForExpiredBuckets() throws IOException {
-        CSVFileService csvFileService = new CSVFileService("TestResponseData.csv");
+        CSVFileService csvFileService = new CSVFileService("TestResponseData1.csv");
         Analyser mockAnalyser = Mockito.mock(Analyser.class);
         Bucket mockBucket1 = Mockito.mock(Bucket.class);
         Bucket mockBucket2 = Mockito.mock(Bucket.class);
@@ -35,7 +35,10 @@ public class CsvFileServiceTest {
         when(mockBucket3.getResponses()).thenReturn(Lists.newArrayList(mockResponse, mockResponse, mockResponse));
         when(mockAnalyser.getAverageValue(mockBucket3)).thenReturn(3.0);
 
-        List<Bucket> mockBuckets = Lists.newArrayList(mockBucket1, mockBucket2, mockBucket3);
+
+        csvFileService.writeBucketDataToFile(mockBucket1);
+
+        List<Bucket> mockBuckets = Lists.newArrayList(mockBucket2, mockBucket3);
         csvFileService.writeMultipleBucketDataToFile(mockBuckets);
         /*No assertions for this test - please open TestResponseData.csv for results.
         Expected outputs are as follows:
@@ -47,4 +50,5 @@ public class CsvFileServiceTest {
 
         */
     }
+
 }
