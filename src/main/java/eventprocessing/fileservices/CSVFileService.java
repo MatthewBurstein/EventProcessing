@@ -18,27 +18,38 @@ public class CSVFileService {
         this.outputCsvFile = outputCsvFile;
     }
 
-    public void writeBucketDataToFile(List<Bucket> bucketToWriteToFile) throws IOException {
+    public void writeBucketDataToFile(Bucket bucketToWriteToFile) throws IOException {
         Analyser analyser = new Analyser();
 
         try (BufferedWriter bufferedWriter = Files.newBufferedWriter(Paths.get(outputCsvFile));
              CSVPrinter csvPrinter = new CSVPrinter(bufferedWriter, CSVFormat.DEFAULT
                      .withHeader("Start Time", "End Time", "Number of Responses", "Average Value"));
         ) {
-            bucketToWriteToFile.forEach(bucket -> {
-                String startTime = bucket.getTimeRange().getMinimum().toString();
-                String endTime = bucket.getTimeRange().getMaximum().toString();
-                String numberOfResponses = String.valueOf(bucket.getResponses().size());
-                String averageValue = String.valueOf(analyser.getAverageValue(bucket));
+                String startTime = bucketToWriteToFile.getTimeRange().getMinimum().toString();
+                String endTime = bucketToWriteToFile.getTimeRange().getMaximum().toString();
+                String numberOfResponses = String.valueOf(bucketToWriteToFile.getResponses().size());
+                String averageValue = String.valueOf(analyser.getAverageValue(bucketToWriteToFile));
 
                 try {
                     csvPrinter.printRecord(startTime, endTime, numberOfResponses, averageValue);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            });
 
             csvPrinter.flush();
         }
     }
+
+    public void writeMultipleBucketDataToFile(List<Bucket> bucketsToWriteToFile) {
+        bucketsToWriteToFile.forEach(bucket -> {
+            try {
+                writeBucketDataToFile(bucket);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
+
+
 }

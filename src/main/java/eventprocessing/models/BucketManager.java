@@ -31,6 +31,10 @@ public class BucketManager {
         nextStartTime = thisBucketStartTime + GlobalConstants.BUCKET_UPPER_BOUND;
     }
 
+    public void createNextBucket() {
+        createBucket(nextStartTime);
+    }
+
     public List<Bucket> getBuckets() {
         return buckets;
     }

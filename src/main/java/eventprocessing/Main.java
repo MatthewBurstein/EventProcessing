@@ -79,10 +79,10 @@ public class Main {
 
         logger.info("Removed buckets: " + removedBuckets);
 
-        csvFileService.writeBucketDataToFile(removedBuckets);
+        csvFileService.writeMultipleBucketDataToFile(removedBuckets);
 
-//        long lastBucketEndTime = bucketManager.getLastBucketEndTime();
-//        bucketManager.createBucket();
+        bucketManager.createNextBucket();
+
         //Responses from here bucketed as they come in
         while (stopWatch.getTime() < (duration*60000 - GlobalConstants.FIRST_LOOP_DURATION)) {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
@@ -90,9 +90,15 @@ public class Main {
             for (Message msg : messageResult.getMessages()) {
                 Response response = responseService.parseResponse(msg.getBody());
 
-                if (responseProcessor.isValidMessage(response, sensorList, initialBucket)) {
-                    initialBucket.addResponse(response);
+                if (responseProcessor.isValidMessage(response, sensorList, bucketManager)) {
+                    bucketManager.addResponseToBucket(response);
                 }
+            }
+
+            Bucket removedBucket = bucketManager.removeExpiredBucket(System.currentTimeMillis());
+            if (removedBucket != null) {
+                csvFileService.writeBucketDataToFile(removedBucket);
+                bucketManager.createNextBucket();
             }
         }
 
