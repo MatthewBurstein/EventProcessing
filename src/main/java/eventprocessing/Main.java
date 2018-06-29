@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -72,7 +73,9 @@ public class Main {
 
         logger.info("Finding earliest timestamp...");
         long earliestTimestamp = initialBucket.getEarliestTimestamp();
-        long expiryTime = earliestTimestamp + GlobalConstants.MAX_MESSAGE_DELAY_MINS * GlobalConstants.BUCKET_UPPER_BOUND;
+        long expiryTime = earliestTimestamp
+                + GlobalConstants.BUCKET_UPPER_BOUND
+                + GlobalConstants.MAX_MESSAGE_DELAY_MINS * GlobalConstants.BUCKET_UPPER_BOUND;
 
         System.out.println("stopwatch.getStartTime = " + stopWatch.getStartTime());
         System.out.println("earliest Time stamp " + earliestTimestamp);
@@ -81,7 +84,7 @@ public class Main {
         //Initial responses are bucketed
         logger.info("Creating bucket...");
 
-        bucketManager = new BucketManager(earliestTimestamp, stopWatch);
+        bucketManager = new BucketManager(earliestTimestamp);
 
         bucketManager.addMultipleResponsesToBucket(initialBucket);
 
@@ -98,12 +101,12 @@ public class Main {
         });
 
 
-        Bucket removedBucket = bucketManager.removeExpiredBucket(expiryTime);
-        System.out.println("Removed bucket " + removedBucket);
+        List<Bucket> removedBuckets = bucketManager.removeMultipleExpiredBuckets(expiryTime);
+        System.out.println("Removed buckets " + removedBuckets);
 
-        if (removedBucket != null) {
-            csvFileService.writeToFile(removedBucket);
-        }
+//        if (removedBuckets != null) {
+//            csvFileService.writeToFile(removedBuckets);
+//        }
 
         //Responses from here bucketed as they come in
 //        while (true) {
