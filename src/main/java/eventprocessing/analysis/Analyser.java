@@ -16,5 +16,4 @@ public class Analyser {
 
         return total / bucket.getResponses().size();
     }
-
 }

@@ -1,10 +1,8 @@
 package eventprocessing;
 
-import com.amazonaws.services.sqs.model.GetQueueAttributesRequest;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
-import com.google.common.collect.Lists;
 import eventprocessing.amazonservices.*;
 import eventprocessing.analysis.Analyser;
 import eventprocessing.fileservices.CSVFileService;
@@ -17,7 +15,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -46,16 +43,11 @@ public class Main {
 
         SqsClient sqsClient = amazonController.getSqsClient();
         String queueUrl = amazonController.getQueueUrl();
-        GetQueueAttributesRequest attrReq = new GetQueueAttributesRequest(queueUrl);
-        attrReq.setAttributeNames(Arrays.asList("ApproximateNumberOfMessages"));
-        System.out.println("QUEUE: " + S3Details.queueName);
 
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
 
         System.out.println("How many minutes to run for?\nMUST be at least 1 minute longer than " + GlobalConstants.MAX_MESSAGE_DELAY_MINS + " mins");
         int duration = scanner.nextInt();
-
-//        System.out.println("Please wait " + GlobalConstants.MAX_MESSAGE_DELAY_MINS + " minutes while the initial set of responses is compiled...");
 
         //initial while loop stores five minutes of data with no buckets
         while (stopWatch.getTime() < (duration*60000 + 1000)) {
@@ -88,31 +80,40 @@ public class Main {
 
         bucketManager.addMultipleResponsesToBucket(initialBucket);
 
-        bucketManager.getBuckets().forEach(bucket -> {
-            System.out.println("BucketManager bucket isExpiredAtTime" + bucket.isExpiredAtTime(expiryTime));
-            System.out.println("BucketManager bucket message IDs" + bucket.getMessageIds());
-            System.out.println("BucketManager bucket number of responses " + bucket.getResponses().size());
-            System.out.println("--------------------------------------------------------------------------");
-        });
+//        bucketManager.getBuckets().forEach(bucket -> {
+//            System.out.println("BucketManager bucket isExpiredAtTime" + bucket.isExpiredAtTime(expiryTime));
+//            System.out.println("BucketManager bucket message IDs" + bucket.getMessageIds());
+//            System.out.println("BucketManager bucket number of responses " + bucket.getResponses().size());
+//            System.out.println("--------------------------------------------------------------------------");
+//        });
 
-        bucketManager.getBuckets().forEach(bucket -> {
-            System.out.println(bucket.getTimeRange().getMinimum());
-            System.out.println(bucket.getTimeRange().getMaximum());
-        });
+//        bucketManager.getBuckets().forEach(bucket -> {
+//            System.out.println(bucket.getTimeRange().getMinimum());
+//            System.out.println(bucket.getTimeRange().getMaximum());
+//        });
 
 
         List<Bucket> removedBuckets = bucketManager.removeMultipleExpiredBuckets(expiryTime);
-        System.out.println("Removed bucketsg " + removedBuckets);
+        System.out.println("Removed buckets " + removedBuckets);
+
+        csvFileService.generateOutputLine(removedBuckets);
 
 //        if (removedBuckets != null) {
-//            csvFileService.writeToFile(removedBuckets);
+//            removedBuckets.forEach(bucket -> {
+//                try {
+//                    csvFileService.generateOutputLine(bucket);
+//                } catch (IOException e) {
+//                    logger.error(e.getMessage());
+//                }
+//            });
+//
 //        }
 
         //Responses from here bucketed as they come in
 //        while (true) {
 //            Bucket removedBucket = bucketManager.removeExpiredBucket();
 //
-//            csvFileService.writeToFile(removedBucket);
+//            csvFileService.generateOutputLine(removedBucket);
 //
 //            ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
 //            for (Message msg : messageResult.getMessages()) {
@@ -149,6 +150,6 @@ public class Main {
         initialBucket = new InitialBucket();
         analyser = new Analyser();
         stopWatch = new StopWatch();
-        csvFileService = new CSVFileService();
+        csvFileService = new CSVFileService("ResponseData.csv");
     }
 }
