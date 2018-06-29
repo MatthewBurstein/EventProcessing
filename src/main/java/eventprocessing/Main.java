@@ -96,12 +96,12 @@ public class Main {
         List<Bucket> removedBuckets = bucketManager.removeMultipleExpiredBuckets(expiryTime);
         System.out.println("Removed buckets " + removedBuckets);
 
-        csvFileService.generateOutputLine(removedBuckets);
+        csvFileService.writeBucketDataToFile(removedBuckets);
 
 //        if (removedBuckets != null) {
 //            removedBuckets.forEach(bucket -> {
 //                try {
-//                    csvFileService.generateOutputLine(bucket);
+//                    csvFileService.writeBucketDataToFile(bucket);
 //                } catch (IOException e) {
 //                    logger.error(e.getMessage());
 //                }
@@ -113,7 +113,7 @@ public class Main {
 //        while (true) {
 //            Bucket removedBucket = bucketManager.removeExpiredBucket();
 //
-//            csvFileService.generateOutputLine(removedBucket);
+//            csvFileService.writeBucketDataToFile(removedBucket);
 //
 //            ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
 //            for (Message msg : messageResult.getMessages()) {

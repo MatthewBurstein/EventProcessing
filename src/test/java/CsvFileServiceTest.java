@@ -5,7 +5,6 @@ import eventprocessing.models.Bucket;
 import eventprocessing.models.Response;
 import org.apache.commons.lang3.Range;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.io.IOException;
@@ -17,7 +16,7 @@ public class CsvFileServiceTest {
 
     @Test
     public void writeRemovedBucketsToFile_createsFileWithCalculatedAveragesForExpiredBuckets() throws IOException {
-        CSVFileService csvFileService = new CSVFileService("testResponseData.csv");
+        CSVFileService csvFileService = new CSVFileService("TestResponseData.csv");
         Analyser mockAnalyser = Mockito.mock(Analyser.class);
         Bucket mockBucket1 = Mockito.mock(Bucket.class);
         Bucket mockBucket2 = Mockito.mock(Bucket.class);
@@ -37,7 +36,15 @@ public class CsvFileServiceTest {
         when(mockAnalyser.getAverageValue(mockBucket3)).thenReturn(3.0);
 
         List<Bucket> mockBuckets = Lists.newArrayList(mockBucket1, mockBucket2, mockBucket3);
-        csvFileService.generateOutputLine(mockBuckets);
-        //No assertions for this test - please open testResponseData.csv for results
+        csvFileService.writeBucketDataToFile(mockBuckets);
+        /*No assertions for this test - please open TestResponseData.csv for results.
+        Expected outputs are as follows:
+
+        Start Time,End Time,Number of Responses,Average Value
+        0,5999,1,0.0
+        6000,11999,2,0.0
+        12000,17999,3,0.0
+
+        */
     }
 }
