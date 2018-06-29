@@ -1,8 +1,10 @@
 package eventprocessing;
 
+import com.amazonaws.services.sqs.model.GetQueueAttributesRequest;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
+import com.google.common.collect.Lists;
 import eventprocessing.amazonservices.*;
 import eventprocessing.analysis.Analyser;
 import eventprocessing.fileservices.CSVFileService;
@@ -15,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -42,6 +45,9 @@ public class Main {
 
         SqsClient sqsClient = amazonController.getSqsClient();
         String queueUrl = amazonController.getQueueUrl();
+        GetQueueAttributesRequest attrReq = new GetQueueAttributesRequest(queueUrl);
+        attrReq.setAttributeNames(Arrays.asList("ApproximateNumberOfMessages"));
+        System.out.println("QUEUE: " + S3Details.queueName);
 
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
 
@@ -49,31 +55,20 @@ public class Main {
         int duration = scanner.nextInt();
 
 //        System.out.println("Please wait " + GlobalConstants.MAX_MESSAGE_DELAY_MINS + " minutes while the initial set of responses is compiled...");
-        int messageCounter = 0;
 
         //initial while loop stores five minutes of data with no buckets
         while (stopWatch.getTime() < (duration*60000 + 1000)) {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
+
             for (Message msg : messageResult.getMessages()) {
                 Response response = responseService.parseResponse(msg.getBody());
+
                 if (responseProcessor.isValidMessage(response, sensorList, initialBucket)) {
                     initialBucket.addResponse(response);
-                    System.out.println("TIMESTAMP FOR RESPONSE: " + response.getResponseTimestamp());
-                    System.out.println(msg.getBody());
+                    System.out.println(response.getMessageTimestamp() + "," + response.getResponseTimestamp());
                 }
             }
-            if (initialBucket.getResponses().size() / GlobalConstants.MULTIPLES_OF_MESSAGES > messageCounter) {
-                System.out.println(initialBucket.getResponses().size() + " messages stored");
-            }
-            messageCounter = initialBucket.getResponses().size() / GlobalConstants.MULTIPLES_OF_MESSAGES;
         }
-
-        System.out.println("RESPONSE TIMESTAMPS");
-        initialBucket.getResponses().forEach(response -> {
-            System.out.println(response.getMessageTimestamp());
-//            System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        });
-        System.out.println("++++++++++++++++++++++++++++++++++++++++");
 
         logger.info("Finding earliest timestamp...");
         long earliestTimestamp = initialBucket.getEarliestTimestamp();
@@ -98,8 +93,8 @@ public class Main {
         });
 
         bucketManager.getBuckets().forEach(bucket -> {
-            System.out.println("BucketManager bucket timerange " + bucket.getTimeRange().getMinimum());
-            System.out.println("BucketManager bucket timerange " + bucket.getTimeRange().getMaximum());
+            System.out.println(bucket.getTimeRange().getMinimum());
+            System.out.println(bucket.getTimeRange().getMaximum());
         });
 
 

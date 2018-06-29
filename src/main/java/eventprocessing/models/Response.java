@@ -58,9 +58,7 @@ public class Response {
             responseTimestampAsLong = dt.getTime();
         } catch(ParseException | NumberFormatException e) {
             responseTimestampAsLong = 0;
-            System.out.println("0");
         }
-        System.out.println(("FINAL " + responseTimestampAsLong));
 
         return responseTimestampAsLong;
     }
