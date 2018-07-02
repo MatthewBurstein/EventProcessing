@@ -20,7 +20,7 @@ public class SqsClient {
         try {
             this.sqs = AmazonSQSClient
                     .builder()
-                    .withRegion(System.getenv(S3Details.awsRegion))
+                    .withRegion(S3Details.awsRegion)
                     .withCredentials(new EnvironmentVariableCredentialsProvider())
                     .build();
         } catch (SdkClientException e) {

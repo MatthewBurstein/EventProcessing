@@ -15,7 +15,7 @@ class SnsClient {
         try {
             this.sns = AmazonSNSClient
                     .builder()
-                    .withRegion(System.getenv(S3Details.awsRegion))
+                    .withRegion(S3Details.awsRegion)
                     .withCredentials(new EnvironmentVariableCredentialsProvider())
                     .build();
             logger.info("SnsClient created");

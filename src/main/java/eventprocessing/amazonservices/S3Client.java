@@ -15,7 +15,7 @@ class S3Client {
 
         final AmazonS3 s3 = AmazonS3ClientBuilder
                 .standard()
-                .withRegion(System.getenv(S3Details.awsRegion))
+                .withRegion(S3Details.awsRegion)
                 .build();
 
         logger.debug("AWS S3 connection established");
