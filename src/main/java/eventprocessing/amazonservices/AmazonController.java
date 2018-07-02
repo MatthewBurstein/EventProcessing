@@ -2,7 +2,7 @@ package eventprocessing.amazonservices;
 
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.sns.util.Topics;
-import eventprocessing.DataReader;
+import eventprocessing.fileservices.S3Interpreter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,7 +15,7 @@ public class AmazonController {
 
     public AmazonController() throws IOException {
         S3ObjectInputStream s3is = new S3Client().generateS3InputStream();
-        DataReader reader = new DataReader();
+        S3Interpreter reader = new S3Interpreter();
         reader.saveToFile(s3is);
 
         this.sqsClient = new SqsClient();

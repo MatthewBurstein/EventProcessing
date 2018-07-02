@@ -6,10 +6,18 @@
                 <Pattern>[%d] %p - %c{1} - %m%n</Pattern>
             </PatternLayout>
         </File>
+
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout>
+                <Pattern>[%d] %p - %c{1} - %m%n</Pattern>
+            </PatternLayout>
+        </Console>
+
     </Appenders>
     <Loggers>
         <Root level="debug">
             <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
         </Root>
     </Loggers>
 </Configuration>

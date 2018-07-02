@@ -7,15 +7,15 @@ import com.amazonaws.services.sns.AmazonSNSClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class SnsClient {
+class SnsClient {
     private AmazonSNS sns;
     private final static Logger logger = LogManager.getLogger("SnSClient");
 
-    public AmazonSNS buildSNSClient() {
+    AmazonSNS buildSNSClient() {
         try {
             this.sns = AmazonSNSClient
                     .builder()
-                    .withRegion(System.getenv("AWS_REGION"))
+                    .withRegion(S3Details.awsRegion)
                     .withCredentials(new EnvironmentVariableCredentialsProvider())
                     .build();
             logger.info("SnsClient created");
@@ -26,7 +26,7 @@ public class SnsClient {
         return sns;
     }
 
-    public AmazonSNS getSns() {
+    AmazonSNS getSns() {
         return sns;
     }
 }
