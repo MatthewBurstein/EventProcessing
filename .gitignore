@@ -1,9 +1,15 @@
 sqlScripts/
 *.iml
 .idea/
+log/
+
+ResponseData.csv
+TestResponseData.csv
 
 target/
 
 src/main/resources/liquibase.properties
 
 dependency-reduced-pom.xml
+
+locations.json  
