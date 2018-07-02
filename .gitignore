@@ -1,7 +1,10 @@
 sqlScripts/
 *.iml
 .idea/
-.log/
+log/
+
+ResponseData.csv
+TestResponseData.csv
 
 target/
 
