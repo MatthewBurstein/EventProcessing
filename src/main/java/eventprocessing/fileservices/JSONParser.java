@@ -1,6 +1,5 @@
 package eventprocessing.fileservices;
 
-import com.google.gson.JsonDeserializer;
 import eventprocessing.models.Sensor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -13,8 +12,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.lang.reflect.Type;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,23 +24,22 @@ public class JSONParser {
         this.filePath = filePath;
     }
 
-    public SensorList createSensorList() {
+    public SensorList createSensorList() throws FileNotFoundException {
         return new SensorList(parseJSON());
     }
 
-    private List<Sensor> parseJSON() {
-        FileReader fileReader = null;
+    private List<Sensor> parseJSON() throws FileNotFoundException {
         Type collectionType = new TypeToken<ArrayList<Sensor>>(){}
                 .getType();
         try {
-            fileReader = new FileReader(filePath);
-
+            FileReader fileReader = new FileReader(filePath);
+            JsonReader jsonReader = new JsonReader(fileReader);
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            Gson gson = gsonBuilder.create();
+            return  gson.fromJson(jsonReader, collectionType);
         } catch (FileNotFoundException e) {
-            logger.error("Error reading file: " + e.getMessage());
+            logger.error("Error reading file: " + e.getMessage() + " - file is used to get working sensors");
+            throw new FileNotFoundException(e.getMessage());
         }
-        JsonReader jsonReader = new JsonReader(fileReader);
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        Gson gson = gsonBuilder.create();
-        return  gson.fromJson(jsonReader, collectionType);
     }
 }

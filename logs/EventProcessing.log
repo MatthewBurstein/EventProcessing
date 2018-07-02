@@ -1,2 +1,24 @@
 [2018-07-02 13:55:12,818] WARN - SqsResponseService - Invalid JSON string receivedcom.google.gson.stream.MalformedJsonException: Unterminated object at line 1 column 122 path $.Message
 [2018-07-02 13:55:12,821] WARN - SqsResponseService - Received json string: {"Type" : "Notification", "MessageId" : "91cc8819-c1bb-5b0d-9e2f-dbadceb050c9", "TopicArn" : "topicARN", "Message" : "{"locationId":"93f1c429-c2fe-4f4a-8b62-6ea990f60b76","eventId":"1730d98e-9087-4814-a6b9-f1c3c97cf73e","value":3.1656330341535552,"timestamp⾁:1530531019281}", "Timestamp" : "2018-07-02T11:30:19.301Z", "SignatureVersion" : "1", "Signature" : "sig", "SigningCertURL" : "sign_url", "UnsubscribeURL" : "unsub_url"}
+[2018-07-02 13:59:04,710] INFO - ResponseProcessor - Removed duplicate message with ID: messageId1
+[2018-07-02 14:05:53,986] DEBUG - Main - App launched
+[2018-07-02 14:05:55,052] DEBUG - S3Client - AWS S3 connection established
+[2018-07-02 14:05:55,378] INFO - SqsClient - Creating queue: EventProcessing1530536755378
+[2018-07-02 14:05:55,686] INFO - SqsClient - Queue EventProcessing1530536755378 created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing1530536755378
+[2018-07-02 14:05:55,719] INFO - SnSClient - SnsClient created
+[2018-07-02 14:05:56,104] ERROR - JSONParser - Error reading file: locatioeqwns.json (The system cannot find the file specified)
+[2018-07-02 14:06:51,890] DEBUG - Main - App launched
+[2018-07-02 14:06:52,908] DEBUG - S3Client - AWS S3 connection established
+[2018-07-02 14:06:53,191] INFO - SqsClient - Creating queue: EventProcessing1530536813191
+[2018-07-02 14:06:53,403] INFO - SqsClient - Queue EventProcessing1530536813191 created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing1530536813191
+[2018-07-02 14:06:53,429] INFO - SnSClient - SnsClient created
+[2018-07-02 14:06:53,718] ERROR - JSONParser - Error reading file: locatioeqwns.json (The system cannot find the file specified) - file is used to get working sensors
+[2018-07-02 14:12:34,547] DEBUG - Main - App launched
+[2018-07-02 14:12:35,596] DEBUG - S3Client - AWS S3 connection established
+[2018-07-02 14:12:35,950] INFO - SqsClient - Creating queue: EventProcessing1530537155950
+[2018-07-02 14:12:36,259] INFO - SqsClient - Queue EventProcessing1530537155950 created at https://sqs.eu-west-1.amazonaws.com/552908040772/EventProcessing1530537155950
+[2018-07-02 14:12:36,284] INFO - SnSClient - SnsClient created
+[2018-07-02 14:12:36,635] ERROR - JSONParser - Error reading file: locatioeqwns.json (The system cannot find the file specified) - file is used to get working sensors
+[2018-07-02 14:12:55,899] DEBUG - Main - App launched
+[2018-07-02 14:12:56,911] DEBUG - S3Client - AWS S3 connection established
+[2018-07-02 14:12:57,161] FATAL - S3Client - Fatal error retrieving locations.json from S3 Bucket The specified bucket does not exist
