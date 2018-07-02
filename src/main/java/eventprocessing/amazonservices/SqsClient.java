@@ -16,11 +16,11 @@ public class SqsClient {
     private String queueUrl;
     private static Logger logger = LogManager.getLogger("SqsClient");
 
-    public AmazonSQS buildSQSClient() {
+    AmazonSQS buildSQSClient() {
         try {
             this.sqs = AmazonSQSClient
                     .builder()
-                    .withRegion(System.getenv("AWS_REGION"))
+                    .withRegion(System.getenv(S3Details.awsRegion))
                     .withCredentials(new EnvironmentVariableCredentialsProvider())
                     .build();
         } catch (SdkClientException e) {
@@ -30,7 +30,7 @@ public class SqsClient {
         return sqs;
     }
 
-    public String getQueueUrl(){
+    String getQueueUrl(){
         logger.info("Creating queue: " + S3Details.queueName);
         CreateQueueRequest createQueueRequest = new CreateQueueRequest(S3Details.queueName);
         CreateQueueResult queue = sqs.createQueue(createQueueRequest);
