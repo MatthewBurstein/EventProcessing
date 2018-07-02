@@ -9,21 +9,19 @@ import eventprocessing.fileservices.CSVFileService;
 import eventprocessing.fileservices.JSONParser;
 import eventprocessing.models.*;
 import eventprocessing.responseservices.ResponseProcessor;
-import eventprocessing.responseservices.ResponseService;
+import eventprocessing.responseservices.SqsResponseService;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
 
 public class Main {
     static Logger logger = LogManager.getLogger(Main.class);
 
-    private static ResponseService responseService;
+    private static SqsResponseService sqsResponseService;
     private static ResponseProcessor responseProcessor;
     private static Scanner scanner;
     private static AmazonController amazonController;
@@ -54,10 +52,10 @@ public class Main {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
 
             for (Message msg : messageResult.getMessages()) {
-                Response response = responseService.parseResponse(msg.getBody());
+                SqsResponse sqsResponse = sqsResponseService.parseResponse(msg.getBody());
 
-                if (responseProcessor.isValidMessage(response, sensorList, initialBucket)) {
-                    initialBucket.addResponse(response);
+                if (responseProcessor.isValidMessage(sqsResponse, sensorList, initialBucket)) {
+                    initialBucket.addResponse(sqsResponse);
                 }
             }
         }
@@ -88,10 +86,10 @@ public class Main {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
 
             for (Message msg : messageResult.getMessages()) {
-                Response response = responseService.parseResponse(msg.getBody());
+                SqsResponse sqsResponse = sqsResponseService.parseResponse(msg.getBody());
 
-                if (responseProcessor.isValidMessage(response, sensorList, bucketManager)) {
-                    bucketManager.addResponseToBucket(response);
+                if (responseProcessor.isValidMessage(sqsResponse, sensorList, bucketManager)) {
+                    bucketManager.addResponseToBucket(sqsResponse);
                 }
             }
 
@@ -111,11 +109,11 @@ public class Main {
 //
 //            ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
 //            for (Message msg : messageResult.getMessages()) {
-//                Response response = responseService.parseResponse(msg.getBody());
+//                SqsResponse response = sqsResponseService.parseResponse(msg.getBody());
 //                if (responseProcessor.isValidMessage(response, sensorList, messageLog)) {
 //                    System.out.println("working sensor with id: " + response.getMessage().getLocationId());
 //                    System.out.println(msg.getBody());
-////                    responseList.getResponses().add(response);
+////                    responseList.getSqsResponse().add(response);
 //                    bucketManager.addResponseToBucket(response);
 //                    messageLog.getMessageHistory().add(response.messageId);
 //                    messageLog.truncateIfExceedsMaxSize();
@@ -137,7 +135,7 @@ public class Main {
     }
 
     private static void createObjects() throws IOException {
-        responseService = new ResponseService();
+        sqsResponseService = new SqsResponseService();
         responseProcessor = new ResponseProcessor();
         scanner = new Scanner(System.in);
         amazonController = new AmazonController();

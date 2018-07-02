@@ -1,9 +1,7 @@
 package eventprocessing.models;
 
 import eventprocessing.GlobalConstants;
-import org.apache.commons.lang3.time.StopWatch;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -39,18 +37,18 @@ public class BucketManager {
         return buckets;
     }
 
-    public void addResponseToBucket(Response response) {
-        long currentResponseTimestamp = response.getMessageTimestamp();
+    public void addResponseToBucket(SqsResponse sqsResponse) {
+        long currentResponseTimestamp = sqsResponse.getMessageTimestamp();
         buckets.forEach(bucket -> {
             if (bucket.getTimeRange().contains(currentResponseTimestamp)) {
-                bucket.addResponse(response);
+                bucket.addResponse(sqsResponse);
             }
         });
     }
 
     public void addMultipleResponsesToBucket(Bucket bucket) {
-        for (Response response : bucket.getResponses()) {
-            addResponseToBucket(response);
+        for (SqsResponse sqsResponse : bucket.getSqsResponse()) {
+            addResponseToBucket(sqsResponse);
         }
     }
 

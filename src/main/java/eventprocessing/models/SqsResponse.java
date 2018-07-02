@@ -7,7 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Response {
+public class SqsResponse {
     @SerializedName("MessageId")
     public String messageId;
     public Message message;

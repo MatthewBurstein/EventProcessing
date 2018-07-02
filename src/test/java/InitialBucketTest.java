@@ -1,6 +1,6 @@
 import com.google.common.collect.Lists;
 import eventprocessing.models.InitialBucket;
-import eventprocessing.models.Response;
+import eventprocessing.models.SqsResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -15,13 +15,13 @@ public class InitialBucketTest {
     @Before
     public void createObjects() {
         initialBucket = new InitialBucket();
-        Response mockResponse1 = Mockito.mock(Response.class);
-        Response mockResponse2 = Mockito.mock(Response.class);
-        Response mockResponse3 = Mockito.mock(Response.class);
-        when(mockResponse1.getMessageTimestamp()).thenReturn((long) 9999);
-        when(mockResponse2.getMessageTimestamp()).thenReturn((long) 333);
-        when(mockResponse3.getMessageTimestamp()).thenReturn((long) 22);
-        initialBucket.getResponses().addAll(Lists.newArrayList(mockResponse1, mockResponse2, mockResponse3));
+        SqsResponse mockSqsResponse1 = Mockito.mock(SqsResponse.class);
+        SqsResponse mockSqsResponse2 = Mockito.mock(SqsResponse.class);
+        SqsResponse mockSqsResponse3 = Mockito.mock(SqsResponse.class);
+        when(mockSqsResponse1.getMessageTimestamp()).thenReturn((long) 9999);
+        when(mockSqsResponse2.getMessageTimestamp()).thenReturn((long) 333);
+        when(mockSqsResponse3.getMessageTimestamp()).thenReturn((long) 22);
+        initialBucket.getSqsResponse().addAll(Lists.newArrayList(mockSqsResponse1, mockSqsResponse2, mockSqsResponse3));
     }
 
     @Test

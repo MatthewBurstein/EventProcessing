@@ -1,12 +1,10 @@
 package eventprocessing.fileservices;
 
-import com.amazonaws.services.cloudformation.model.EstimateTemplateCostRequest;
 import eventprocessing.analysis.Analyser;
 import eventprocessing.models.Bucket;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
-import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -45,7 +43,7 @@ public class CSVFileService {
     private void writeBucketToStream(CSVPrinter csvPrinter, Bucket bucket) {
         String startTime = bucket.getTimeRange().getMinimum().toString();
         String endTime = bucket.getTimeRange().getMaximum().toString();
-        String numberOfResponses = String.valueOf(bucket.getResponses().size());
+        String numberOfResponses = String.valueOf(bucket.getSqsResponse().size());
         String averageValue = String.valueOf(analyser.getAverageValue(bucket));
         try {
             csvPrinter.printRecord(startTime, endTime, numberOfResponses, averageValue);

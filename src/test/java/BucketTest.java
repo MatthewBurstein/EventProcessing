@@ -1,5 +1,5 @@
 import eventprocessing.GlobalConstants;
-import eventprocessing.models.Response;
+import eventprocessing.models.SqsResponse;
 import eventprocessing.models.Bucket;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
@@ -50,11 +50,11 @@ public class BucketTest {
     
     @Test
     public void getMessageIds_returnsListOfMessageIds() {
-        Response mockResponse1 = Mockito.mock(Response.class);
-        when(mockResponse1.getMessageId()).thenReturn("mockResponse1id");
-        Response mockResponse2 = Mockito.mock(Response.class);
-        when(mockResponse2.getMessageId()).thenReturn("mockResponse2id");
-        bucket.getResponses().addAll(Lists.newArrayList(mockResponse1, mockResponse2));
+        SqsResponse mockSqsResponse1 = Mockito.mock(SqsResponse.class);
+        when(mockSqsResponse1.getMessageId()).thenReturn("mockResponse1id");
+        SqsResponse mockSqsResponse2 = Mockito.mock(SqsResponse.class);
+        when(mockSqsResponse2.getMessageId()).thenReturn("mockResponse2id");
+        bucket.getSqsResponse().addAll(Lists.newArrayList(mockSqsResponse1, mockSqsResponse2));
         List<String> expected = Lists.newArrayList("mockResponse1id", "mockResponse2id");
         assertEquals(bucket.getMessageIds(), expected);
     }

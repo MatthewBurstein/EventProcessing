@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class Bucket {
 
     private Range<Long> timeRange;
-    private List<Response> responses = new ArrayList<>();
+    private List<SqsResponse> sqsResponse = new ArrayList<>();
 
     public Bucket(long startTime) {
         long endTime = startTime + GlobalConstants.THIS_BUCKET_RANGE;
@@ -21,23 +21,23 @@ public class Bucket {
         //Constructor for InitialBucket
     }
 
-    public void addResponse(Response response) {
-        responses.add(response);
+    public void addResponse(SqsResponse sqsResponse) {
+        this.sqsResponse.add(sqsResponse);
     }
 
-    public List<Response> getResponses() {
-        return responses;
+    public List<SqsResponse> getSqsResponse() {
+        return sqsResponse;
     }
 
     public List<Double> getMessageValues() {
-        return responses
+        return sqsResponse
                 .stream()
                 .map(response -> response.getValue())
                 .collect(Collectors.toList());
     }
 
     public List<String> getMessageIds() {
-        return responses.stream()
+        return sqsResponse.stream()
                 .map(response -> response.getMessageId())
                 .collect(Collectors.toList());
     }

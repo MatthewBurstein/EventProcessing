@@ -14,6 +14,6 @@ public class Analyser {
                 .stream()
                 .reduce(0.0, Double::sum);
 
-        return total / bucket.getResponses().size();
+        return total / bucket.getSqsResponse().size();
     }
 }

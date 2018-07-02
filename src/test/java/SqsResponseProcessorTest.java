@@ -9,12 +9,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-public class ResponseProcessorTest {
+public class SqsResponseProcessorTest {
 
     private Sensor mockSensor;
     private SensorList mockSensorList;
     private Message mockMessage;
-    private Response mockResponse;
+    private SqsResponse mockSqsResponse;
     private Bucket mockBucket;
     private ResponseProcessor responseProcessor;
 
@@ -25,8 +25,8 @@ public class ResponseProcessorTest {
         mockSensorList = Mockito.mock(SensorList.class);
         when(mockSensorList.getSensors()).thenReturn(Lists.newArrayList(mockSensor));
         mockMessage = Mockito.mock(Message.class);
-        mockResponse = Mockito.mock(Response.class);
-        when(mockResponse.getMessage()).thenReturn(mockMessage);
+        mockSqsResponse = Mockito.mock(SqsResponse.class);
+        when(mockSqsResponse.getMessage()).thenReturn(mockMessage);
 
         mockBucket = Mockito.mock(Bucket.class);
         when(mockBucket.getMessageIds()).thenReturn(Lists.newArrayList("messageId1", "messageId2"));
@@ -37,24 +37,24 @@ public class ResponseProcessorTest {
     @Test
     public void isWorkingSensor_returnsTrue() {
         when(mockMessage.getLocationId()).thenReturn("validId");
-        assertTrue(responseProcessor.isWorkingSensor(mockResponse, mockSensorList));
+        assertTrue(responseProcessor.isWorkingSensor(mockSqsResponse, mockSensorList));
     }
 
     @Test
     public void isNotWorkingSensor_returnsFalse() {
         when(mockMessage.getLocationId()).thenReturn("invalidId");
-        assertFalse(responseProcessor.isWorkingSensor(mockResponse, mockSensorList));
+        assertFalse(responseProcessor.isWorkingSensor(mockSqsResponse, mockSensorList));
     }
 
     @Test
     public void isDuplicateMessage_whenDuplicate_returnsTrue() {
-        when(mockResponse.getMessageId()).thenReturn("messageId1");
-        assertTrue(responseProcessor.isDuplicateMessage(mockResponse, mockBucket));
+        when(mockSqsResponse.getMessageId()).thenReturn("messageId1");
+        assertTrue(responseProcessor.isDuplicateMessage(mockSqsResponse, mockBucket));
     }
 
     @Test
     public void isDuplicateMessage_whenNotDuplicate_returnsFalse() {
-        when(mockResponse.getMessageId()).thenReturn("newMessageId");
-        assertFalse(responseProcessor.isDuplicateMessage(mockResponse, mockBucket));
+        when(mockSqsResponse.getMessageId()).thenReturn("newMessageId");
+        assertFalse(responseProcessor.isDuplicateMessage(mockSqsResponse, mockBucket));
     }
 }
