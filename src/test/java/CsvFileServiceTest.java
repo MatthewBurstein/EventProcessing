@@ -44,7 +44,7 @@ public class CsvFileServiceTest {
         Expected outputs are as follows:
 
         Start Time,End Time,Number of Responses,Average Value
-        0,5999,1,0.0
+        0,5999,1,0.0 => this line will not be printed if writing the file overwrited previous information
         6000,11999,2,0.0
         12000,17999,3,0.0
 
