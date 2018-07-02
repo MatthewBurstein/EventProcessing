@@ -5,6 +5,7 @@ import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import eventprocessing.amazonservices.*;
 import eventprocessing.analysis.Analyser;
+import eventprocessing.customerrors.InvalidSqsResponseException;
 import eventprocessing.fileservices.CSVFileService;
 import eventprocessing.fileservices.JSONParser;
 import eventprocessing.models.*;
@@ -84,12 +85,17 @@ public class Main {
         //Responses from here bucketed as they come in
         while (stopWatch.getTime() < (duration*60000 - GlobalConstants.FIRST_LOOP_DURATION)) {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
+            SqsResponse sqsResponse;
 
             for (Message msg : messageResult.getMessages()) {
-                SqsResponse sqsResponse = sqsResponseService.parseResponse(msg.getBody());
-
-                if (responseProcessor.isValidMessage(sqsResponse, sensorList, bucketManager)) {
-                    bucketManager.addResponseToBucket(sqsResponse);
+                try {
+                    sqsResponse = sqsResponseService.parseResponse(msg.getBody());
+                    if (responseProcessor.isValidMessage(sqsResponse, sensorList, bucketManager)) {
+                        bucketManager.addResponseToBucket(sqsResponse);
+                    }
+                } catch (InvalidSqsResponseException e) {
+                    logger.warn("Invalid JSON string received" + e.getMessage());
+                    logger.warn("Received json string: " + msg.getBody());
                 }
             }
 

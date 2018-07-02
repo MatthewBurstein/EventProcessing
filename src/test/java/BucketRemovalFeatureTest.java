@@ -55,7 +55,6 @@ public class BucketRemovalFeatureTest {
         Bucket expectedBucket = bucketManager.getBuckets().get(0);
 
         Bucket removedBucket = bucketManager.removeExpiredBucket(expiryTime);
-        System.out.println("Removed bucket " + removedBucket);
         assertEquals(expectedBucket, removedBucket);
     }
 
@@ -72,7 +71,6 @@ public class BucketRemovalFeatureTest {
                 bucketManager.getBuckets().get(2));
 
         List<Bucket> removedBuckets = bucketManager.removeMultipleExpiredBuckets(expiryTime);
-        System.out.println("Removed bucket " + removedBuckets);
         assertEquals(expectedBuckets, removedBuckets);
     }
 
