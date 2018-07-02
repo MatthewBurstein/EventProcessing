@@ -1,5 +1,6 @@
 package eventprocessing.fileservices;
 
+import com.amazonaws.services.cloudformation.model.EstimateTemplateCostRequest;
 import eventprocessing.analysis.Analyser;
 import eventprocessing.models.Bucket;
 import org.apache.commons.csv.CSVFormat;
@@ -15,6 +16,7 @@ import java.util.List;
 public class CSVFileService {
     private final String outputCsvFile;
     private final Analyser analyser;
+    private int ESTIMATED_LINE_LENGTH = 70;
 
     public CSVFileService(String outputCsvFile) {
         this.outputCsvFile = outputCsvFile;
@@ -23,18 +25,19 @@ public class CSVFileService {
 
     public void writeBucketDataToFile(Bucket bucketToWriteToFile) throws IOException {
         CSVFormat csvFormat = getCsvFormat();
-        StringBuffer stringBuffer = new StringBuffer(1000);
+        StringBuffer stringBuffer = new StringBuffer(ESTIMATED_LINE_LENGTH * 2);
         try (CSVPrinter csvPrinter = new CSVPrinter(stringBuffer, csvFormat)) {
             writeBucketToStream(csvPrinter, bucketToWriteToFile);
             writeToFile(stringBuffer);
         }
     }
 
-    public void writeMultipleBucketDataToFile(List<Bucket> bucketToWriteToFile) throws IOException {
+    public void writeMultipleBucketDataToFile(List<Bucket> bucketsToWriteToFile) throws IOException {
         CSVFormat csvFormat = getCsvFormat();
-        StringBuffer stringBuffer = new StringBuffer(1000);
+        int estimatedCharacterCount = ESTIMATED_LINE_LENGTH * (bucketsToWriteToFile.size() + 1);
+        StringBuffer stringBuffer = new StringBuffer(estimatedCharacterCount);
         try (CSVPrinter csvPrinter = new CSVPrinter(stringBuffer, csvFormat)) {
-            bucketToWriteToFile.forEach(bucket -> writeBucketToStream(csvPrinter, bucket));
+            bucketsToWriteToFile.forEach(bucket -> writeBucketToStream(csvPrinter, bucket));
             writeToFile(stringBuffer);
         }
     }
