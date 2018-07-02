@@ -8,6 +8,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
@@ -16,7 +19,9 @@ public class CsvFileServiceTest {
 
     @Test
     public void writeRemovedBucketsToFile_createsFileWithCalculatedAveragesForExpiredBuckets() throws IOException {
-        CSVFileService csvFileService = new CSVFileService("TestResponseData1.csv");
+        String testDataFileName = "TestResponseData.csv";
+        Files.deleteIfExists(Paths.get(testDataFileName));
+        CSVFileService csvFileService = new CSVFileService(testDataFileName);
         Analyser mockAnalyser = Mockito.mock(Analyser.class);
         Bucket mockBucket1 = Mockito.mock(Bucket.class);
         Bucket mockBucket2 = Mockito.mock(Bucket.class);
