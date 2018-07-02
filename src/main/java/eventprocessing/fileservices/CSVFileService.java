@@ -40,6 +40,10 @@ public class CSVFileService {
         }
     }
 
+    public void deleteOutputFile() throws IOException {
+        Files.deleteIfExists(Paths.get(outputCsvFile));
+    }
+
     private void writeBucketToStream(CSVPrinter csvPrinter, Bucket bucket) {
         String startTime = bucket.getTimeRange().getMinimum().toString();
         String endTime = bucket.getTimeRange().getMaximum().toString();

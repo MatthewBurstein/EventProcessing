@@ -1,8 +1,8 @@
 package eventprocessing;
 
+import com.amazonaws.services.sqs.model.*;
 import com.amazonaws.services.sqs.model.Message;
-import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
-import com.amazonaws.services.sqs.model.ReceiveMessageResult;
+import com.google.common.collect.Lists;
 import eventprocessing.amazonservices.*;
 import eventprocessing.analysis.Analyser;
 import eventprocessing.customerrors.InvalidSqsResponseException;
@@ -16,7 +16,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -36,6 +38,8 @@ public class Main {
         logger.debug("App launched");
         createObjects();
 
+        csvFileService.deleteOutputFile();
+
         JSONParser jsonParser = new JSONParser("locations.json");
         SensorList sensorList = jsonParser.createSensorList();
 
@@ -49,16 +53,30 @@ public class Main {
 
         //initial while loop stores five minutes of data with no buckets
         stopWatch.start();
+        long tensOfSeconds = 0;
         while (stopWatch.getTime() < GlobalConstants.FIRST_LOOP_DURATION) {
+            System.out.println("start of loop: " + System.currentTimeMillis());
+//            if (tensOfSeconds == stopWatch.getTime() / 10000) {
+//                GetQueueAttributesRequest attr = new GetQueueAttributesRequest(queueUrl);
+//                attr.setAttributeNames(Lists.newArrayList("ApproximateNumberOfMessages"));
+//                Map<String, String> attributesMap = sqsClient.getSqs().getQueueAttributes(attr).getAttributes();
+//                logger.info("queue size = " + attributesMap.get("ApproximateNumberOfMessages"));
+//                tensOfSeconds++;
+//            }
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
-
+            System.out.println("After Request: " + System.currentTimeMillis());
             for (Message msg : messageResult.getMessages()) {
-                SqsResponse sqsResponse = sqsResponseService.parseResponse(msg.getBody());
-
-                if (responseProcessor.isValidMessage(sqsResponse, sensorList, initialBucket)) {
-                    initialBucket.addResponse(sqsResponse);
+                try {
+                    SqsResponse sqsResponse = sqsResponseService.parseResponse(msg.getBody());
+                    if (responseProcessor.isValidMessage(sqsResponse, sensorList, initialBucket)) {
+                        initialBucket.addResponse(sqsResponse);
+                    }
+                } catch (InvalidSqsResponseException e) {
+                    logger.warn("Invalid JSON string received" + e.getMessage());
+                    logger.warn("Received json string: " + msg.getBody());
                 }
             }
+            System.out.println("After Processing: " + System.currentTimeMillis());
         }
 
         logger.info("Finding earliest timestamp...");
@@ -85,11 +103,10 @@ public class Main {
         //Responses from here bucketed as they come in
         while (stopWatch.getTime() < (duration*60000 - GlobalConstants.FIRST_LOOP_DURATION)) {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
-            SqsResponse sqsResponse;
 
             for (Message msg : messageResult.getMessages()) {
                 try {
-                    sqsResponse = sqsResponseService.parseResponse(msg.getBody());
+                    SqsResponse sqsResponse = sqsResponseService.parseResponse(msg.getBody());
                     if (responseProcessor.isValidMessage(sqsResponse, sensorList, bucketManager)) {
                         bucketManager.addResponseToBucket(sqsResponse);
                     }
@@ -106,38 +123,6 @@ public class Main {
             }
         }
 
-
-
-//        while (true) {
-//            Bucket removedBucket = bucketManager.removeExpiredBucket();
-//
-//            csvFileService.writeBucketDataToFile(removedBucket);
-//
-//            ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
-//            for (Message msg : messageResult.getMessages()) {
-//                SqsResponse response = sqsResponseService.parseResponse(msg.getBody());
-//                if (responseProcessor.isValidMessage(response, sensorList, messageLog)) {
-//                    System.out.println("working sensor with id: " + response.getMessage().getLocationId());
-//                    System.out.println(msg.getBody());
-////                    responseList.getSqsResponse().add(response);
-//                    bucketManager.addResponseToBucket(response);
-//                    messageLog.getMessageHistory().add(response.messageId);
-//                    messageLog.truncateIfExceedsMaxSize();
-//                } else {
-//                    System.out.println("sensor not working with id: " + response.getMessage().getLocationId());
-//                }
-//            }
-//            System.out.println("=================================================");
-//            Thread.sleep(1000);
-//
-////            double averageValue = analyser.getAverageValue(responseList);
-////            System.out.println("Cumulative average of sensor values: " + averageValue);
-//
-//            if (stopWatch.getTime() > duration) {
-//                sqsClient.destroyQueue();
-//                break;
-//            }
-//        }
     }
 
     private static void createObjects() throws IOException {

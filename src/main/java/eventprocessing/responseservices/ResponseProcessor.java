@@ -37,7 +37,7 @@ public class ResponseProcessor {
 
     public boolean isDuplicateMessage(SqsResponse sqsResponse, Bucket bucket) {
         boolean result = bucket.getMessageIds().contains(sqsResponse.getMessageId());
-        if (result) { logger.info("Removed duplicate message with ID: " + sqsResponse.getMessageId()); }
+//        if (result) { logger.info("Removed duplicate message with ID: " + sqsResponse.getMessageId()); }
         return result;
     }
 }
