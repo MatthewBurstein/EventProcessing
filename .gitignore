@@ -1,7 +1,7 @@
 sqlScripts/
 *.iml
 .idea/
-.logs/
+logs/
 
 target/
 
