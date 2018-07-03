@@ -16,27 +16,13 @@ import static org.mockito.Mockito.when;
 public class CsvFileServiceTest {
 
     @Test
-    public void writeRemovedBucketsToFile_createsFileWithCalculatedAveragesForExpiredBuckets() throws IOException {
+    public void writeBucketDataAndWriteMultipleBucketData_createFileWithCalculatedAveragesForExpiredBuckets() throws IOException {
         String testDataFileName = "TestResponseData.csv";
         Files.deleteIfExists(Paths.get(testDataFileName));
         CSVFileService csvFileService = new CSVFileService(testDataFileName);
-        Bucket mockBucket1 = Mockito.mock(Bucket.class);
-        Bucket mockBucket2 = Mockito.mock(Bucket.class);
-        Bucket mockBucket3 = Mockito.mock(Bucket.class);
-        SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
-
-        when(mockBucket1.getTimeRange()).thenReturn(Range.between((long) 0, (long) 5999));
-        when(mockBucket1.getSqsResponses()).thenReturn(Lists.newArrayList(mockSqsResponse));
-        when(mockBucket1.getAverageValue()).thenReturn(1.0);
-
-        when(mockBucket2.getTimeRange()).thenReturn(Range.between((long) 6000, (long) 11999));
-        when(mockBucket2.getSqsResponses()).thenReturn(Lists.newArrayList(mockSqsResponse, mockSqsResponse));
-        when(mockBucket2.getAverageValue()).thenReturn(2.0);
-
-        when(mockBucket3.getTimeRange()).thenReturn(Range.between((long) 12000, (long) 17999));
-        when(mockBucket3.getSqsResponses()).thenReturn(Lists.newArrayList(mockSqsResponse, mockSqsResponse, mockSqsResponse));
-        when(mockBucket3.getAverageValue()).thenReturn(3.0);
-
+        Bucket mockBucket1 = setupMockBucket(0, 5999, 1);
+        Bucket mockBucket2 = setupMockBucket(6000, 11999, 2);
+        Bucket mockBucket3 = setupMockBucket(12000, 17999, 3);
 
         csvFileService.writeBucketDataToFile(mockBucket1);
 
@@ -51,6 +37,15 @@ public class CsvFileServiceTest {
         12000,17999,3,0.0
 
         */
+    }
+
+    private Bucket setupMockBucket(long rangeStart, long rangeEnd, double averageValue) {
+        Bucket mockBucket = Mockito.mock(Bucket.class);
+        SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
+        when(mockBucket.getTimeRange()).thenReturn(Range.between(rangeStart, rangeEnd));
+        when(mockBucket.getSqsResponses()).thenReturn(Lists.newArrayList(mockSqsResponse));
+        when(mockBucket.getAverageValue()).thenReturn(averageValue);
+        return mockBucket;
     }
 
 }

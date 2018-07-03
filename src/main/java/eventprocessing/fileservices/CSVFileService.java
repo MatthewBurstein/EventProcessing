@@ -12,7 +12,7 @@ import java.util.List;
 
 public class CSVFileService {
     private final String outputCsvFile;
-    private int ESTIMATED_LINE_LENGTH = 70;
+    private final int ESTIMATED_LINE_LENGTH = 70;
 
     public CSVFileService(String outputCsvFile) {
         this.outputCsvFile = outputCsvFile;
