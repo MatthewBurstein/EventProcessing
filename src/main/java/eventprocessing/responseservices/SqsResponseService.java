@@ -8,7 +8,6 @@ import eventprocessing.models.SqsResponse;
 public class SqsResponseService {
 
     public SqsResponse parseResponse(String jsonString) {
-
         jsonString = formatJsonString(jsonString);
         Gson gson = new GsonBuilder().registerTypeAdapter(Message.class, new MessageAdaptor()).create();
         try {

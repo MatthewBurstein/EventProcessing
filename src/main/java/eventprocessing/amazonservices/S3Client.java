@@ -29,10 +29,11 @@ class S3Client {
             S3Object s3Object = s3.getObject(S3Details.s3BucketLocation, S3Details.s3Key);
             return s3Object.getObjectContent();
         } catch (AmazonServiceException e) {
-            logger.fatal("Fatal error retrieving locations.json from S3 Bucket - " + e.getErrorMessage());
-            throw e;
+            String errorString = "Fatal error retrieving locations.json from S3 Bucket " +
+            "\n s3BucketLocation: " + S3Details.s3BucketLocation +
+            "\n s3Key: " + S3Details.s3Key;
+            throw new RuntimeException(errorString, e);
         }
-
     }
 
 }
