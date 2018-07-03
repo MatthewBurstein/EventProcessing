@@ -13,4 +13,12 @@ public class SensorList {
     public List<Sensor> getSensors() {
         return sensors;
     }
+
+    public boolean isWorkingSensor(SqsResponse sqsResponse) {
+        long count = sensors
+                .stream()
+                .filter(sensor -> sensor.getId().equals(sqsResponse.getMessage().getLocationId()))
+                .count();
+        return count > 0;
+    }
 }

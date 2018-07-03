@@ -123,18 +123,4 @@ public class BucketManagerTest {
         Bucket removedBucket = bucketManager.removeExpiredBucket(GlobalConstants.BUCKET_UPPER_BOUND * 6);
         assertEquals(removedBucket, firstBucket);
     }
-
-    @Test
-    public void getMessageIds_returnsListOfMessageIds() {
-        Bucket mockBucket1 = Mockito.mock(Bucket.class);
-        when(mockBucket1.getMessageIds()).thenReturn(Lists.newArrayList("bucket1 id1", "bucket1 id2"));
-        Bucket mockBucket2 = Mockito.mock(Bucket.class);
-        when(mockBucket2.getMessageIds()).thenReturn(Lists.newArrayList("bucket2 id1"));
-        bucketManager.getBuckets().addAll(Lists.newArrayList(mockBucket1, mockBucket2));
-        List<String> expected = Lists.newArrayList("bucket1 id1", "bucket1 id2", "bucket2 id1");
-        assertEquals(bucketManager.getMessageIds(), expected);
-    }
-
-
-
 }

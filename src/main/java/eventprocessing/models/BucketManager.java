@@ -78,11 +78,4 @@ public class BucketManager {
         buckets.remove(bucket);
         return bucket;
     }
-
-    public List<String> getMessageIds() {
-        return buckets.stream()
-                .map(bucket -> bucket.getMessageIds())
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
-    }
 }

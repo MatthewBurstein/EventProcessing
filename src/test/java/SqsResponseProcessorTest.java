@@ -11,8 +11,6 @@ import static org.mockito.Mockito.when;
 
 public class SqsResponseProcessorTest {
 
-    private Sensor mockSensor;
-    private SensorList mockSensorList;
     private Message mockMessage;
     private SqsResponse mockSqsResponse;
     private Bucket mockBucket;
@@ -20,10 +18,6 @@ public class SqsResponseProcessorTest {
 
     @Before
     public void setup() {
-        mockSensor = Mockito.mock(Sensor.class);
-        when(mockSensor.getId()).thenReturn("validId");
-        mockSensorList = Mockito.mock(SensorList.class);
-        when(mockSensorList.getSensors()).thenReturn(Lists.newArrayList(mockSensor));
         mockMessage = Mockito.mock(Message.class);
         mockSqsResponse = Mockito.mock(SqsResponse.class);
         when(mockSqsResponse.getMessage()).thenReturn(mockMessage);
@@ -32,18 +26,6 @@ public class SqsResponseProcessorTest {
         when(mockBucket.getMessageIds()).thenReturn(Lists.newArrayList("messageId1", "messageId2"));
 
         responseProcessor = new ResponseProcessor();
-    }
-
-    @Test
-    public void isWorkingSensor_returnsTrue() {
-        when(mockMessage.getLocationId()).thenReturn("validId");
-        assertTrue(responseProcessor.isWorkingSensor(mockSqsResponse, mockSensorList));
-    }
-
-    @Test
-    public void isNotWorkingSensor_returnsFalse() {
-        when(mockMessage.getLocationId()).thenReturn("invalidId");
-        assertFalse(responseProcessor.isWorkingSensor(mockSqsResponse, mockSensorList));
     }
 
     @Test
