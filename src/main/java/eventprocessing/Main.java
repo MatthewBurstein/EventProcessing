@@ -106,7 +106,6 @@ public class Main {
                     logger.warn("Received json string: " + msg.getBody());
                 }
             }
-
             Bucket removedBucket = bucketManager.removeExpiredBucket(System.currentTimeMillis());
             if (removedBucket != null) {
                 csvFileService.writeBucketDataToFile(removedBucket);

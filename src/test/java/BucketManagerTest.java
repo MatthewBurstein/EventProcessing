@@ -1,5 +1,6 @@
 import com.google.common.collect.Lists;
 import eventprocessing.GlobalConstants;
+import eventprocessing.fileservices.CSVFileService;
 import eventprocessing.models.Bucket;
 import eventprocessing.models.BucketManager;
 import eventprocessing.models.InitialBucket;
@@ -8,7 +9,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.mockito.stubbing.OngoingStubbing;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -53,8 +56,7 @@ public class BucketManagerTest {
 
     @Test
     public void addResponseToBucket_addsResponseToCorrectBucket() {
-        SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
-        when(mockSqsResponse.getMessageTimestamp()).thenReturn(GlobalConstants.BUCKET_UPPER_BOUND);
+        SqsResponse mockSqsResponse = buildMockSqsResponse(GlobalConstants.BUCKET_UPPER_BOUND);
         bucketManager.addResponseToBucket(mockSqsResponse);
         List<Bucket> bucket = bucketManager.getBuckets();
 
@@ -67,21 +69,16 @@ public class BucketManagerTest {
 
     @Test
     public void addMultipleResponsesToBucket_addsResponsesToCorrectBuckets() {
-        SqsResponse mockSqsResponse1 = Mockito.mock(SqsResponse.class);
-        when(mockSqsResponse1.getMessageTimestamp()).thenReturn(GlobalConstants.BUCKET_UPPER_BOUND);
-        SqsResponse mockSqsResponse2 = Mockito.mock(SqsResponse.class);
-        when(mockSqsResponse2.getMessageTimestamp()).thenReturn((long) 0);
-        SqsResponse mockSqsResponse3 = Mockito.mock(SqsResponse.class);
-        when(mockSqsResponse3.getMessageTimestamp()).thenReturn(GlobalConstants.BUCKET_UPPER_BOUND * 4);
-        SqsResponse mockSqsResponse4 = Mockito.mock(SqsResponse.class);
-        when(mockSqsResponse4.getMessageTimestamp()).thenReturn(GlobalConstants.BUCKET_UPPER_BOUND * 2);
-        SqsResponse mockSqsResponse5 = Mockito.mock(SqsResponse.class);
-        when(mockSqsResponse5.getMessageTimestamp()).thenReturn(GlobalConstants.BUCKET_UPPER_BOUND * 3);
+        SqsResponse mockSqsResponse1 = buildMockSqsResponse(GlobalConstants.BUCKET_UPPER_BOUND);
+        SqsResponse mockSqsResponse2 = buildMockSqsResponse(0);
+        SqsResponse mockSqsResponse3 = buildMockSqsResponse(GlobalConstants.BUCKET_UPPER_BOUND * 4);
+        SqsResponse mockSqsResponse4 = buildMockSqsResponse(GlobalConstants.BUCKET_UPPER_BOUND * 2);
+        SqsResponse mockSqsResponse5 = buildMockSqsResponse(GlobalConstants.BUCKET_UPPER_BOUND * 3);
 
-        InitialBucket mockResponseList = Mockito.mock(InitialBucket.class);
-        when(mockResponseList.getSqsResponses()).thenReturn(Lists.newArrayList(mockSqsResponse1, mockSqsResponse2,
+        InitialBucket mockInitialBucket = Mockito.mock(InitialBucket.class);
+        when(mockInitialBucket.getSqsResponses()).thenReturn(Lists.newArrayList(mockSqsResponse1, mockSqsResponse2,
                 mockSqsResponse3, mockSqsResponse4, mockSqsResponse5));
-        bucketManager.addMultipleResponsesToBucket(mockResponseList);
+        bucketManager.addMultipleResponsesToBucket(mockInitialBucket);
         List<Bucket> buckets = bucketManager.getBuckets();
 
         assertThat(buckets.get(0).getSqsResponses()).containsOnly(mockSqsResponse2);
@@ -140,5 +137,12 @@ public class BucketManagerTest {
         when(mockBucket1.isDuplicateMessage(mockSqsResponse)).thenReturn(false);
         bucketManager.getBuckets().add(mockBucket1);
         assertFalse(bucketManager.isDuplicateMessage(mockSqsResponse));
+    }
+
+
+    private SqsResponse buildMockSqsResponse(long timeStamp) {
+        SqsResponse mockSqsResponse1 = Mockito.mock(SqsResponse.class);
+        when(mockSqsResponse1.getMessageTimestamp()).thenReturn(timeStamp);
+        return mockSqsResponse1;
     }
 }
