@@ -2,29 +2,24 @@ package eventprocessing;
 
 import com.amazonaws.services.sqs.model.*;
 import com.amazonaws.services.sqs.model.Message;
-import com.google.common.collect.Lists;
 import eventprocessing.amazonservices.*;
 import eventprocessing.customerrors.InvalidSqsResponseException;
 import eventprocessing.fileservices.CSVFileService;
 import eventprocessing.fileservices.JSONParser;
 import eventprocessing.models.*;
-import eventprocessing.responseservices.ResponseProcessor;
 import eventprocessing.responseservices.SqsResponseService;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
     static Logger logger = LogManager.getLogger(Main.class);
 
     private static SqsResponseService sqsResponseService;
-    private static ResponseProcessor responseProcessor;
     private static Scanner scanner;
     private static AmazonController amazonController;
     private static InitialBucket initialBucket;
@@ -66,7 +61,7 @@ public class Main {
             for (Message msg : messageResult.getMessages()) {
                 try {
                     SqsResponse sqsResponse = sqsResponseService.parseResponse(msg.getBody());
-                    if (responseProcessor.isValidMessage(sqsResponse, sensorList, initialBucket)) {
+                    if (!initialBucket.isDuplicateMessage(sqsResponse) && sensorList.isWorkingSensor(sqsResponse)) {
                         initialBucket.addResponse(sqsResponse);
                     }
                 } catch (InvalidSqsResponseException e) {
@@ -105,9 +100,10 @@ public class Main {
             for (Message msg : messageResult.getMessages()) {
                 try {
                     SqsResponse sqsResponse = sqsResponseService.parseResponse(msg.getBody());
-                    if (responseProcessor.isValidMessage(sqsResponse, sensorList, bucketManager)) {
-                        bucketManager.addResponseToBucket(sqsResponse);
+                    if(!bucketManager.isDuplicateMessage(sqsResponse) && sensorList.isWorkingSensor(sqsResponse)) {
+                            bucketManager.addResponseToBucket(sqsResponse);
                     }
+
                 } catch (InvalidSqsResponseException e) {
                     logger.warn("Invalid JSON string received" + e.getMessage());
                     logger.warn("Received json string: " + msg.getBody());
@@ -125,7 +121,6 @@ public class Main {
 
     private static void createObjects() throws IOException {
         sqsResponseService = new SqsResponseService();
-        responseProcessor = new ResponseProcessor();
         scanner = new Scanner(System.in);
         amazonController = new AmazonController();
         initialBucket = new InitialBucket();

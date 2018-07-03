@@ -1,6 +1,5 @@
 import com.google.common.collect.Lists;
 import eventprocessing.models.*;
-import eventprocessing.responseservices.ResponseProcessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

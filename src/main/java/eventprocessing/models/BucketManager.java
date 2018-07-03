@@ -2,6 +2,7 @@ package eventprocessing.models;
 
 import eventprocessing.GlobalConstants;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -76,5 +77,13 @@ public class BucketManager {
     public Bucket remove(Bucket bucket) {
         buckets.remove(bucket);
         return bucket;
+    }
+
+    public boolean isDuplicateMessage(SqsResponse sqsResponse) {
+        boolean result = false;
+        for(Bucket bucket : buckets) {
+            if(bucket.isDuplicateMessage(sqsResponse)) result = true ;
+        }
+        return result;
     }
 }

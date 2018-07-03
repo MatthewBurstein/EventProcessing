@@ -123,4 +123,22 @@ public class BucketManagerTest {
         Bucket removedBucket = bucketManager.removeExpiredBucket(GlobalConstants.BUCKET_UPPER_BOUND * 6);
         assertEquals(removedBucket, firstBucket);
     }
+
+    @Test
+    public void isDuplicateMessage_returnsTrueForDuplicateMessage() {
+        SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
+        Bucket mockBucket1 = Mockito.mock(Bucket.class);
+        when(mockBucket1.isDuplicateMessage(mockSqsResponse)).thenReturn(true);
+        bucketManager.getBuckets().add(mockBucket1);
+        assertTrue(bucketManager.isDuplicateMessage(mockSqsResponse));
+    }
+
+    @Test
+    public void isDuplicateMessage_returnsFalseForNonDuplicateMessage() {
+        SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
+        Bucket mockBucket1 = Mockito.mock(Bucket.class);
+        when(mockBucket1.isDuplicateMessage(mockSqsResponse)).thenReturn(false);
+        bucketManager.getBuckets().add(mockBucket1);
+        assertFalse(bucketManager.isDuplicateMessage(mockSqsResponse));
+    }
 }
