@@ -8,7 +8,8 @@ import eventprocessing.models.SqsResponse;
 public class SqsResponseService {
 
     public SqsResponse parseResponse(String jsonString) {
-        jsonString = jsonString.replace("\"{", "{").replace("}\"", "}");
+
+        jsonString = formatJsonString(jsonString);
         Gson gson = new GsonBuilder().registerTypeAdapter(Message.class, new MessageAdaptor()).create();
         try {
             SqsResponse sqsResponseObject = gson.fromJson(jsonString, SqsResponse.class);
@@ -17,5 +18,11 @@ public class SqsResponseService {
         } catch (IllegalStateException | JsonSyntaxException e) {
             throw new InvalidSqsResponseException(e);
         }
+    }
+
+    private String formatJsonString(String jsonString) {
+        jsonString = jsonString.replace("\"{", "{").replace("}\"", "}");
+        jsonString = jsonString.replace("\\", "");
+        return jsonString;
     }
 }

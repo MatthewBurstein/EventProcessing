@@ -48,7 +48,6 @@ public class Main {
         stopWatch.start();
         long tensOfSeconds = 0;
         while (stopWatch.getTime() < GlobalConstants.FIRST_LOOP_DURATION) {
-            System.out.println("start of loop: " + System.currentTimeMillis());
 //            if (tensOfSeconds == stopWatch.getTime() / 10000) {
 //                GetQueueAttributesRequest attr = new GetQueueAttributesRequest(queueUrl);
 //                attr.setAttributeNames(Lists.newArrayList("ApproximateNumberOfMessages"));
@@ -57,7 +56,6 @@ public class Main {
 //                tensOfSeconds++;
 //            }
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
-            System.out.println("After Request: " + System.currentTimeMillis());
             for (Message msg : messageResult.getMessages()) {
                 try {
                     SqsResponse sqsResponse = sqsResponseService.parseResponse(msg.getBody());
@@ -69,7 +67,6 @@ public class Main {
                     logger.warn("Received json string: " + msg.getBody());
                 }
             }
-            System.out.println("After Processing: " + System.currentTimeMillis());
         }
 
         logger.info("Finding earliest timestamp...");
