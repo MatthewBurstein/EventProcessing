@@ -17,4 +17,20 @@ public class Message {
     public long getTimestamp() {
         return timestamp;
     }
+
+    public void setLocationId(String locationId) {
+        this.locationId = locationId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
 }

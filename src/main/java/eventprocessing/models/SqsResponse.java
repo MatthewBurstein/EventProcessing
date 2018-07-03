@@ -10,9 +10,8 @@ import java.util.Date;
 public class SqsResponse {
     @SerializedName("MessageId")
     private String messageId;
-    private Message message;
     @SerializedName("Message")
-    private String messageString;
+    private Message message;
     @SerializedName("Timestamp")
     private String responseTimestamp;
 
@@ -25,20 +24,12 @@ public class SqsResponse {
         }
     }
 
-    public void setMessage(Message message) {
-        this.message = message;
-    }
-
     public Message getMessage() {
         return message;
     }
 
     public String getMessageId() {
         return messageId;
-    }
-
-    public String getMessageString() {
-        return messageString;
     }
 
     public double getValue() {

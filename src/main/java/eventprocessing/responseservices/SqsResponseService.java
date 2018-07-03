@@ -1,26 +1,19 @@
 package eventprocessing.responseservices;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.stream.MalformedJsonException;
+import com.google.gson.*;
+import eventprocessing.adaptors.MessageAdaptor;
 import eventprocessing.customerrors.InvalidSqsResponseException;
 import eventprocessing.models.Message;
 import eventprocessing.models.SqsResponse;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 
 public class SqsResponseService {
 
-    private final Logger logger = LogManager.getLogger("SqsResponseService");
-
     public SqsResponse parseResponse(String jsonString) {
-        Gson gson = new Gson();
+        jsonString = jsonString.replace("\"{", "{").replace("}\"", "}");
+        Gson gson = new GsonBuilder().registerTypeAdapter(Message.class, new MessageAdaptor()).create();
         try {
             SqsResponse sqsResponseObject = gson.fromJson(jsonString, SqsResponse.class);
-            String messageString = sqsResponseObject.getMessageString();
-            Message messageObject = gson.fromJson(messageString, Message.class);
-            sqsResponseObject.setMessage(messageObject);
             return sqsResponseObject;
+
         } catch (IllegalStateException | JsonSyntaxException e) {
             throw new InvalidSqsResponseException(e);
         }
