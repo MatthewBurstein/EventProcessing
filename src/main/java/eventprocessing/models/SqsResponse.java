@@ -9,12 +9,12 @@ import java.util.Date;
 
 public class SqsResponse {
     @SerializedName("MessageId")
-    public String messageId;
-    public Message message;
+    private String messageId;
+    private Message message;
     @SerializedName("Message")
-    public String messageString;
+    private String messageString;
     @SerializedName("Timestamp")
-    public String responseTimestamp;
+    private String responseTimestamp;
 
     @Override
     public String toString() {

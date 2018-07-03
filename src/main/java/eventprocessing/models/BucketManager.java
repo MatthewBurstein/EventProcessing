@@ -73,7 +73,6 @@ public class BucketManager {
         return remove(removedBucket);
     }
 
-
     public Bucket remove(Bucket bucket) {
         buckets.remove(bucket);
         return bucket;

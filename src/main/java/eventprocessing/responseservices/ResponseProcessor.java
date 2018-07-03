@@ -12,11 +12,11 @@ public class ResponseProcessor {
 
     public boolean isValidMessage(SqsResponse sqsResponse, SensorList sensorList, BucketManager bucketManager) {
         boolean isValid = true;
+        if(!sensorList.isWorkingSensor(sqsResponse)) {
+            isValid = false;
+        }
         for(Bucket bucket : bucketManager.getBuckets()) {
-            if(!sensorList.isWorkingSensor(sqsResponse)) {
-                isValid = false;
-            }
-            if (isDuplicateMessage(sqsResponse, bucket)) {
+            if (bucket.isDuplicateMessage(sqsResponse)) {
                 isValid = false;
             }
         }
@@ -24,11 +24,7 @@ public class ResponseProcessor {
     }
 
     public boolean isValidMessage(SqsResponse sqsResponse, SensorList sensorList, Bucket bucket) {
-        return sensorList.isWorkingSensor(sqsResponse) && !isDuplicateMessage(sqsResponse, bucket);
+        return sensorList.isWorkingSensor(sqsResponse) && !bucket.isDuplicateMessage(sqsResponse);
     }
 
-    public boolean isDuplicateMessage(SqsResponse sqsResponse, Bucket bucket) {
-        boolean result = bucket.getMessageIds().contains(sqsResponse.getMessageId());
-        return result;
-    }
 }

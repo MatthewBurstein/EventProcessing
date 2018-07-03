@@ -61,4 +61,8 @@ public class Bucket {
         return total / getSqsResponses().size();
     }
 
+    public boolean isDuplicateMessage(SqsResponse sqsResponse) {
+        boolean result = getMessageIds().contains(sqsResponse.getMessageId());
+        return result;
+    }
 }

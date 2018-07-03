@@ -6,13 +6,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class BucketTest {
@@ -72,5 +70,19 @@ public class BucketTest {
         assertEquals(expectedValue, bucket.getAverageValue(), 0);
     }
 
+    @Test
+    public void isDuplicateMessage_whenDuplicate_returnsTrue() {
+        SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
+        when(mockSqsResponse.getMessageId()).thenReturn("messageId1");
+        bucket.addResponse(mockSqsResponse);
+        assertTrue(bucket.isDuplicateMessage(mockSqsResponse));
+    }
+
+    @Test
+    public void isDuplicateMessage_whenNotDuplicate_returnsFalse() {
+        SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
+        when(mockSqsResponse.getMessageId()).thenReturn("newMessageId");
+        assertFalse(bucket.isDuplicateMessage(mockSqsResponse));
+    }
 
 }
