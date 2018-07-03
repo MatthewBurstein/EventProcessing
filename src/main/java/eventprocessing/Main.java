@@ -4,7 +4,6 @@ import com.amazonaws.services.sqs.model.*;
 import com.amazonaws.services.sqs.model.Message;
 import com.google.common.collect.Lists;
 import eventprocessing.amazonservices.*;
-import eventprocessing.analysis.Analyser;
 import eventprocessing.customerrors.InvalidSqsResponseException;
 import eventprocessing.fileservices.CSVFileService;
 import eventprocessing.fileservices.JSONParser;
@@ -30,7 +29,6 @@ public class Main {
     private static AmazonController amazonController;
     private static InitialBucket initialBucket;
     private static BucketManager bucketManager;
-    private static Analyser analyser;
     private static StopWatch stopWatch;
     private static CSVFileService csvFileService;
 
@@ -131,7 +129,6 @@ public class Main {
         scanner = new Scanner(System.in);
         amazonController = new AmazonController();
         initialBucket = new InitialBucket();
-        analyser = new Analyser();
         stopWatch = new StopWatch();
         csvFileService = new CSVFileService("ResponseData.csv");
     }

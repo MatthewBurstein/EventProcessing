@@ -10,7 +10,7 @@ public class InitialBucket extends Bucket {
     }
 
     public long getEarliestTimestamp() {
-        Optional<SqsResponse> earliestResponse = getSqsResponse().stream()
+        Optional<SqsResponse> earliestResponse = getSqsResponses().stream()
                 .min(Comparator.comparing(SqsResponse::getMessageTimestamp));
 
         return earliestResponse.get().getMessageTimestamp();

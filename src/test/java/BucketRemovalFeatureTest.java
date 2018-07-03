@@ -119,7 +119,7 @@ public class BucketRemovalFeatureTest {
     
     public void createInitialBucket() {
         initialBucket = new InitialBucket();
-        initialBucket.getSqsResponse().addAll(Lists.newArrayList(mockSqsResponse1, mockSqsResponse2, mockSqsResponse3, mockSqsResponse4, mockSqsResponse5, mockSqsResponse6, mockSqsResponse7, mockSqsResponse8, mockSqsResponse9, mockSqsResponse10, mockSqsResponse11, mockSqsResponse12, mockSqsResponse13, mockSqsResponse14, mockSqsResponse15, mockSqsResponse16, mockSqsResponse17, mockSqsResponse18, mockSqsResponse19, mockSqsResponse20));
+        initialBucket.getSqsResponses().addAll(Lists.newArrayList(mockSqsResponse1, mockSqsResponse2, mockSqsResponse3, mockSqsResponse4, mockSqsResponse5, mockSqsResponse6, mockSqsResponse7, mockSqsResponse8, mockSqsResponse9, mockSqsResponse10, mockSqsResponse11, mockSqsResponse12, mockSqsResponse13, mockSqsResponse14, mockSqsResponse15, mockSqsResponse16, mockSqsResponse17, mockSqsResponse18, mockSqsResponse19, mockSqsResponse20));
 
         earliestTimestamp = initialBucket.getEarliestTimestamp();
         expiryTime = earliestTimestamp

@@ -1,5 +1,4 @@
 import com.google.common.collect.Lists;
-import eventprocessing.analysis.Analyser;
 import eventprocessing.fileservices.CSVFileService;
 import eventprocessing.models.Bucket;
 import eventprocessing.models.SqsResponse;
@@ -21,23 +20,22 @@ public class CsvFileServiceTest {
         String testDataFileName = "TestResponseData.csv";
         Files.deleteIfExists(Paths.get(testDataFileName));
         CSVFileService csvFileService = new CSVFileService(testDataFileName);
-        Analyser mockAnalyser = Mockito.mock(Analyser.class);
         Bucket mockBucket1 = Mockito.mock(Bucket.class);
         Bucket mockBucket2 = Mockito.mock(Bucket.class);
         Bucket mockBucket3 = Mockito.mock(Bucket.class);
         SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
 
         when(mockBucket1.getTimeRange()).thenReturn(Range.between((long) 0, (long) 5999));
-        when(mockBucket1.getSqsResponse()).thenReturn(Lists.newArrayList(mockSqsResponse));
-        when(mockAnalyser.getAverageValue(mockBucket1)).thenReturn(1.0);
+        when(mockBucket1.getSqsResponses()).thenReturn(Lists.newArrayList(mockSqsResponse));
+        when(mockBucket1.getAverageValue()).thenReturn(1.0);
 
         when(mockBucket2.getTimeRange()).thenReturn(Range.between((long) 6000, (long) 11999));
-        when(mockBucket2.getSqsResponse()).thenReturn(Lists.newArrayList(mockSqsResponse, mockSqsResponse));
-        when(mockAnalyser.getAverageValue(mockBucket2)).thenReturn(2.0);
+        when(mockBucket2.getSqsResponses()).thenReturn(Lists.newArrayList(mockSqsResponse, mockSqsResponse));
+        when(mockBucket2.getAverageValue()).thenReturn(2.0);
 
         when(mockBucket3.getTimeRange()).thenReturn(Range.between((long) 12000, (long) 17999));
-        when(mockBucket3.getSqsResponse()).thenReturn(Lists.newArrayList(mockSqsResponse, mockSqsResponse, mockSqsResponse));
-        when(mockAnalyser.getAverageValue(mockBucket3)).thenReturn(3.0);
+        when(mockBucket3.getSqsResponses()).thenReturn(Lists.newArrayList(mockSqsResponse, mockSqsResponse, mockSqsResponse));
+        when(mockBucket3.getAverageValue()).thenReturn(3.0);
 
 
         csvFileService.writeBucketDataToFile(mockBucket1);

@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class Bucket {
 
     private Range<Long> timeRange;
-    private List<SqsResponse> sqsResponse = new ArrayList<>();
+    private List<SqsResponse> sqsResponses = new ArrayList<>();
 
     public Bucket(long startTime) {
         long endTime = startTime + GlobalConstants.THIS_BUCKET_RANGE;
@@ -22,22 +22,22 @@ public class Bucket {
     }
 
     public void addResponse(SqsResponse sqsResponse) {
-        this.sqsResponse.add(sqsResponse);
+        this.sqsResponses.add(sqsResponse);
     }
 
-    public List<SqsResponse> getSqsResponse() {
-        return sqsResponse;
+    public List<SqsResponse> getSqsResponses() {
+        return sqsResponses;
     }
 
     public List<Double> getMessageValues() {
-        return sqsResponse
+        return sqsResponses
                 .stream()
                 .map(response -> response.getValue())
                 .collect(Collectors.toList());
     }
 
     public List<String> getMessageIds() {
-        return sqsResponse.stream()
+        return sqsResponses.stream()
                 .map(response -> response.getMessageId())
                 .collect(Collectors.toList());
     }
@@ -51,6 +51,14 @@ public class Bucket {
         long maxMsgOffset = GlobalConstants.BUCKET_UPPER_BOUND * GlobalConstants.MAX_MESSAGE_DELAY_MINS;
         long expirationTime = timeRange.getMaximum() + maxMsgOffset;
         return time >= expirationTime;
+    }
+
+    public double getAverageValue() {
+        double total = getMessageValues()
+                .stream()
+                .reduce(0.0, Double::sum);
+
+        return total / getSqsResponses().size();
     }
 
 }

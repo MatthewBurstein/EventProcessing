@@ -58,11 +58,11 @@ public class BucketManagerTest {
         bucketManager.addResponseToBucket(mockSqsResponse);
         List<Bucket> bucket = bucketManager.getBuckets();
 
-        assertThat(bucket.get(1).getSqsResponse()).containsOnly(mockSqsResponse);
-        assertThat(bucket.get(0).getSqsResponse()).doesNotContain(mockSqsResponse);
-        assertThat(bucket.get(2).getSqsResponse()).doesNotContain(mockSqsResponse);
-        assertThat(bucket.get(3).getSqsResponse()).doesNotContain(mockSqsResponse);
-        assertThat(bucket.get(4).getSqsResponse()).doesNotContain(mockSqsResponse);
+        assertThat(bucket.get(1).getSqsResponses()).containsOnly(mockSqsResponse);
+        assertThat(bucket.get(0).getSqsResponses()).doesNotContain(mockSqsResponse);
+        assertThat(bucket.get(2).getSqsResponses()).doesNotContain(mockSqsResponse);
+        assertThat(bucket.get(3).getSqsResponses()).doesNotContain(mockSqsResponse);
+        assertThat(bucket.get(4).getSqsResponses()).doesNotContain(mockSqsResponse);
     }
 
     @Test
@@ -79,16 +79,16 @@ public class BucketManagerTest {
         when(mockSqsResponse5.getMessageTimestamp()).thenReturn(GlobalConstants.BUCKET_UPPER_BOUND * 3);
 
         InitialBucket mockResponseList = Mockito.mock(InitialBucket.class);
-        when(mockResponseList.getSqsResponse()).thenReturn(Lists.newArrayList(mockSqsResponse1, mockSqsResponse2,
+        when(mockResponseList.getSqsResponses()).thenReturn(Lists.newArrayList(mockSqsResponse1, mockSqsResponse2,
                 mockSqsResponse3, mockSqsResponse4, mockSqsResponse5));
         bucketManager.addMultipleResponsesToBucket(mockResponseList);
         List<Bucket> buckets = bucketManager.getBuckets();
 
-        assertThat(buckets.get(0).getSqsResponse()).containsOnly(mockSqsResponse2);
-        assertThat(buckets.get(1).getSqsResponse()).containsOnly(mockSqsResponse1);
-        assertThat(buckets.get(2).getSqsResponse()).containsOnly(mockSqsResponse4);
-        assertThat(buckets.get(3).getSqsResponse()).containsOnly(mockSqsResponse5);
-        assertThat(buckets.get(4).getSqsResponse()).containsOnly(mockSqsResponse3);
+        assertThat(buckets.get(0).getSqsResponses()).containsOnly(mockSqsResponse2);
+        assertThat(buckets.get(1).getSqsResponses()).containsOnly(mockSqsResponse1);
+        assertThat(buckets.get(2).getSqsResponses()).containsOnly(mockSqsResponse4);
+        assertThat(buckets.get(3).getSqsResponses()).containsOnly(mockSqsResponse5);
+        assertThat(buckets.get(4).getSqsResponses()).containsOnly(mockSqsResponse3);
     }
 
     @Test

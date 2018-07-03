@@ -47,7 +47,7 @@ public class BucketManager {
     }
 
     public void addMultipleResponsesToBucket(Bucket bucket) {
-        for (SqsResponse sqsResponse : bucket.getSqsResponse()) {
+        for (SqsResponse sqsResponse : bucket.getSqsResponses()) {
             addResponseToBucket(sqsResponse);
         }
     }

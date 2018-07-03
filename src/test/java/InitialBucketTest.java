@@ -21,7 +21,7 @@ public class InitialBucketTest {
         when(mockSqsResponse1.getMessageTimestamp()).thenReturn((long) 9999);
         when(mockSqsResponse2.getMessageTimestamp()).thenReturn((long) 333);
         when(mockSqsResponse3.getMessageTimestamp()).thenReturn((long) 22);
-        initialBucket.getSqsResponse().addAll(Lists.newArrayList(mockSqsResponse1, mockSqsResponse2, mockSqsResponse3));
+        initialBucket.getSqsResponses().addAll(Lists.newArrayList(mockSqsResponse1, mockSqsResponse2, mockSqsResponse3));
     }
 
     @Test

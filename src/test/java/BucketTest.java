@@ -6,11 +6,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class BucketTest {
@@ -54,9 +56,21 @@ public class BucketTest {
         when(mockSqsResponse1.getMessageId()).thenReturn("mockResponse1id");
         SqsResponse mockSqsResponse2 = Mockito.mock(SqsResponse.class);
         when(mockSqsResponse2.getMessageId()).thenReturn("mockResponse2id");
-        bucket.getSqsResponse().addAll(Lists.newArrayList(mockSqsResponse1, mockSqsResponse2));
+        bucket.getSqsResponses().addAll(Lists.newArrayList(mockSqsResponse1, mockSqsResponse2));
         List<String> expected = Lists.newArrayList("mockResponse1id", "mockResponse2id");
         assertEquals(bucket.getMessageIds(), expected);
     }
-    
+
+    @Test
+    public void getAverageValue_returnsAverageOfMessageValues() {
+        SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
+        List<SqsResponse> mockSqsResponses = Lists.newArrayList(mockSqsResponse, mockSqsResponse, mockSqsResponse);
+        bucket.getSqsResponses().addAll(mockSqsResponses);
+        when(mockSqsResponse.getValue()).thenReturn(1.0, 2.0, 3.0);
+
+        double expectedValue = 2.0;
+        assertEquals(expectedValue, bucket.getAverageValue(), 0);
+    }
+
+
 }

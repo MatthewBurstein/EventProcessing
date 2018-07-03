@@ -1,6 +1,5 @@
 package eventprocessing.fileservices;
 
-import eventprocessing.analysis.Analyser;
 import eventprocessing.models.Bucket;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -13,12 +12,10 @@ import java.util.List;
 
 public class CSVFileService {
     private final String outputCsvFile;
-    private final Analyser analyser;
     private int ESTIMATED_LINE_LENGTH = 70;
 
     public CSVFileService(String outputCsvFile) {
         this.outputCsvFile = outputCsvFile;
-        this.analyser = new Analyser();
     }
 
     public void writeBucketDataToFile(Bucket bucketToWriteToFile) throws IOException {
@@ -47,8 +44,8 @@ public class CSVFileService {
     private void writeBucketToStream(CSVPrinter csvPrinter, Bucket bucket) {
         String startTime = bucket.getTimeRange().getMinimum().toString();
         String endTime = bucket.getTimeRange().getMaximum().toString();
-        String numberOfResponses = String.valueOf(bucket.getSqsResponse().size());
-        String averageValue = String.valueOf(analyser.getAverageValue(bucket));
+        String numberOfResponses = String.valueOf(bucket.getSqsResponses().size());
+        String averageValue = String.valueOf(bucket.getAverageValue());
         try {
             csvPrinter.printRecord(startTime, endTime, numberOfResponses, averageValue);
         } catch (IOException e) {
