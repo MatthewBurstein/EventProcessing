@@ -30,13 +30,12 @@ public class ReadingAggregator {
     }
 
     private Bucket getExpiredBucket() {
-        Bucket expiredBucket = null;
-        for (Bucket bucket : Lists.reverse(buckets)) {
-            if (bucket.isExpiredAtTime(clock.millis())) {
-                expiredBucket = bucket;
-            }
+        Bucket expiredBucket = Iterables.getFirst(buckets, null);
+        if(expiredBucket.isExpiredAtTime(clock.millis())) {
+            return expiredBucket;
+        } else {
+            return null;
         }
-        return expiredBucket;
     }
 
     private void createBucket(long startTime) {

@@ -8,7 +8,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.threeten.extra.MutableClock;
 
-import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -21,89 +20,81 @@ public class ReadingAggregatorTest {
 
     private ReadingAggregator readingAggregator;
     private CSVFileWriter fileWriter;
+    private MutableClock clock;
 
     @Before
     public void buildReadingAggregator() {
+        clock = buildClock();
         fileWriter = Mockito.mock(CSVFileWriter.class);
+        readingAggregator = new ReadingAggregator(fileWriter, clock);
     }
 
     @Test
     public void process_nothingWhileNoReadingsAreOlderThanDelayTime() {
-        readingAggregator = new ReadingAggregator(fileWriter, Clock.systemUTC());
-        SqsResponse reading = buildReading(generateTimestamp(Clock.systemUTC(), 0));
+        SqsResponse reading = buildReading(0);
         readingAggregator.process(reading);
         verify(fileWriter, never()).write(any());
     }
 
     @Test
     public void process_singleReadingExceedingDelayTime_isSentToFileWriter() {
-        MutableClock clock = buildClock(0);
-        SqsResponse oldReading = buildReading(generateTimestamp(clock, -5));
+        SqsResponse oldReading = buildReading(-5);
         SqsResponse newReading = buildReading(0);
-        readingAggregator = new ReadingAggregator(fileWriter, clock);
 
         readingAggregator.process(oldReading);
-        advanceByMinutes(clock, 1);
+        advanceClockByMinutes(1);
         readingAggregator.process(newReading);
 
-        ArgumentCaptor<Bucket> bucketCaptor = ArgumentCaptor.forClass(Bucket.class);
-        verify(fileWriter, times(1)).write(bucketCaptor.capture());
-        assertThat(bucketCaptor.getValue().getSqsResponses()).containsOnly(oldReading);
+        assertWriteCalledTimesWithReadings(1, oldReading);
     }
 
     @Test
     public void process_multipleReadingsExceedingDelayTime_areSentToFileWriter() {
-        MutableClock clock = buildClock(0);
-        SqsResponse oldReading1 = buildReading(generateTimestamp(clock, -5));
-        SqsResponse oldReading2 = buildReading(generateTimestamp(clock, -4.9));
-        SqsResponse oldReading3 = buildReading(generateTimestamp(clock, -4));
+        SqsResponse oldReading1 = buildReading(-5);
+        SqsResponse oldReading2 = buildReading(-4.9);
+        SqsResponse oldReading3 = buildReading(-4);
         SqsResponse newReading = buildReading(0);
-        readingAggregator = new ReadingAggregator(fileWriter, clock);
 
         processMultipleReadings(oldReading1, oldReading2, oldReading3);
-        advanceByMinutes(clock, 1);
+        advanceClockByMinutes(1);
         readingAggregator.process(newReading);
 
-        ArgumentCaptor<Bucket> bucketCaptor = ArgumentCaptor.forClass(Bucket.class);
-        verify(fileWriter, times(1)).write(bucketCaptor.capture());
-        assertThat(bucketCaptor.getValue().getSqsResponses()).containsOnly(oldReading1, oldReading2);
+        assertWriteCalledTimesWithReadings(1, oldReading1, oldReading2);
     }
 
     @Test
     public void process_sendsEachReadingToFileWriterOnlyOnce() {
-        MutableClock clock = buildClock(0);
-        SqsResponse oldReading1 = buildReading(generateTimestamp(clock, -5));
-        SqsResponse oldReading2 = buildReading(generateTimestamp(clock, -4.9));
-        SqsResponse oldReading3 = buildReading(generateTimestamp(clock, -4));
+        SqsResponse oldReading1 = buildReading(-5);
+        SqsResponse oldReading2 = buildReading(-4.9);
+        SqsResponse oldReading3 = buildReading(-4);
         SqsResponse newReading = buildReading(0);
-        readingAggregator = new ReadingAggregator(fileWriter, clock);
 
         processMultipleReadings(oldReading1, oldReading2, oldReading3);
-        advanceByMinutes(clock, 1);
+        advanceClockByMinutes(1);
         readingAggregator.process(newReading);
-        advanceByMinutes(clock, 1);
+        advanceClockByMinutes(1);
         readingAggregator.process(newReading);
 
-        ArgumentCaptor<Bucket> bucketCaptor = ArgumentCaptor.forClass(Bucket.class);
-        verify(fileWriter, times(2)).write(bucketCaptor.capture());
-        assertThat(bucketCaptor.getValue().getSqsResponses()).containsOnly(oldReading3);
+        assertWriteCalledTimesWithReadings(2, oldReading3);
     }
 
     @Test
     public void process_ensuresAllReadingsCanBeProcessedCorrectlyAtAllTimes() {
-        MutableClock clock = buildClock(0);
-        SqsResponse dummyReading = buildReading(generateTimestamp(clock, -5));
-        SqsResponse newReading = buildReading(generateTimestamp(clock, 1.5));
-        readingAggregator = new ReadingAggregator(fileWriter, clock);
+        SqsResponse dummyReading = buildReading(-5);
+        SqsResponse newReading = buildReading(1.5);
 
-        advanceByMinutes(clock, 6);
+        advanceClockByMinutes(6);
         processMultipleReadings(dummyReading,dummyReading,dummyReading,dummyReading,dummyReading,dummyReading);
-        advanceByMinutes(clock, 1);
+        advanceClockByMinutes(1);
         readingAggregator.process(newReading);
 
+        assertWriteCalledTimesWithReadings(7, newReading);
+    }
+
+    private void assertWriteCalledTimesWithReadings(int numberOfTimesCalled, SqsResponse ... argsOfLastCall) {
         ArgumentCaptor<Bucket> bucketCaptor = ArgumentCaptor.forClass(Bucket.class);
-        verify(fileWriter, times(7)).write(bucketCaptor.capture());
-        assertThat(bucketCaptor.getValue().getSqsResponses()).containsOnly(newReading);
+        verify(fileWriter, times(numberOfTimesCalled)).write(bucketCaptor.capture());
+        assertThat(bucketCaptor.getValue().getSqsResponses()).containsOnly(argsOfLastCall);
     }
 
     private void processMultipleReadings(SqsResponse ... sqsResponses) {
@@ -112,22 +103,22 @@ public class ReadingAggregatorTest {
         }
     }
 
-    private long generateTimestamp(Clock clock, double modifyByMinutes) {
-        return clock.millis() + (long) (modifyByMinutes * 60000);
+    private SqsResponse buildReading(double withMinutes) {
+        SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
+        when(mockSqsResponse.getMessageTimestamp()).thenReturn(generateTimestamp(withMinutes));
+        return mockSqsResponse;
     }
 
-    private void advanceByMinutes(MutableClock clock, int minutes) {
+    private long generateTimestamp(double atMinute) {
+        return clock.millis() + (long) (atMinute * 60000);
+    }
+
+    private void advanceClockByMinutes(int minutes) {
         clock.add(minutes * 60000, ChronoUnit.MILLIS);
     }
 
-    private MutableClock buildClock(long clockTime) {
-        Instant fixedInstant = Instant.ofEpochMilli(clockTime);
+    private MutableClock buildClock() {
+        Instant fixedInstant = Instant.ofEpochMilli(0);
         return MutableClock.of(fixedInstant, ZoneId.systemDefault());
-    }
-
-    private SqsResponse buildReading(long messageTimeStamp) {
-        SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
-        when(mockSqsResponse.getMessageTimestamp()).thenReturn(messageTimeStamp);
-        return mockSqsResponse;
     }
 }
