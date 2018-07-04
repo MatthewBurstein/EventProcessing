@@ -1,4 +1,4 @@
-import eventprocessing.fileservices.CSVFileWriter;
+import eventprocessing.fileservices.CSVFileService;
 import eventprocessing.models.Bucket;
 import eventprocessing.models.ReadingAggregator;
 import eventprocessing.models.SqsResponse;
@@ -19,21 +19,21 @@ import static org.mockito.Mockito.*;
 public class ReadingAggregatorTest {
 
     private ReadingAggregator readingAggregator;
-    private CSVFileWriter fileWriter;
+    private CSVFileService fileService;
     private MutableClock clock;
 
     @Before
     public void buildReadingAggregator() {
         clock = buildClock();
-        fileWriter = Mockito.mock(CSVFileWriter.class);
-        readingAggregator = new ReadingAggregator(fileWriter, clock);
+        fileService = Mockito.mock(CSVFileService.class);
+        readingAggregator = new ReadingAggregator(fileService, clock);
     }
 
     @Test
     public void process_nothingWhileNoReadingsAreOlderThanDelayTime() {
         SqsResponse reading = buildReading(0);
         readingAggregator.process(reading);
-        verify(fileWriter, never()).write(any());
+        verify(fileService, never()).write(any());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class ReadingAggregatorTest {
 
     private void assertWriteCalledTimesWithReadings(int numberOfTimesCalled, SqsResponse ... argsOfLastCall) {
         ArgumentCaptor<Bucket> bucketCaptor = ArgumentCaptor.forClass(Bucket.class);
-        verify(fileWriter, times(numberOfTimesCalled)).write(bucketCaptor.capture());
+        verify(fileService, times(numberOfTimesCalled)).write(bucketCaptor.capture());
         assertThat(bucketCaptor.getValue().getSqsResponses()).containsOnly(argsOfLastCall);
     }
 
@@ -105,6 +105,7 @@ public class ReadingAggregatorTest {
 
     private SqsResponse buildReading(double withMinutes) {
         SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
+        when(mockSqsResponse.getMessageId()).thenReturn(String.valueOf(System.currentTimeMillis()));
         when(mockSqsResponse.getMessageTimestamp()).thenReturn(generateTimestamp(withMinutes));
         return mockSqsResponse;
     }

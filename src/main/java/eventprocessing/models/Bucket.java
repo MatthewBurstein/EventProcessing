@@ -22,7 +22,9 @@ public class Bucket {
     }
 
     public void addResponse(SqsResponse sqsResponse) {
-        this.sqsResponses.add(sqsResponse);
+        if (!isDuplicateMessage(sqsResponse)) {
+            this.sqsResponses.add(sqsResponse);
+        }
     }
 
     public List<SqsResponse> getSqsResponses() {
@@ -61,7 +63,6 @@ public class Bucket {
     }
 
     public boolean isDuplicateMessage(SqsResponse sqsResponse) {
-        boolean result = getMessageIds().contains(sqsResponse.getMessageId());
-        return result;
+        return getMessageIds().contains(sqsResponse.getMessageId());
     }
 }
