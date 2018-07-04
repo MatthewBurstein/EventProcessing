@@ -1,4 +1,3 @@
-import com.google.common.collect.Lists;
 import eventprocessing.fileservices.CSVFileWriter;
 import eventprocessing.models.Bucket;
 import eventprocessing.models.ReadingAggregator;
@@ -16,6 +15,9 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -62,15 +64,56 @@ public class ReadingAggregatorTest {
         SqsResponse newReading = buildReading(0);
         readingAggregator = new ReadingAggregator(fileWriter, clock);
 
-        readingAggregator.process(oldReading1);
-        readingAggregator.process(oldReading2);
-        readingAggregator.process(oldReading3);
+        processMultipleReadings(oldReading1, oldReading2, oldReading3);
         advanceByMinutes(clock, 1);
         readingAggregator.process(newReading);
 
         ArgumentCaptor<Bucket> bucketCaptor = ArgumentCaptor.forClass(Bucket.class);
         verify(fileWriter, times(1)).write(bucketCaptor.capture());
         assertThat(bucketCaptor.getValue().getSqsResponses()).containsOnly(oldReading1, oldReading2);
+    }
+
+    @Test
+    public void process_sendsEachReadingToFileWriterOnlyOnce() {
+        MutableClock clock = buildClock(0);
+        SqsResponse oldReading1 = buildReading(generateTimestamp(clock, -5));
+        SqsResponse oldReading2 = buildReading(generateTimestamp(clock, -4.9));
+        SqsResponse oldReading3 = buildReading(generateTimestamp(clock, -4));
+        SqsResponse newReading = buildReading(0);
+        readingAggregator = new ReadingAggregator(fileWriter, clock);
+
+        processMultipleReadings(oldReading1, oldReading2, oldReading3);
+        advanceByMinutes(clock, 1);
+        readingAggregator.process(newReading);
+        advanceByMinutes(clock, 1);
+        readingAggregator.process(newReading);
+
+        ArgumentCaptor<Bucket> bucketCaptor = ArgumentCaptor.forClass(Bucket.class);
+        verify(fileWriter, times(2)).write(bucketCaptor.capture());
+        assertThat(bucketCaptor.getValue().getSqsResponses()).containsOnly(oldReading3);
+    }
+
+    @Test
+    public void process_ensuresAllReadingsCanBeProcessedCorrectlyAtAllTimes() {
+        MutableClock clock = buildClock(0);
+        SqsResponse dummyReading = buildReading(generateTimestamp(clock, -5));
+        SqsResponse newReading = buildReading(generateTimestamp(clock, 1.5));
+        readingAggregator = new ReadingAggregator(fileWriter, clock);
+
+        advanceByMinutes(clock, 6);
+        processMultipleReadings(dummyReading,dummyReading,dummyReading,dummyReading,dummyReading,dummyReading);
+        advanceByMinutes(clock, 1);
+        readingAggregator.process(newReading);
+
+        ArgumentCaptor<Bucket> bucketCaptor = ArgumentCaptor.forClass(Bucket.class);
+        verify(fileWriter, times(7)).write(bucketCaptor.capture());
+        assertThat(bucketCaptor.getValue().getSqsResponses()).containsOnly(newReading);
+    }
+
+    private void processMultipleReadings(SqsResponse ... sqsResponses) {
+        for(SqsResponse response : sqsResponses) {
+            readingAggregator.process(response);
+        }
     }
 
     private long generateTimestamp(Clock clock, double modifyByMinutes) {
