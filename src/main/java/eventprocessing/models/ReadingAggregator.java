@@ -1,6 +1,7 @@
 package eventprocessing.models;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import eventprocessing.fileservices.CSVFileWriter;
 
 import java.time.Clock;
@@ -17,25 +18,20 @@ public class ReadingAggregator {
         this.clock = clock;
         this.buckets = new ArrayList<>();
         createInitialBuckets();
-        System.out.println("Constructor buckets " + buckets);
     }
 
     public void process(SqsResponse sqsResponse) {
-        System.out.println("Process Buckets " + buckets);
         assignResponseToBucket(sqsResponse);
         Bucket bucket = removeExpiredBucket();
         if (bucket != null) {
-            System.out.println("Removed Bucket " + bucket);
-            System.out.println(bucket.getSqsResponses().size());
             csvFileWriter.write(bucket);
             createNextBucket();
         }
-        System.out.println("New Buckets " + buckets.size());
     }
 
     private Bucket getExpiredBucket() {
         Bucket expiredBucket = null;
-        for (Bucket bucket : buckets) {
+        for (Bucket bucket : Lists.reverse(buckets)) {
             if (bucket.isExpiredAtTime(clock.millis())) {
                 expiredBucket = bucket;
             }
@@ -66,8 +62,7 @@ public class ReadingAggregator {
 
     private Bucket removeExpiredBucket() {
         Bucket expiredBucket = getExpiredBucket();
-        System.out.println("Expired bucket to be removed " + Iterables.getFirst(buckets, 0));
-        System.out.println("buckets.remove(expiredBucket);" + buckets.remove(expiredBucket));
+        buckets.remove(expiredBucket);
         return expiredBucket;
     }
 
@@ -75,7 +70,5 @@ public class ReadingAggregator {
         Bucket lastBucket = Iterables.getLast(buckets);
         long nextBucketStartTime = lastBucket.getTimeRange().getMaximum() + 1;
         createBucket(nextBucketStartTime);
-        System.out.println("All buckets : " + buckets);
-        System.out.println("New bucket " + Iterables.getLast(buckets));
     }
 }
