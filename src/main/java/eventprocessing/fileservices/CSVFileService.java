@@ -18,12 +18,14 @@ public class CSVFileService {
         this.outputCsvFile = outputCsvFile;
     }
 
-    public void writeBucketDataToFile(Bucket bucketToWriteToFile) throws IOException {
+    public void write(Bucket bucketToWriteToFile) {
         CSVFormat csvFormat = getCsvFormat();
         StringBuffer stringBuffer = new StringBuffer(ESTIMATED_LINE_LENGTH * 2);
         try (CSVPrinter csvPrinter = new CSVPrinter(stringBuffer, csvFormat)) {
             writeBucketToStream(csvPrinter, bucketToWriteToFile);
             writeToFile(stringBuffer);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
     }
 

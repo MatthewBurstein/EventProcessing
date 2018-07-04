@@ -24,7 +24,7 @@ public class CsvFileServiceTest {
         Bucket mockBucket2 = setupMockBucket(6000, 11999, 2);
         Bucket mockBucket3 = setupMockBucket(12000, 17999, 3);
 
-        csvFileService.writeBucketDataToFile(mockBucket1);
+        csvFileService.write(mockBucket1);
 
         List<Bucket> mockBuckets = Lists.newArrayList(mockBucket2, mockBucket3);
         csvFileService.writeMultipleBucketDataToFile(mockBuckets);

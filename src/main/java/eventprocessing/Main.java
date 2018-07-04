@@ -108,7 +108,7 @@ public class Main {
             }
             Bucket removedBucket = bucketManager.removeExpiredBucket(System.currentTimeMillis());
             if (removedBucket != null) {
-                csvFileService.writeBucketDataToFile(removedBucket);
+                csvFileService.write(removedBucket);
                 bucketManager.createNextBucket();
             }
         }

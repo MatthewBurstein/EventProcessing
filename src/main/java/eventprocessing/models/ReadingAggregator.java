@@ -1,7 +1,7 @@
 package eventprocessing.models;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import eventprocessing.fileservices.CSVFileService;
 import eventprocessing.fileservices.CSVFileWriter;
 
 import java.time.Clock;
@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReadingAggregator {
-    private CSVFileWriter csvFileWriter;
+    private CSVFileService csvFileService;
     private Clock clock;
     private List<Bucket> buckets;
 
-    public ReadingAggregator(CSVFileWriter csvFileWriter, Clock clock) {
-        this.csvFileWriter = csvFileWriter;
+    public ReadingAggregator(CSVFileService csvFileService, Clock clock) {
+        this.csvFileService = csvFileService;
         this.clock = clock;
         this.buckets = new ArrayList<>();
         createInitialBuckets();
@@ -24,7 +24,7 @@ public class ReadingAggregator {
         assignResponseToBucket(sqsResponse);
         Bucket bucket = removeExpiredBucket();
         if (bucket != null) {
-            csvFileWriter.write(bucket);
+            csvFileService.write(bucket);
             createNextBucket();
         }
     }
