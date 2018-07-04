@@ -1,3 +1,4 @@
+import com.google.common.collect.Lists;
 import eventprocessing.fileservices.CSVFileWriter;
 import eventprocessing.models.Bucket;
 import eventprocessing.models.ReadingAggregator;
@@ -29,7 +30,7 @@ public class ReadingAggregatorTest {
     }
 
     @Test
-    public void process_receivesSingleEventSendsNothingToFileWriter() {
+    public void process_nothingWhileNoReadingsAreOlderThanDelayTime() {
         readingAggregator = new ReadingAggregator(fileWriter, Clock.systemUTC());
         SqsResponse reading = buildReading(generateTimestamp(Clock.systemUTC(), 0));
         readingAggregator.process(reading);
@@ -37,7 +38,7 @@ public class ReadingAggregatorTest {
     }
 
     @Test
-    public void process_receivesSingleEventFiveMinutesLater_sendsCorrectBucketToFileWriter() {
+    public void process_singleReadingExceedingDelayTime_isSentToFileWriter() {
         MutableClock clock = buildClock(0);
         SqsResponse oldReading = buildReading(generateTimestamp(clock, -5));
         SqsResponse newReading = buildReading(0);
@@ -52,8 +53,28 @@ public class ReadingAggregatorTest {
         assertThat(bucketCaptor.getValue().getSqsResponses()).containsOnly(oldReading);
     }
 
-    private long generateTimestamp(Clock clock, int modifyByMinutes) {
-        return clock.millis() + (modifyByMinutes * 60000);
+    @Test
+    public void process_multipleReadingsExceedingDelayTime_areSentToFileWriter() {
+        MutableClock clock = buildClock(0);
+        SqsResponse oldReading1 = buildReading(generateTimestamp(clock, -5));
+        SqsResponse oldReading2 = buildReading(generateTimestamp(clock, -4.9));
+        SqsResponse oldReading3 = buildReading(generateTimestamp(clock, -4));
+        SqsResponse newReading = buildReading(0);
+        readingAggregator = new ReadingAggregator(fileWriter, clock);
+
+        readingAggregator.process(oldReading1);
+        readingAggregator.process(oldReading2);
+        readingAggregator.process(oldReading3);
+        advanceByMinutes(clock, 1);
+        readingAggregator.process(newReading);
+
+        ArgumentCaptor<Bucket> bucketCaptor = ArgumentCaptor.forClass(Bucket.class);
+        verify(fileWriter, times(1)).write(bucketCaptor.capture());
+        assertThat(bucketCaptor.getValue().getSqsResponses()).containsOnly(oldReading1, oldReading2);
+    }
+
+    private long generateTimestamp(Clock clock, double modifyByMinutes) {
+        return clock.millis() + (long) (modifyByMinutes * 60000);
     }
 
     private void advanceByMinutes(MutableClock clock, int minutes) {
