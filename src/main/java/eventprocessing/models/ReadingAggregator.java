@@ -2,7 +2,6 @@ package eventprocessing.models;
 
 import com.google.common.collect.Iterables;
 import eventprocessing.fileservices.CSVFileService;
-import eventprocessing.fileservices.CSVFileWriter;
 
 import java.time.Clock;
 import java.util.ArrayList;
@@ -12,6 +11,15 @@ public class ReadingAggregator {
     private CSVFileService csvFileService;
     private Clock clock;
     private List<Bucket> buckets;
+    private int duplicateCounter = 0;
+
+    public int getDuplicateCounter() {
+        return duplicateCounter;
+    }
+
+    public List<Bucket> getBuckets() {
+        return buckets;
+    }
 
     public ReadingAggregator(CSVFileService csvFileService, Clock clock) {
         this.csvFileService = csvFileService;
@@ -39,7 +47,9 @@ public class ReadingAggregator {
     }
 
     private void createBucket(long startTime) {
-        buckets.add(new Bucket(startTime));
+        Bucket newBucket = new Bucket(startTime);
+        buckets.add(newBucket);
+        System.out.println("New bucket: " + newBucket.getTimeRange());
     }
 
     private void createInitialBuckets() {
@@ -52,9 +62,19 @@ public class ReadingAggregator {
     }
 
     private void assignResponseToBucket(SqsResponse sqsResponse) {
+
+        List<Bucket> bucketLog = buckets;
         buckets.forEach(bucket -> {
             if (bucket.getTimeRange().contains(sqsResponse.getMessageTimestamp())) {
-                bucket.addResponse(sqsResponse);
+                if (bucket.addResponse(sqsResponse)) {
+                    System.out.println("[READING AGG] Assigning response " + sqsResponse.getMessageTimestamp() + " to bucket " + bucket.getTimeRange());
+                    System.out.println("Bucket size " + bucket.getSqsResponses().size());
+                } else {
+                    sqsResponse.setCategory("Duplicate");
+                    duplicateCounter++;
+                }
+            } else {
+                sqsResponse.setCategory("No bucket available");
             }
         });
     }

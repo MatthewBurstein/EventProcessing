@@ -21,10 +21,15 @@ public class Bucket {
         //Constructor for InitialBucket
     }
 
-    public void addResponse(SqsResponse sqsResponse) {
+    public boolean addResponse(SqsResponse sqsResponse) {
         if (!isDuplicateMessage(sqsResponse)) {
             this.sqsResponses.add(sqsResponse);
+            sqsResponse.setCategory("Bucketed");
+            System.out.println("[BUCKET CLASS] Actually adding response  " + sqsResponse.getMessageTimestamp() + " to bucket " + getTimeRange());
+            return true;
         }
+//        sqsResponse.setCategory("Duplicate");
+        return false;
     }
 
     public List<SqsResponse> getSqsResponses() {

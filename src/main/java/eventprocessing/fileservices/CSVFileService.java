@@ -1,8 +1,11 @@
 package eventprocessing.fileservices;
 
+import eventprocessing.Main;
 import eventprocessing.models.Bucket;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,11 +17,14 @@ public class CSVFileService {
     private final String outputCsvFile;
     private final int ESTIMATED_LINE_LENGTH = 70;
 
+    static Logger logger = LogManager.getLogger(Main.class);
+
     public CSVFileService(String outputCsvFile) {
         this.outputCsvFile = outputCsvFile;
     }
 
     public void write(Bucket bucketToWriteToFile) {
+        logger.info("Writing bucket with TimeRange " + bucketToWriteToFile.getTimeRange() + "and " + bucketToWriteToFile.getSqsResponses().size() + " responses.");
         CSVFormat csvFormat = getCsvFormat();
         StringBuffer stringBuffer = new StringBuffer(ESTIMATED_LINE_LENGTH * 2);
         try (CSVPrinter csvPrinter = new CSVPrinter(stringBuffer, csvFormat)) {
