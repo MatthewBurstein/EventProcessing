@@ -1,3 +1,4 @@
+import com.google.common.collect.Lists;
 import eventprocessing.fileservices.CSVFileService;
 import eventprocessing.models.Bucket;
 import eventprocessing.models.ReadingAggregator;
@@ -11,6 +12,7 @@ import org.threeten.extra.MutableClock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -84,7 +86,7 @@ public class ReadingAggregatorTest {
         SqsResponse newReading = buildReadingWithTimestampMinutes(1.5);
 
         advanceClockByMinutes(6);
-        processMultipleReadings(dummyReading,dummyReading,dummyReading,dummyReading,dummyReading,dummyReading);
+        processMultipleReadings(dummyReading, dummyReading, dummyReading, dummyReading, dummyReading, dummyReading);
         advanceClockByMinutes(1);
         readingAggregator.process(newReading);
 
@@ -105,14 +107,38 @@ public class ReadingAggregatorTest {
         assertWriteCalledTimesWithReadings(1, duplicateReading1, uniqueReading);
     }
 
-    private void assertWriteCalledTimesWithReadings(int numberOfTimesCalled, SqsResponse ... argsOfLastCall) {
+    @Test
+    public void processAllBuckets_writesAllBucketsToFile() {
+        SqsResponse firstReading = buildReadingWithTimestampMinutes(-4.8);
+        SqsResponse secondReading = buildReadingWithTimestampMinutes(-3.8);
+        SqsResponse thirdReading = buildReadingWithTimestampMinutes(-2.8);
+        SqsResponse fourthReading = buildReadingWithTimestampMinutes(-1.8);
+        SqsResponse fifthReading = buildReadingWithTimestampMinutes(-0.8);
+        SqsResponse sixthReading = buildReadingWithTimestampMinutes(0.8);
+        List<SqsResponse> readings = Lists.newArrayList(firstReading, secondReading, thirdReading, fourthReading, fifthReading, sixthReading);
+
+        processMultipleReadings(firstReading, secondReading, thirdReading, fourthReading, fifthReading, sixthReading);
+        readingAggregator.processAllBuckets();
+
+        assertCalledOnceWithEachReading(readings);
+    }
+
+    private void assertCalledOnceWithEachReading(List<SqsResponse> readings) {
+        ArgumentCaptor<Bucket> bucketCaptor = ArgumentCaptor.forClass(Bucket.class);
+        verify(fileService, times(readings.size())).write(bucketCaptor.capture());
+        for (int i = 0; i < bucketCaptor.getAllValues().size(); i++) {
+            assertThat(bucketCaptor.getAllValues().get(i).getSqsResponses()).containsOnly(readings.get(i));
+        }
+    }
+
+    private void assertWriteCalledTimesWithReadings(int numberOfTimesCalled, SqsResponse... argsOfLastCall) {
         ArgumentCaptor<Bucket> bucketCaptor = ArgumentCaptor.forClass(Bucket.class);
         verify(fileService, times(numberOfTimesCalled)).write(bucketCaptor.capture());
         assertThat(bucketCaptor.getValue().getSqsResponses()).containsOnly(argsOfLastCall);
     }
 
-    private void processMultipleReadings(SqsResponse ... sqsResponses) {
-        for(SqsResponse response : sqsResponses) {
+    private void processMultipleReadings(SqsResponse... sqsResponses) {
+        for (SqsResponse response : sqsResponses) {
             readingAggregator.process(response);
         }
     }

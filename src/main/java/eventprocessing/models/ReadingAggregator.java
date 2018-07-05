@@ -38,6 +38,12 @@ public class ReadingAggregator {
         }
     }
 
+    public void processAllBuckets() {
+        buckets.forEach(bucket -> {
+            csvFileService.write(bucket);
+        });
+    }
+
     private Bucket getExpiredBucket() {
         Bucket expiredBucket = Iterables.getFirst(buckets, null);
         if(expiredBucket.isExpiredAtTime(clock.millis())) {
