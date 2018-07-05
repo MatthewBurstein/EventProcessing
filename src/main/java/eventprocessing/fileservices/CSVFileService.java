@@ -24,7 +24,7 @@ public class CSVFileService {
     }
 
     public void write(Bucket bucketToWriteToFile) {
-        logger.debug("Writing bucket with TimeRange " + bucketToWriteToFile.getTimeRange() + "and " + bucketToWriteToFile.getSqsResponses().size() + " responses.");
+        logger.info("Writing bucket with TimeRange " + bucketToWriteToFile.getTimeRange() + "and " + bucketToWriteToFile.getSqsResponses().size() + " responses.");
         CSVFormat csvFormat = getCsvFormat();
         StringBuffer stringBuffer = new StringBuffer(ESTIMATED_LINE_LENGTH * 2);
         try (CSVPrinter csvPrinter = new CSVPrinter(stringBuffer, csvFormat)) {
