@@ -30,7 +30,7 @@ public class Main {
     private static ReadingAggregator readingAggregator;
 
     public static void main(String[] args) throws IOException {
-        logger.debug("App launched");
+        logger.info("App launched");
         createObjects();
 
         csvFileService.deleteOutputFile();
@@ -47,7 +47,7 @@ public class Main {
         int duration = scanner.nextInt();
         int notWorkingSensorCount = 0;
         stopWatch.start();
-        System.out.println("Start app at " + stopWatch.getStartTime());
+
         int messageCounter = 0;
 
 
@@ -55,41 +55,43 @@ public class Main {
 
         while (stopWatch.getTime() < (duration*60000)) {
 
-            if (tensOfSeconds == stopWatch.getTime() / 10000) {
-                GetQueueAttributesRequest attr = new GetQueueAttributesRequest(queueUrl);
-                attr.setAttributeNames(Lists.newArrayList("ApproximateNumberOfMessages"));
-                Map<String, String> attributesMap = sqsClient.getSqs().getQueueAttributes(attr).getAttributes();
-                logger.info("queue size = " + attributesMap.get("ApproximateNumberOfMessages"));
-                tensOfSeconds++;
-            }
+            //KEEP FOR LOGGING QUEUE SIZE
+//            if (tensOfSeconds == stopWatch.getTime() / 10000) {
+//                GetQueueAttributesRequest attr = new GetQueueAttributesRequest(queueUrl);
+//                attr.setAttributeNames(Lists.newArrayList("ApproximateNumberOfMessages"));
+//                Map<String, String> attributesMap = sqsClient.getSqs().getQueueAttributes(attr).getAttributes();
+//                logger.info("queue size = " + attributesMap.get("ApproximateNumberOfMessages"));
+//                tensOfSeconds++;
+//            }
 
 
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
+
             messageCounter += messageResult.getMessages().size();
             for (Message msg : messageResult.getMessages()) {
                 try {
                     SqsResponse sqsResponse = sqsResponseService.parseResponse(msg.getBody());
                     if(sensorList.isWorkingSensor(sqsResponse)) {
                         readingAggregator.process(sqsResponse);
-                        System.out.println(sqsResponse.getMessageId() + " - " + sqsResponse.getCategory());
+//                        System.out.println(sqsResponse.getMessageId() + " - " + sqsResponse.getCategory());
                     } else {
-                        sqsResponse.setCategory("Bad Sensor");
-                        System.out.println(sqsResponse.getMessageId() + " - " + sqsResponse.getCategory());
+//                        System.out.println(sqsResponse.getMessageId() + " - " + sqsResponse.getCategory());
                         notWorkingSensorCount++;
                     }
                 } catch (InvalidSqsResponseException e) {
-                    logger.warn("Invalid JSON string received" + e.getMessage());
-                    logger.warn("Received json string: " + msg.getBody());
+                    logger.error("Invalid JSON string received" + e.getMessage());
+                    logger.error("Received json string: " + msg.getBody());
                 }
+
+            final String messageReceiptHandle = messageResult.getMessages().get(0).getReceiptHandle();
+            sqsClient.getSqs().deleteMessage(new DeleteMessageRequest(queueUrl, messageReceiptHandle));
             }
+
+
         }
         logger.info("Total messages received: " + messageCounter);
-        readingAggregator.getBuckets().forEach(bucket -> {
-            System.out.println("Bucket TimeRange: " + bucket.getTimeRange().getMinimum() + "," + bucket.getTimeRange().getMaximum() + " size: " + bucket.getSqsResponses().size());
-        });
-        System.out.println("Total duplicates in this run: " + readingAggregator.getDuplicateCounter());
-        System.out.println("Total faulty sensors in this run: " + notWorkingSensorCount);
-
+        logger.info("Total duplicates in this run: " + readingAggregator.getDuplicateCounter());
+        logger.info("Total faulty sensors in this run: " + notWorkingSensorCount);
 
     }
 

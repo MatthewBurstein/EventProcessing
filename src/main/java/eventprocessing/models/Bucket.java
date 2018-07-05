@@ -1,7 +1,10 @@
 package eventprocessing.models;
 
 import eventprocessing.GlobalConstants;
+import eventprocessing.Main;
 import org.apache.commons.lang3.Range;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +15,8 @@ public class Bucket {
     private Range<Long> timeRange;
     private List<SqsResponse> sqsResponses = new ArrayList<>();
 
+    static Logger logger = LogManager.getLogger(Main.class);
+
     public Bucket(long startTime) {
         long endTime = startTime + GlobalConstants.THIS_BUCKET_RANGE;
         this.timeRange = Range.between(startTime, endTime);
@@ -21,15 +26,10 @@ public class Bucket {
         //Constructor for InitialBucket
     }
 
-    public boolean addResponse(SqsResponse sqsResponse) {
+    public void addResponse(SqsResponse sqsResponse) {
         if (!isDuplicateMessage(sqsResponse)) {
             this.sqsResponses.add(sqsResponse);
-            sqsResponse.setCategory("Bucketed");
-            System.out.println("[BUCKET CLASS] Actually adding response  " + sqsResponse.getMessageTimestamp() + " to bucket " + getTimeRange());
-            return true;
         }
-//        sqsResponse.setCategory("Duplicate");
-        return false;
     }
 
     public List<SqsResponse> getSqsResponses() {

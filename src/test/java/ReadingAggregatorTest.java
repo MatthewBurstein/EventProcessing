@@ -31,15 +31,15 @@ public class ReadingAggregatorTest {
 
     @Test
     public void process_nothingWhileNoReadingsAreOlderThanDelayTime() {
-        SqsResponse reading = buildReading(0);
+        SqsResponse reading = buildReadingWithTimestampMinutes(0);
         readingAggregator.process(reading);
         verify(fileService, never()).write(any());
     }
 
     @Test
     public void process_singleReadingExceedingDelayTime_isSentToFileWriter() {
-        SqsResponse oldReading = buildReading(-5);
-        SqsResponse newReading = buildReading(0);
+        SqsResponse oldReading = buildReadingWithTimestampMinutes(-5);
+        SqsResponse newReading = buildReadingWithTimestampMinutes(0);
 
         readingAggregator.process(oldReading);
         advanceClockByMinutes(1);
@@ -50,10 +50,10 @@ public class ReadingAggregatorTest {
 
     @Test
     public void process_multipleReadingsExceedingDelayTime_areSentToFileWriter() {
-        SqsResponse oldReading1 = buildReading(-5);
-        SqsResponse oldReading2 = buildReading(-4.9);
-        SqsResponse oldReading3 = buildReading(-4);
-        SqsResponse newReading = buildReading(0);
+        SqsResponse oldReading1 = buildReadingWithTimestampMinutesAndId(-5, "W");
+        SqsResponse oldReading2 = buildReadingWithTimestampMinutesAndId(-4.9, "E");
+        SqsResponse oldReading3 = buildReadingWithTimestampMinutesAndId(-4, "L");
+        SqsResponse newReading = buildReadingWithTimestampMinutesAndId(0, "P");
 
         processMultipleReadings(oldReading1, oldReading2, oldReading3);
         advanceClockByMinutes(1);
@@ -64,10 +64,10 @@ public class ReadingAggregatorTest {
 
     @Test
     public void process_sendsEachReadingToFileWriterOnlyOnce() {
-        SqsResponse oldReading1 = buildReading(-5);
-        SqsResponse oldReading2 = buildReading(-4.9);
-        SqsResponse oldReading3 = buildReading(-4);
-        SqsResponse newReading = buildReading(0);
+        SqsResponse oldReading1 = buildReadingWithTimestampMinutes(-5);
+        SqsResponse oldReading2 = buildReadingWithTimestampMinutes(-4.9);
+        SqsResponse oldReading3 = buildReadingWithTimestampMinutes(-4);
+        SqsResponse newReading = buildReadingWithTimestampMinutes(0);
 
         processMultipleReadings(oldReading1, oldReading2, oldReading3);
         advanceClockByMinutes(1);
@@ -80,8 +80,8 @@ public class ReadingAggregatorTest {
 
     @Test
     public void process_ensuresAllReadingsCanBeProcessedCorrectlyAtAllTimes() {
-        SqsResponse dummyReading = buildReading(-5);
-        SqsResponse newReading = buildReading(1.5);
+        SqsResponse dummyReading = buildReadingWithTimestampMinutes(-5);
+        SqsResponse newReading = buildReadingWithTimestampMinutes(1.5);
 
         advanceClockByMinutes(6);
         processMultipleReadings(dummyReading,dummyReading,dummyReading,dummyReading,dummyReading,dummyReading);
@@ -89,6 +89,20 @@ public class ReadingAggregatorTest {
         readingAggregator.process(newReading);
 
         assertWriteCalledTimesWithReadings(7, newReading);
+    }
+
+    @Test
+    public void process_rejectsDuplicateIdMessages() {
+        SqsResponse duplicateReading1 = buildReadingWithTimestampMinutesAndId(-4.8, "duplicateMessageId");
+        SqsResponse duplicateReading2 = buildReadingWithTimestampMinutesAndId(-4.6, "duplicateMessageId");
+        SqsResponse uniqueReading = buildReadingWithTimestampMinutesAndId(-4.8, "uniqueMessageId");
+
+        readingAggregator.process(duplicateReading1);
+        readingAggregator.process(duplicateReading2);
+        advanceClockByMinutes(1);
+        readingAggregator.process(uniqueReading);
+
+        assertWriteCalledTimesWithReadings(1, duplicateReading1, uniqueReading);
     }
 
     private void assertWriteCalledTimesWithReadings(int numberOfTimesCalled, SqsResponse ... argsOfLastCall) {
@@ -103,11 +117,19 @@ public class ReadingAggregatorTest {
         }
     }
 
-    private SqsResponse buildReading(double withMinutes) {
+    private SqsResponse buildReadingWithTimestampMinutes(double withMinutes) {
         SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
-        when(mockSqsResponse.getMessageId()).thenReturn(String.valueOf(System.currentTimeMillis()));
+        String currentTime = String.valueOf(System.currentTimeMillis());
+        when(mockSqsResponse.getMessageId()).thenReturn(currentTime);
         when(mockSqsResponse.getMessageTimestamp()).thenReturn(generateTimestamp(withMinutes));
         return mockSqsResponse;
+    }
+
+    private SqsResponse buildReadingWithTimestampMinutesAndId(double minutes, String id) {
+        SqsResponse mockReading = Mockito.mock(SqsResponse.class);
+        when(mockReading.getMessageId()).thenReturn(String.valueOf(id));
+        when(mockReading.getMessageTimestamp()).thenReturn(generateTimestamp(minutes));
+        return mockReading;
     }
 
     private long generateTimestamp(double atMinute) {
