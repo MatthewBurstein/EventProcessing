@@ -24,14 +24,14 @@ public class CSVFileService {
     }
 
     public void write(Bucket bucketToWriteToFile) {
-        logger.info("Writing bucket with TimeRange " + bucketToWriteToFile.getTimeRange() + "and " + bucketToWriteToFile.getSqsResponses().size() + " responses.");
+        logger.debug("Writing bucket with TimeRange " + bucketToWriteToFile.getTimeRange() + "and " + bucketToWriteToFile.getSqsResponses().size() + " responses.");
         CSVFormat csvFormat = getCsvFormat();
         StringBuffer stringBuffer = new StringBuffer(ESTIMATED_LINE_LENGTH * 2);
         try (CSVPrinter csvPrinter = new CSVPrinter(stringBuffer, csvFormat)) {
             writeBucketToStream(csvPrinter, bucketToWriteToFile);
             writeToFile(stringBuffer);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 

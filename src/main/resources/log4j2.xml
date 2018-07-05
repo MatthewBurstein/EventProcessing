@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="warn" name="SupportBank" packages="">
+<Configuration status="WARN" name="SupportBank" packages="">
     <Appenders>
         <File name="FileAppender" fileName="logs/eventprocessing.log">
             <PatternLayout>
@@ -15,7 +15,7 @@
 
     </Appenders>
     <Loggers>
-        <Root level="debug">
+        <Root level="DEBUG">
             <AppenderRef ref="FileAppender"/>
             <AppenderRef ref="ConsoleAppender"/>
         </Root>

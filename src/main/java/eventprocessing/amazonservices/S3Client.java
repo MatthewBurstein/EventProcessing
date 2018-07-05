@@ -18,7 +18,7 @@ class S3Client {
                 .withRegion(S3Details.awsRegion)
                 .build();
 
-        logger.debug("AWS S3 connection established");
+        logger.info("AWS S3 connection established");
 
         return s3;
     }
