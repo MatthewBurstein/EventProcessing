@@ -20,14 +20,14 @@ public class CsvFileServiceTest {
         String testDataFileName = "TestResponseData.csv";
         Files.deleteIfExists(Paths.get(testDataFileName));
         CSVFileService csvFileService = new CSVFileService(testDataFileName);
-        Bucket mockBucket1 = setupMockBucket(0, 5999, 1);
-        Bucket mockBucket2 = setupMockBucket(6000, 11999, 2);
-        Bucket mockBucket3 = setupMockBucket(12000, 17999, 3);
+        Bucket bucket1 = buildBucketWithRangeAndValue(0, 5999, 1);
+        Bucket bucket2 = buildBucketWithRangeAndValue(6000, 11999, 2);
+        Bucket bucket3 = buildBucketWithRangeAndValue(12000, 17999, 3);
 
-        csvFileService.write(mockBucket1);
+        csvFileService.write(bucket1);
 
-        List<Bucket> mockBuckets = Lists.newArrayList(mockBucket2, mockBucket3);
-        csvFileService.writeMultipleBucketDataToFile(mockBuckets);
+        List<Bucket> buckets = Lists.newArrayList(bucket2, bucket3);
+        csvFileService.writeMultipleBucketDataToFile(buckets);
         /*No assertions for this test - please open TestResponseData.csv for results.
         Expected outputs are as follows:
 
@@ -39,13 +39,13 @@ public class CsvFileServiceTest {
         */
     }
 
-    private Bucket setupMockBucket(long rangeStart, long rangeEnd, double averageValue) {
-        Bucket mockBucket = Mockito.mock(Bucket.class);
+    private Bucket buildBucketWithRangeAndValue(long rangeStart, long rangeEnd, double averageValue) {
+        Bucket bucket = Mockito.mock(Bucket.class);
         Reading reading = Mockito.mock(Reading.class);
-        when(mockBucket.getTimeRange()).thenReturn(Range.between(rangeStart, rangeEnd));
-        when(mockBucket.getReadings()).thenReturn(Lists.newArrayList(reading));
-        when(mockBucket.getAverageValue()).thenReturn(averageValue);
-        return mockBucket;
+        when(bucket.getTimeRange()).thenReturn(Range.between(rangeStart, rangeEnd));
+        when(bucket.getReadings()).thenReturn(Lists.newArrayList(reading));
+        when(bucket.getAverageValue()).thenReturn(averageValue);
+        return bucket;
     }
 
 }
