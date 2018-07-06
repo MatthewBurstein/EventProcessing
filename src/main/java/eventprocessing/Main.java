@@ -1,9 +1,8 @@
 package eventprocessing;
 
-import com.amazonaws.services.sqs.model.DeleteMessageRequest;
+import com.amazonaws.services.sqs.model.*;
 import com.amazonaws.services.sqs.model.Message;
-import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
-import com.amazonaws.services.sqs.model.ReceiveMessageResult;
+import com.google.common.collect.Lists;
 import eventprocessing.amazonservices.AmazonController;
 import eventprocessing.amazonservices.SqsClient;
 import eventprocessing.customerrors.InvalidSqsResponseException;
@@ -18,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.time.Clock;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -30,10 +30,9 @@ public class Main {
     private static StopWatch stopWatch;
     private static CSVFileService csvFileService;
     private static ReadingAggregator readingAggregator;
+    private static TemporarySqsResponseStorage temporarySqsResponseStorage;
 
-    public static void main(String[] args) throws IOException {
-        SqsClientThread thread = new SqsClientThread("some name");
-        thread.start();
+    public static void main(String[] args) throws IOException, InterruptedException {
         logger.info("App launched");
         createObjects();
 
@@ -52,23 +51,25 @@ public class Main {
         int messageCounter = 0;
 
 
-//        long tensOfSeconds = 0;
+        long tensOfSeconds = 0;
 
+        SqsClientThread sqsClientThread1 = createAndStartSqsClientThread(sqsClient, receiveMessageRequest);
+        SqsClientThread sqsClientThread2 = createAndStartSqsClientThread(sqsClient, receiveMessageRequest);
+        SqsClientThread sqsClientThread3 = createAndStartSqsClientThread(sqsClient, receiveMessageRequest);
         while (stopWatch.getTime() < (duration*60000)) {
 
-            //KEEP FOR LOGGING QUEUE SIZE
-//            if (tensOfSeconds == stopWatch.getTime() / 10000) {
-//                GetQueueAttributesRequest attr = new GetQueueAttributesRequest(queueUrl);
-//                attr.setAttributeNames(Lists.newArrayList("ApproximateNumberOfMessages"));
-//                Map<String, String> attributesMap = sqsClient.getSqs().getQueueAttributes(attr).getAttributes();
-//                logger.info("queue size = " + attributesMap.get("ApproximateNumberOfMessages"));
-//                tensOfSeconds++;
-//            }
-
-
-            ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
+//            KEEP FOR LOGGING QUEUE SIZE
+            if (tensOfSeconds == stopWatch.getTime() / 10000) {
+                GetQueueAttributesRequest attr = new GetQueueAttributesRequest(queueUrl);
+                attr.setAttributeNames(Lists.newArrayList("ApproximateNumberOfMessages"));
+                Map<String, String> attributesMap = sqsClient.getSqs().getQueueAttributes(attr).getAttributes();
+                logger.info("queue size = " + attributesMap.get("ApproximateNumberOfMessages"));
+                tensOfSeconds++;
+            }
+            ReceiveMessageResult messageResult = temporarySqsResponseStorage.take();
 
             messageCounter += messageResult.getMessages().size();
+
             for (Message msg : messageResult.getMessages()) {
                 try {
                     SqsResponse sqsResponse = sqsResponseService.parseResponse(msg.getBody());
@@ -89,11 +90,20 @@ public class Main {
 
 
         }
+        sqsClientThread1.terminate();
+        sqsClientThread2.terminate();
+        sqsClientThread3.terminate();
         readingAggregator.processAllBuckets();
         logger.info("Total messages received: " + messageCounter);
         logger.info("Total duplicates in this run: " + readingAggregator.getDuplicateCounter());
         logger.info("Total faulty sensors in this run: " + notWorkingSensorCount);
 
+    }
+
+    private static SqsClientThread createAndStartSqsClientThread(SqsClient sqsClient, ReceiveMessageRequest receiveMessageRequest) {
+        SqsClientThread sqsClientThread = new SqsClientThread(temporarySqsResponseStorage, sqsClient, receiveMessageRequest);
+        sqsClientThread.start();
+        return sqsClientThread;
     }
 
     private static void createObjects() throws IOException {
@@ -104,5 +114,6 @@ public class Main {
         stopWatch = new StopWatch();
         csvFileService = new CSVFileService("ResponseData" + System.currentTimeMillis() + ".csv");
         readingAggregator = new ReadingAggregator(csvFileService, Clock.systemUTC(), gc);
+        temporarySqsResponseStorage = new TemporarySqsResponseStorage();
     }
 }

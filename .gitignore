@@ -10,5 +10,5 @@ src/main/resources/liquibase.properties
 dependency-reduced-pom.xml
 
 locations.json
-ResponseData.csv
+ResponseData*
 TestResponseData.csv
