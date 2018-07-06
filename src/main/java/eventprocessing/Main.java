@@ -9,11 +9,9 @@ import eventprocessing.amazonservices.SqsClient;
 import eventprocessing.customerrors.InvalidSqsResponseException;
 import eventprocessing.fileservices.CSVFileService;
 import eventprocessing.fileservices.JSONParser;
-import eventprocessing.models.Reading;
-import eventprocessing.models.ReadingAggregator;
-import eventprocessing.models.SensorList;
-import eventprocessing.models.SqsResponse;
+import eventprocessing.models.*;
 import eventprocessing.responseservices.SqsResponseService;
+import eventprocessing.threads.SqsClientThread;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,6 +32,8 @@ public class Main {
     private static ReadingAggregator readingAggregator;
 
     public static void main(String[] args) throws IOException {
+        SqsClientThread thread = new SqsClientThread("some name");
+        thread.start();
         logger.info("App launched");
         createObjects();
 
@@ -44,7 +44,6 @@ public class Main {
         String queueUrl = amazonController.getQueueUrl();
 
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
-
         System.out.println("How many minutes to run for?\nMUST be at least 1 minute longer than " + gc.MAX_MESSAGE_DELAY_MINS + " mins");
         int duration = scanner.nextInt();
         int notWorkingSensorCount = 0;
@@ -74,7 +73,6 @@ public class Main {
                 try {
                     SqsResponse sqsResponse = sqsResponseService.parseResponse(msg.getBody());
                     Reading reading = new Reading(sqsResponse);
-
                     if(sensorList.isWorkingSensor(reading)) {
                         readingAggregator.process(reading);
                     } else {
