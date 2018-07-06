@@ -1,5 +1,8 @@
 package eventprocessing.responseservices;
-import com.google.gson.*;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import eventprocessing.adaptors.MessageAdaptor;
 import eventprocessing.customerrors.InvalidSqsResponseException;
 import eventprocessing.models.Message;

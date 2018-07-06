@@ -2,7 +2,8 @@ package eventprocessing.models;
 
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class TemporarySqsResponseStorage {
 

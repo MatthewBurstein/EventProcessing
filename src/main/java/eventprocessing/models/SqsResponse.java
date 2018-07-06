@@ -1,11 +1,6 @@
 package eventprocessing.models;
 
 import com.google.gson.annotations.SerializedName;
-import org.joda.time.DateTime;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class SqsResponse {
     @SerializedName("MessageId")

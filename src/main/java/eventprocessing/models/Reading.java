@@ -1,7 +1,7 @@
 package eventprocessing.models;
 
 public class Reading {
-    private String id; //same as eventId in Message
+    private String id;
     private long timestamp;
     private String locationId;
     private double value;
