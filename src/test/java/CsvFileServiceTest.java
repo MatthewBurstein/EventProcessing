@@ -1,7 +1,7 @@
 import com.google.common.collect.Lists;
 import eventprocessing.fileservices.CSVFileService;
 import eventprocessing.models.Bucket;
-import eventprocessing.models.SqsResponse;
+import eventprocessing.models.Reading;
 import org.apache.commons.lang3.Range;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -41,9 +41,9 @@ public class CsvFileServiceTest {
 
     private Bucket setupMockBucket(long rangeStart, long rangeEnd, double averageValue) {
         Bucket mockBucket = Mockito.mock(Bucket.class);
-        SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
+        Reading reading = Mockito.mock(Reading.class);
         when(mockBucket.getTimeRange()).thenReturn(Range.between(rangeStart, rangeEnd));
-        when(mockBucket.getSqsResponses()).thenReturn(Lists.newArrayList(mockSqsResponse));
+        when(mockBucket.getReadings()).thenReturn(Lists.newArrayList(reading));
         when(mockBucket.getAverageValue()).thenReturn(averageValue);
         return mockBucket;
     }

@@ -18,16 +18,20 @@ public class Message {
         return timestamp;
     }
 
+    public String getEventId() {
+        return eventId;
+    }
+
     public void setLocationId(String locationId) {
         this.locationId = locationId;
     }
 
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
-    }
-
     public void setValue(double value) {
         this.value = value;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 
     public void setTimestamp(long timestamp) {

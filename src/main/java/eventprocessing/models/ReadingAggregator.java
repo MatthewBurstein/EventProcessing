@@ -31,8 +31,8 @@ public class ReadingAggregator {
         createInitialBuckets();
     }
 
-    public void process(SqsResponse sqsResponse) {
-        assignResponseToBucket(sqsResponse);
+    public void process(Reading reading) {
+        assignResponseToBucket(reading);
         Bucket bucket = removeExpiredBucket();
         if (bucket != null) {
             csvFileService.write(bucket);
@@ -69,10 +69,10 @@ public class ReadingAggregator {
         }
     }
 
-    private void assignResponseToBucket(SqsResponse sqsResponse) {
+    private void assignResponseToBucket(Reading reading) {
         buckets.forEach(bucket -> {
-            if (bucket.getTimeRange().contains(sqsResponse.getMessageTimestamp())) {
-                bucket.addResponse(sqsResponse);
+            if (bucket.getTimeRange().contains(reading.getTimestamp())) {
+                bucket.addResponse(reading);
             }
         });
 

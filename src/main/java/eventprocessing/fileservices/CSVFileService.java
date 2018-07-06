@@ -24,7 +24,7 @@ public class CSVFileService {
     }
 
     public void write(Bucket bucketToWriteToFile) {
-        logger.info("Writing bucket with TimeRange " + bucketToWriteToFile.getTimeRange() + "and " + bucketToWriteToFile.getSqsResponses().size() + " responses.");
+        logger.info("Writing bucket with TimeRange " + bucketToWriteToFile.getTimeRange() + "and " + bucketToWriteToFile.getReadings().size() + " responses.");
         CSVFormat csvFormat = getCsvFormat();
         StringBuffer stringBuffer = new StringBuffer(ESTIMATED_LINE_LENGTH * 2);
         try (CSVPrinter csvPrinter = new CSVPrinter(stringBuffer, csvFormat)) {
@@ -52,7 +52,7 @@ public class CSVFileService {
     private void writeBucketToStream(CSVPrinter csvPrinter, Bucket bucket) {
         String startTime = bucket.getTimeRange().getMinimum().toString();
         String endTime = bucket.getTimeRange().getMaximum().toString();
-        String numberOfResponses = String.valueOf(bucket.getSqsResponses().size());
+        String numberOfResponses = String.valueOf(bucket.getReadings().size());
         String averageValue = String.valueOf(bucket.getAverageValue());
         try {
             csvPrinter.printRecord(startTime, endTime, numberOfResponses, averageValue);

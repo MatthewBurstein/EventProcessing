@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class Bucket {
 
     private Range<Long> timeRange;
-    private List<SqsResponse> sqsResponses = new ArrayList<>();
+    private List<Reading> readings = new ArrayList<>();
     private GlobalConstants gc;
 
     static Logger logger = LogManager.getLogger(Main.class);
@@ -25,26 +25,26 @@ public class Bucket {
         this.timeRange = Range.between(startTime, endTime);
     }
 
-    public void addResponse(SqsResponse sqsResponse) {
-        if (!isDuplicateMessage(sqsResponse)) {
-            this.sqsResponses.add(sqsResponse);
+    public void addResponse(Reading reading) {
+        if (!isDuplicateReading(reading)) {
+            this.readings.add(reading);
         }
     }
 
-    public List<SqsResponse> getSqsResponses() {
-        return sqsResponses;
+    public List<Reading> getReadings() {
+        return readings;
     }
 
-    public List<Double> getMessageValues() {
-        return sqsResponses
+    public List<Double> getReadingValues() {
+        return readings
                 .stream()
-                .map(response -> response.getValue())
+                .map(Reading::getValue)
                 .collect(Collectors.toList());
     }
 
-    public List<String> getMessageIds() {
-        return sqsResponses.stream()
-                .map(response -> response.getMessageId())
+    public List<String> getReadingIds() {
+        return readings.stream()
+                .map(Reading::getId)
                 .collect(Collectors.toList());
     }
 
@@ -59,14 +59,14 @@ public class Bucket {
     }
 
     public double getAverageValue() {
-        double total = getMessageValues()
+        double total = getReadingValues()
                 .stream()
                 .reduce(0.0, Double::sum);
 
-        return total / getSqsResponses().size();
+        return total / getReadings().size();
     }
 
-    public boolean isDuplicateMessage(SqsResponse sqsResponse) {
-        return getMessageIds().contains(sqsResponse.getMessageId());
+    public boolean isDuplicateReading(Reading reading) {
+        return getReadingIds().contains(reading.getId());
     }
 }

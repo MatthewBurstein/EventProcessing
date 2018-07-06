@@ -1,12 +1,11 @@
 import eventprocessing.GlobalConstants;
-import eventprocessing.models.SqsResponse;
+import eventprocessing.models.Reading;
 import eventprocessing.models.Bucket;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.threeten.extra.MutableClock;
-import sun.security.action.GetLongAction;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -60,40 +59,40 @@ public class BucketTest {
     }
 
     @Test
-    public void getMessageIds_returnsListOfMessageIds() {
-        SqsResponse mockSqsResponse1 = Mockito.mock(SqsResponse.class);
-        when(mockSqsResponse1.getMessageId()).thenReturn("mockResponse1id");
-        SqsResponse mockSqsResponse2 = Mockito.mock(SqsResponse.class);
-        when(mockSqsResponse2.getMessageId()).thenReturn("mockResponse2id");
-        bucket.getSqsResponses().addAll(Lists.newArrayList(mockSqsResponse1, mockSqsResponse2));
-        List<String> expected = Lists.newArrayList("mockResponse1id", "mockResponse2id");
-        assertEquals(bucket.getMessageIds(), expected);
+    public void getReadingIds_returnsListOfReadingIds() {
+        Reading reading1 = Mockito.mock(Reading.class);
+        when(reading1.getId()).thenReturn("reading1Id");
+        Reading reading2 = Mockito.mock(Reading.class);
+        when(reading2.getId()).thenReturn("reading2Id");
+        bucket.getReadings().addAll(Lists.newArrayList(reading1, reading2));
+        List<String> expected = Lists.newArrayList("reading1Id", "reading2Id");
+        assertEquals(bucket.getReadingIds(), expected);
     }
 
     @Test
-    public void getAverageValue_returnsAverageOfMessageValues() {
-        SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
-        List<SqsResponse> mockSqsResponses = Lists.newArrayList(mockSqsResponse, mockSqsResponse, mockSqsResponse);
-        bucket.getSqsResponses().addAll(mockSqsResponses);
-        when(mockSqsResponse.getValue()).thenReturn(1.0, 2.0, 3.0);
+    public void getAverageValue_returnsAverageOfReadingValues() {
+        Reading reading = Mockito.mock(Reading.class);
+        List<Reading> readings = Lists.newArrayList(reading, reading, reading);
+        bucket.getReadings().addAll(readings);
+        when(reading.getValue()).thenReturn(1.0, 2.0, 3.0);
 
         double expectedAverageValue = 2.0;
         assertEquals(expectedAverageValue, bucket.getAverageValue(), 0);
     }
 
     @Test
-    public void isDuplicateMessage_whenDuplicate_returnsTrue() {
-        SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
-        when(mockSqsResponse.getMessageId()).thenReturn("messageId1");
-        bucket.addResponse(mockSqsResponse);
-        assertTrue(bucket.isDuplicateMessage(mockSqsResponse));
+    public void isDuplicateReading_whenDuplicate_returnsTrue() {
+        Reading reading = Mockito.mock(Reading.class);
+        when(reading.getId()).thenReturn("readingId");
+        bucket.addResponse(reading);
+        assertTrue(bucket.isDuplicateReading(reading));
     }
 
     @Test
-    public void isDuplicateMessage_whenNotDuplicate_returnsFalse() {
-        SqsResponse mockSqsResponse = Mockito.mock(SqsResponse.class);
-        when(mockSqsResponse.getMessageId()).thenReturn("newMessageId");
-        assertFalse(bucket.isDuplicateMessage(mockSqsResponse));
+    public void isDuplicateReading_whenNotDuplicate_returnsFalse() {
+        Reading reading = Mockito.mock(Reading.class);
+        when(reading.getId()).thenReturn("readingId");
+        assertFalse(bucket.isDuplicateReading(reading));
     }
 
     private MutableClock buildClock(long millis) {

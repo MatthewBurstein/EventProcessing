@@ -1,23 +1,25 @@
 package eventprocessing;
 
-import com.amazonaws.services.sqs.model.*;
+import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.Message;
-import com.google.common.collect.Lists;
-import eventprocessing.amazonservices.*;
+import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+import com.amazonaws.services.sqs.model.ReceiveMessageResult;
+import eventprocessing.amazonservices.AmazonController;
+import eventprocessing.amazonservices.SqsClient;
 import eventprocessing.customerrors.InvalidSqsResponseException;
 import eventprocessing.fileservices.CSVFileService;
 import eventprocessing.fileservices.JSONParser;
-import eventprocessing.models.*;
+import eventprocessing.models.Reading;
+import eventprocessing.models.ReadingAggregator;
+import eventprocessing.models.SensorList;
+import eventprocessing.models.SqsResponse;
 import eventprocessing.responseservices.SqsResponseService;
-import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.Clock;
-import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -71,8 +73,10 @@ public class Main {
             for (Message msg : messageResult.getMessages()) {
                 try {
                     SqsResponse sqsResponse = sqsResponseService.parseResponse(msg.getBody());
-                    if(sensorList.isWorkingSensor(sqsResponse)) {
-                        readingAggregator.process(sqsResponse);
+                    Reading reading = new Reading(sqsResponse);
+
+                    if(sensorList.isWorkingSensor(reading)) {
+                        readingAggregator.process(reading);
                     } else {
                         notWorkingSensorCount++;
                     }

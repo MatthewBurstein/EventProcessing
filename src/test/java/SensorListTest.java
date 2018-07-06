@@ -10,34 +10,29 @@ import static org.mockito.Mockito.when;
 
 public class SensorListTest {
 
-    private Sensor mockSensor1;
-    private Sensor mockSensor2;
-    private Message mockMessage;
-    private SqsResponse mockSqsResponse;
+    private Reading reading;
     private SensorList sensorList;
 
     @Before
     public void setup() {
-        mockSensor1 = Mockito.mock(Sensor.class);
-        mockSensor2 = Mockito.mock(Sensor.class);
-        when(mockSensor1.getId()).thenReturn("mockSensorId1");
-        when(mockSensor2.getId()).thenReturn("mockSensorId2");
-        sensorList = new SensorList(Lists.newArrayList(mockSensor1, mockSensor2));
-        mockMessage = Mockito.mock(Message.class);
-        mockSqsResponse = Mockito.mock(SqsResponse.class);
-        when(mockSqsResponse.getMessage()).thenReturn(mockMessage);
+        Sensor sensor1 = Mockito.mock(Sensor.class);
+        Sensor sensor2 = Mockito.mock(Sensor.class);
+        when(sensor1.getId()).thenReturn("mockSensorId1");
+        when(sensor2.getId()).thenReturn("mockSensorId2");
+        sensorList = new SensorList(Lists.newArrayList(sensor1, sensor2));
+        reading = Mockito.mock(Reading.class);
     }
 
     @Test
-    public void isWorkingSensor_returnsTrue() {
-        when(mockMessage.getLocationId()).thenReturn("mockSensorId2");
-        assertTrue(sensorList.isWorkingSensor(mockSqsResponse));
+    public void isWorkingSensor_returnsTrue_whenSensorInSensorList() {
+        when(reading.getLocationId()).thenReturn("mockSensorId2");
+        assertTrue(sensorList.isWorkingSensor(reading));
     }
 
     @Test
-    public void isNotWorkingSensor_returnsFalse() {
-        when(mockMessage.getLocationId()).thenReturn("invalidId");
-        assertFalse(sensorList.isWorkingSensor(mockSqsResponse));
+    public void isNotWorkingSensor_returnsFalse_whenSensorNotInSensorList() {
+        when(reading.getLocationId()).thenReturn("invalidId");
+        assertFalse(sensorList.isWorkingSensor(reading));
     }
 
 }

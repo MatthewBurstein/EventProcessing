@@ -14,10 +14,10 @@ public class SensorList {
         return sensors;
     }
 
-    public boolean isWorkingSensor(SqsResponse sqsResponse) {
+    public boolean isWorkingSensor(Reading reading) {
         long count = sensors
                 .stream()
-                .filter(sensor -> sensor.getId().equals(sqsResponse.getMessage().getLocationId()))
+                .filter(sensor -> sensor.getId().equals(reading.getLocationId()))
                 .count();
         return count > 0;
     }
