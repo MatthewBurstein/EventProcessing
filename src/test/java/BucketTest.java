@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.threeten.extra.MutableClock;
+import sun.security.action.GetLongAction;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -21,36 +22,41 @@ public class BucketTest {
     private Bucket bucket;
     private long bucketStart;
     private MutableClock clock;
+    private GlobalConstants gc;
 
     @Before
     public void createResponseList() {
+        gc = new GlobalConstants(60, 5);
         bucketStart = 100000;
-        bucket = new Bucket(bucketStart);
+        bucket = new Bucket(bucketStart, gc);
     }
 
     @Test
-    public void isExpiredAtTime_returnsTrueWhenPassedArgumentIsBeforeRange() {
-        clock = buildClock(bucketStart - 1000);
+    public void isExpiredAtTime_returnsFalseWhenPassedArgumentIsBeforeRange() {
+        long timeBeforeBucketStart = bucketStart - 1;
+        clock = buildClock(timeBeforeBucketStart);
         assertFalse(bucket.isExpiredAtTime(clock));
     }
 
     @Test
     public void isExpiredAtTime_returnsFalseWhenPassedArgumentIsInRange() {
-        clock = buildClock(bucketStart + GlobalConstants.THIS_BUCKET_RANGE);
+        long lastMilliOfBucket = bucketStart + gc.THIS_BUCKET_RANGE;
+        clock = buildClock(lastMilliOfBucket);
         assertFalse(bucket.isExpiredAtTime(clock));
-    }
-
-    @Test
-    public void isExpiredAtTime_returnsFalseWhenPassedArgumentIsAfterFiveMins() {
-        clock = buildClock(bucketStart + GlobalConstants.THIS_BUCKET_RANGE + GlobalConstants.BUCKET_UPPER_BOUND * GlobalConstants.MAX_MESSAGE_DELAY_MINS
-        );
-        assertTrue(bucket.isExpiredAtTime(clock));
     }
 
     @Test
     public void isExpiredAtTime_returnsFalseWhenPassedArgumentIsWithinDelayTime() {
-        clock = buildClock(bucketStart + GlobalConstants.THIS_BUCKET_RANGE * GlobalConstants.MAX_MESSAGE_DELAY_MINS);
+        long timeOutsideRangeInDelayTime = bucketStart + gc.MAX_MESSAGE_DELAY_MILLIS;
+        clock = buildClock(timeOutsideRangeInDelayTime);
         assertFalse(bucket.isExpiredAtTime(clock));
+    }
+
+    @Test
+    public void isExpiredAtTime_returnsTrueWhenPassedArgumentIsAfterMaxDelay() {
+        long timeAfterBucketExpires = bucketStart + gc.THIS_BUCKET_RANGE + gc.MAX_MESSAGE_DELAY_MILLIS;
+        clock = buildClock(timeAfterBucketExpires);
+        assertTrue(bucket.isExpiredAtTime(clock));
     }
 
     @Test
@@ -71,8 +77,8 @@ public class BucketTest {
         bucket.getSqsResponses().addAll(mockSqsResponses);
         when(mockSqsResponse.getValue()).thenReturn(1.0, 2.0, 3.0);
 
-        double expectedValue = 2.0;
-        assertEquals(expectedValue, bucket.getAverageValue(), 0);
+        double expectedAverageValue = 2.0;
+        assertEquals(expectedAverageValue, bucket.getAverageValue(), 0);
     }
 
     @Test

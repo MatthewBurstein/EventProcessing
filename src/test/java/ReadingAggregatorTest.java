@@ -1,5 +1,6 @@
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import eventprocessing.GlobalConstants;
 import eventprocessing.fileservices.CSVFileService;
 import eventprocessing.models.Bucket;
 import eventprocessing.models.ReadingAggregator;
@@ -24,12 +25,14 @@ public class ReadingAggregatorTest {
     private ReadingAggregator readingAggregator;
     private CSVFileService fileService;
     private MutableClock clock;
+    private GlobalConstants gc;
 
     @Before
     public void buildReadingAggregator() {
         clock = buildClock();
         fileService = Mockito.mock(CSVFileService.class);
-        readingAggregator = new ReadingAggregator(fileService, clock);
+        gc = new GlobalConstants(60, 5);
+        readingAggregator = new ReadingAggregator(fileService, clock, gc);
     }
 
     @Test
@@ -53,10 +56,10 @@ public class ReadingAggregatorTest {
 
     @Test
     public void process_multipleReadingsExceedingDelayTime_areSentToFileWriter() {
-        SqsResponse oldReading1 = buildReadingWithTimestampMinutesAndId(-5, "W");
-        SqsResponse oldReading2 = buildReadingWithTimestampMinutesAndId(-4.9, "E");
-        SqsResponse oldReading3 = buildReadingWithTimestampMinutesAndId(-4, "L");
-        SqsResponse newReading = buildReadingWithTimestampMinutesAndId(0, "P");
+        SqsResponse oldReading1 = buildReadingWithTimestampMinutesAndId(-5, "id1");
+        SqsResponse oldReading2 = buildReadingWithTimestampMinutesAndId(-4.9, "id2");
+        SqsResponse oldReading3 = buildReadingWithTimestampMinutesAndId(-4, "id3");
+        SqsResponse newReading = buildReadingWithTimestampMinutesAndId(0, "id4");
 
         processMultipleReadings(oldReading1, oldReading2, oldReading3);
         advanceClockByMinutes(1);

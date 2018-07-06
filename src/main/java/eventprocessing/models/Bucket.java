@@ -15,11 +15,13 @@ public class Bucket {
 
     private Range<Long> timeRange;
     private List<SqsResponse> sqsResponses = new ArrayList<>();
+    private GlobalConstants gc;
 
     static Logger logger = LogManager.getLogger(Main.class);
 
-    public Bucket(long startTime) {
-        long endTime = startTime + GlobalConstants.THIS_BUCKET_RANGE;
+    public Bucket(long startTime, GlobalConstants gc) {
+        this.gc = gc;
+        long endTime = startTime + gc.THIS_BUCKET_RANGE;
         this.timeRange = Range.between(startTime, endTime);
     }
 
@@ -51,7 +53,7 @@ public class Bucket {
     }
 
     public boolean isExpiredAtTime(Clock clock) {
-        long maxMsgOffset = GlobalConstants.BUCKET_UPPER_BOUND * GlobalConstants.MAX_MESSAGE_DELAY_MINS;
+        long maxMsgOffset = gc.BUCKET_UPPER_BOUND * gc.MAX_MESSAGE_DELAY_MINS;
         long expirationTime = timeRange.getMaximum() + maxMsgOffset;
         return clock.millis() >= expirationTime;
     }

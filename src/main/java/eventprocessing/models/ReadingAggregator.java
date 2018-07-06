@@ -1,6 +1,7 @@
 package eventprocessing.models;
 
 import com.google.common.collect.Iterables;
+import eventprocessing.GlobalConstants;
 import eventprocessing.Main;
 import eventprocessing.fileservices.CSVFileService;
 import org.apache.logging.log4j.LogManager;
@@ -15,6 +16,7 @@ public class ReadingAggregator {
     private Clock clock;
     private final List<Bucket> buckets = new ArrayList<>();
     private int duplicateCounter = 0;
+    private GlobalConstants gc;
 
     static Logger logger = LogManager.getLogger(Main.class);
 
@@ -22,9 +24,10 @@ public class ReadingAggregator {
         return duplicateCounter;
     }
 
-    public ReadingAggregator(CSVFileService csvFileService, Clock clock) {
+    public ReadingAggregator(CSVFileService csvFileService, Clock clock, GlobalConstants gc) {
         this.csvFileService = csvFileService;
         this.clock = clock;
+        this.gc = gc;
         createInitialBuckets();
     }
 
@@ -53,16 +56,16 @@ public class ReadingAggregator {
     }
 
     private void createBucket(long startTime) {
-        Bucket newBucket = new Bucket(startTime);
+        Bucket newBucket = new Bucket(startTime, gc);
         buckets.add(newBucket);
     }
 
     private void createInitialBuckets() {
         long currentTime = clock.millis();
-        long thisBucketStartTime = currentTime - 300000;
+        long thisBucketStartTime = currentTime - gc.MAX_MESSAGE_DELAY_MILLIS;
         while (thisBucketStartTime <= currentTime) {
             createBucket(thisBucketStartTime);
-            thisBucketStartTime += 60000;
+            thisBucketStartTime += gc.BUCKET_UPPER_BOUND;
         }
     }
 

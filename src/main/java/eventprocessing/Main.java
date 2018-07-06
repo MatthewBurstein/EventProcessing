@@ -23,6 +23,7 @@ import java.util.Scanner;
 public class Main {
     static Logger logger = LogManager.getLogger(Main.class);
 
+    private static GlobalConstants gc;
     private static SqsResponseService sqsResponseService;
     private static Scanner scanner;
     private static AmazonController amazonController;
@@ -42,7 +43,7 @@ public class Main {
 
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
 
-        System.out.println("How many minutes to run for?\nMUST be at least 1 minute longer than " + GlobalConstants.MAX_MESSAGE_DELAY_MINS + " mins");
+        System.out.println("How many minutes to run for?\nMUST be at least 1 minute longer than " + gc.MAX_MESSAGE_DELAY_MINS + " mins");
         int duration = scanner.nextInt();
         int notWorkingSensorCount = 0;
         stopWatch.start();
@@ -50,7 +51,7 @@ public class Main {
         int messageCounter = 0;
 
 
-        long tensOfSeconds = 0;
+//        long tensOfSeconds = 0;
 
         while (stopWatch.getTime() < (duration*60000)) {
 
@@ -72,9 +73,7 @@ public class Main {
                     SqsResponse sqsResponse = sqsResponseService.parseResponse(msg.getBody());
                     if(sensorList.isWorkingSensor(sqsResponse)) {
                         readingAggregator.process(sqsResponse);
-//                        System.out.println(sqsResponse.getMessageId() + " - " + sqsResponse.getCategory());
                     } else {
-//                        System.out.println(sqsResponse.getMessageId() + " - " + sqsResponse.getCategory());
                         notWorkingSensorCount++;
                     }
                 } catch (InvalidSqsResponseException e) {
@@ -96,11 +95,12 @@ public class Main {
     }
 
     private static void createObjects() throws IOException {
+        gc = new GlobalConstants(60, 5);
         sqsResponseService = new SqsResponseService();
         scanner = new Scanner(System.in);
         amazonController = new AmazonController();
         stopWatch = new StopWatch();
         csvFileService = new CSVFileService("ResponseData" + System.currentTimeMillis() + ".csv");
-        readingAggregator = new ReadingAggregator(csvFileService, Clock.systemUTC());
+        readingAggregator = new ReadingAggregator(csvFileService, Clock.systemUTC(), gc);
     }
 }
