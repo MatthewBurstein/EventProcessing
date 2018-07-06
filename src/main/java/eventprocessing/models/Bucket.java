@@ -6,6 +6,7 @@ import org.apache.commons.lang3.Range;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,10 +21,6 @@ public class Bucket {
     public Bucket(long startTime) {
         long endTime = startTime + GlobalConstants.THIS_BUCKET_RANGE;
         this.timeRange = Range.between(startTime, endTime);
-    }
-
-    public Bucket() {
-        //Constructor for InitialBucket
     }
 
     public void addResponse(SqsResponse sqsResponse) {
@@ -53,10 +50,10 @@ public class Bucket {
         return timeRange;
     }
 
-    public boolean isExpiredAtTime(long time) {
+    public boolean isExpiredAtTime(Clock clock) {
         long maxMsgOffset = GlobalConstants.BUCKET_UPPER_BOUND * GlobalConstants.MAX_MESSAGE_DELAY_MINS;
         long expirationTime = timeRange.getMaximum() + maxMsgOffset;
-        return time >= expirationTime;
+        return clock.millis() >= expirationTime;
     }
 
     public double getAverageValue() {

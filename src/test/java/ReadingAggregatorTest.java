@@ -1,3 +1,4 @@
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eventprocessing.fileservices.CSVFileService;
 import eventprocessing.models.Bucket;
@@ -47,7 +48,7 @@ public class ReadingAggregatorTest {
         advanceClockByMinutes(1);
         readingAggregator.process(newReading);
 
-        assertWriteCalledTimesWithReadings(1, oldReading);
+        assertWriteCalledWithBucketContainingReadings(oldReading);
     }
 
     @Test
@@ -61,7 +62,7 @@ public class ReadingAggregatorTest {
         advanceClockByMinutes(1);
         readingAggregator.process(newReading);
 
-        assertWriteCalledTimesWithReadings(1, oldReading1, oldReading2);
+        assertWriteCalledWithBucketContainingReadings(oldReading1, oldReading2);
     }
 
     @Test
@@ -77,7 +78,7 @@ public class ReadingAggregatorTest {
         advanceClockByMinutes(1);
         readingAggregator.process(newReading);
 
-        assertWriteCalledTimesWithReadings(2, oldReading3);
+        assertWriteCalledWithBucketContainingReadings(oldReading3);
     }
 
     @Test
@@ -90,7 +91,7 @@ public class ReadingAggregatorTest {
         advanceClockByMinutes(1);
         readingAggregator.process(newReading);
 
-        assertWriteCalledTimesWithReadings(7, newReading);
+        assertWriteCalledWithBucketContainingReadings(newReading);
     }
 
     @Test
@@ -104,7 +105,7 @@ public class ReadingAggregatorTest {
         advanceClockByMinutes(1);
         readingAggregator.process(uniqueReading);
 
-        assertWriteCalledTimesWithReadings(1, duplicateReading1, uniqueReading);
+        assertWriteCalledWithBucketContainingReadings(duplicateReading1, uniqueReading);
     }
 
     @Test
@@ -131,10 +132,11 @@ public class ReadingAggregatorTest {
         }
     }
 
-    private void assertWriteCalledTimesWithReadings(int numberOfTimesCalled, SqsResponse... argsOfLastCall) {
+    private void assertWriteCalledWithBucketContainingReadings(SqsResponse... argsOfLastCall) {
         ArgumentCaptor<Bucket> bucketCaptor = ArgumentCaptor.forClass(Bucket.class);
-        verify(fileService, times(numberOfTimesCalled)).write(bucketCaptor.capture());
-        assertThat(bucketCaptor.getValue().getSqsResponses()).containsOnly(argsOfLastCall);
+        verify(fileService, atLeastOnce()).write(bucketCaptor.capture());
+        Bucket argumentOfLastCall = Iterables.getLast(bucketCaptor.getAllValues());
+        assertThat(argumentOfLastCall.getSqsResponses()).containsOnly(argsOfLastCall);
     }
 
     private void processMultipleReadings(SqsResponse... sqsResponses) {

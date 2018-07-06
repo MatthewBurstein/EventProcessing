@@ -57,7 +57,7 @@ public class CSVFileService {
         try {
             csvPrinter.printRecord(startTime, endTime, numberOfResponses, averageValue);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getStackTrace());
         }
     }
 

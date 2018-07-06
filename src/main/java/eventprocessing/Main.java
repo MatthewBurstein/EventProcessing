@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.Clock;
 import java.util.Map;
 import java.util.Scanner;
@@ -32,8 +33,6 @@ public class Main {
     public static void main(String[] args) throws IOException {
         logger.info("App launched");
         createObjects();
-
-        csvFileService.deleteOutputFile();
 
         JSONParser jsonParser = new JSONParser("locations.json");
         SensorList sensorList = jsonParser.createSensorList();
@@ -101,7 +100,7 @@ public class Main {
         scanner = new Scanner(System.in);
         amazonController = new AmazonController();
         stopWatch = new StopWatch();
-        csvFileService = new CSVFileService("ResponseData.csv");
+        csvFileService = new CSVFileService("ResponseData" + System.currentTimeMillis() + ".csv");
         readingAggregator = new ReadingAggregator(csvFileService, Clock.systemUTC());
     }
 }

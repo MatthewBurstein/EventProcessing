@@ -13,7 +13,7 @@ import java.util.List;
 public class ReadingAggregator {
     private CSVFileService csvFileService;
     private Clock clock;
-    private List<Bucket> buckets;
+    private final List<Bucket> buckets = new ArrayList<>();
     private int duplicateCounter = 0;
 
     static Logger logger = LogManager.getLogger(Main.class);
@@ -25,7 +25,6 @@ public class ReadingAggregator {
     public ReadingAggregator(CSVFileService csvFileService, Clock clock) {
         this.csvFileService = csvFileService;
         this.clock = clock;
-        this.buckets = new ArrayList<>();
         createInitialBuckets();
     }
 
@@ -46,7 +45,7 @@ public class ReadingAggregator {
 
     private Bucket getExpiredBucket() {
         Bucket expiredBucket = Iterables.getFirst(buckets, null);
-        if(expiredBucket.isExpiredAtTime(clock.millis())) {
+        if(expiredBucket.isExpiredAtTime(clock)) {
             return expiredBucket;
         } else {
             return null;
