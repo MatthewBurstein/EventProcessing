@@ -24,10 +24,6 @@ public class SqsResponse {
         }
     }
 
-    public Message getMessage() {
-        return message;
-    }
-
     public String getMessageId() {
         return messageId;
     }
@@ -43,20 +39,5 @@ public class SqsResponse {
     public long getMessageTimestamp() {
         return message.getTimestamp();
     }
-
-    // NOT CURRENTLY USED
-//    public long getResponseTimestamp() {
-//        long responseTimestampAsLong;
-//        responseTimestamp = responseTimestamp.substring(0, responseTimestamp.length() - 1) + "-0000";
-//        try {
-//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-//            Date dt = sdf.parse(responseTimestamp);
-//            responseTimestampAsLong = dt.getTime();
-//        } catch(ParseException | NumberFormatException e) {
-//            responseTimestampAsLong = 0;
-//        }
-//
-//        return responseTimestampAsLong;
-//    }
 
 }

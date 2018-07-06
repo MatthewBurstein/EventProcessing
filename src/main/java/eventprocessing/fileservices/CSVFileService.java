@@ -6,12 +6,12 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.pattern.NotANumber;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 
 public class CSVFileService {
     private final String outputCsvFile;
@@ -35,25 +35,13 @@ public class CSVFileService {
         }
     }
 
-    public void writeMultipleBucketDataToFile(List<Bucket> bucketsToWriteToFile) throws IOException {
-        CSVFormat csvFormat = getCsvFormat();
-        int estimatedCharacterCount = ESTIMATED_LINE_LENGTH * (bucketsToWriteToFile.size() + 1);
-        StringBuffer stringBuffer = new StringBuffer(estimatedCharacterCount);
-        try (CSVPrinter csvPrinter = new CSVPrinter(stringBuffer, csvFormat)) {
-            bucketsToWriteToFile.forEach(bucket -> writeBucketToStream(csvPrinter, bucket));
-            writeToFile(stringBuffer);
-        }
-    }
-
-    public void deleteOutputFile() throws IOException {
-        Files.deleteIfExists(Paths.get(outputCsvFile));
-    }
-
     private void writeBucketToStream(CSVPrinter csvPrinter, Bucket bucket) {
         String startTime = bucket.getTimeRange().getMinimum().toString();
         String endTime = bucket.getTimeRange().getMaximum().toString();
         String numberOfResponses = String.valueOf(bucket.getReadings().size());
-        String averageValue = String.valueOf(bucket.getAverageValue());
+        String averageValue = Double.isNaN(bucket.getAverageValue()) ?
+                "No Readings In TimeRange" :
+                String.valueOf(bucket.getAverageValue());
         try {
             csvPrinter.printRecord(startTime, endTime, numberOfResponses, averageValue);
         } catch (IOException e) {

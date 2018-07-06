@@ -25,9 +25,8 @@ public class CsvFileServiceTest {
         Bucket bucket3 = buildBucketWithRangeAndValue(12000, 17999, 3);
 
         csvFileService.write(bucket1);
-
-        List<Bucket> buckets = Lists.newArrayList(bucket2, bucket3);
-        csvFileService.writeMultipleBucketDataToFile(buckets);
+        csvFileService.write(bucket2);
+        csvFileService.write(bucket3);
         /*No assertions for this test - please open TestResponseData.csv for results.
         Expected outputs are as follows:
 
