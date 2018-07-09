@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 class SnsClient {
     private AmazonSNS sns;
-    private final static Logger logger = LogManager.getLogger("SnSClient");
+    private static final Logger logger = LogManager.getLogger("S3Client");
 
     AmazonSNS buildSNSClient() {
         try {

@@ -3,20 +3,17 @@ package eventprocessing.amazonservices;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.sns.util.Topics;
 import eventprocessing.fileservices.S3Interpreter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
 public class AmazonController {
 
-    private static final Logger logger = LogManager.getLogger("AmazonController");
     private SqsClient sqsClient;
 
-    public AmazonController() throws IOException {
+    public AmazonController(String s3InterpreterFileName) throws IOException {
         S3ObjectInputStream s3is = new S3Client().generateS3InputStream();
-        S3Interpreter reader = new S3Interpreter();
-        reader.saveToFile(s3is);
+        S3Interpreter s3Interpreter = new S3Interpreter();
+        s3Interpreter.saveToFile(s3is, s3InterpreterFileName);
 
         this.sqsClient = new SqsClient();
         sqsClient.buildSQSClient();
@@ -25,7 +22,6 @@ public class AmazonController {
         SnsClient snsClient = new SnsClient();
         snsClient.buildSNSClient();
         Topics.subscribeQueue(snsClient.getSns(), sqsClient.getSqs(), S3Details.arnTopic, myQueueUrl);
-
     }
 
     public SqsClient getSqsClient() {

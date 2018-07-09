@@ -7,8 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class S3Interpreter {
-    public void saveToFile(S3ObjectInputStream amazonS3Stream) throws IOException {
-        FileOutputStream fos = new FileOutputStream(new File("locations.json"));
+    public void saveToFile(S3ObjectInputStream amazonS3Stream, String fileSaveLocation) throws IOException {
+        FileOutputStream fos = new FileOutputStream(new File(fileSaveLocation));
         byte[] read_buf = new byte[1024];
         int read_len;
         while ((read_len = amazonS3Stream.read(read_buf)) > 0) {

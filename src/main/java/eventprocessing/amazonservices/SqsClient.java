@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 public class SqsClient {
     private AmazonSQS sqs;
     private String queueUrl;
-    private static Logger logger = LogManager.getLogger("SqsClient");
+    private static final Logger logger = LogManager.getLogger("S3Client");
 
     AmazonSQS buildSQSClient() {
         try {

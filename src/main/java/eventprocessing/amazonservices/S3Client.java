@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 class S3Client {
-    private final Logger logger = LogManager.getLogger("S3Client");
+    private static final Logger logger = LogManager.getLogger("S3Client");
 
     private AmazonS3 clientBuilder() {
 
@@ -35,5 +35,4 @@ class S3Client {
             throw new RuntimeException(errorString, e);
         }
     }
-
 }

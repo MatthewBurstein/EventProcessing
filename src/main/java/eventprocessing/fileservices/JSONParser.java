@@ -18,7 +18,7 @@ import java.util.List;
 public class JSONParser {
 
     private String filePath;
-    private final Logger logger = LogManager.getLogger("JSONParser");
+    private static final Logger logger = LogManager.getLogger("S3Client");
 
     public JSONParser(String filePath) {
         this.filePath = filePath;

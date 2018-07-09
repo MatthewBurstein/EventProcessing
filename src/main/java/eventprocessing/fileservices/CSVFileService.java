@@ -16,7 +16,7 @@ public class CSVFileService {
     private final String outputCsvFile;
     private final int ESTIMATED_LINE_LENGTH = 70;
 
-    static Logger logger = LogManager.getLogger(Main.class);
+    private static final Logger logger = LogManager.getLogger("S3Client");
 
     public CSVFileService(String outputCsvFile) {
         this.outputCsvFile = outputCsvFile;
