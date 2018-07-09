@@ -25,7 +25,7 @@ public class SensorList {
     public void storeSensorData(Reading reading) {
         String readingLocationId = reading.getLocationId();
         sensors.forEach(sensor -> {
-            if(sensor.getLocationId() == readingLocationId) {
+            if(sensor.getLocationId().equals(readingLocationId)) {
                 sensor.addReading(reading);
             }
         });

@@ -8,6 +8,7 @@ import java.io.IOException;
 
 public class AmazonController {
 
+    private final String myQueueUrl;
     private SqsClient sqsClient;
 
     public AmazonController(String s3InterpreterFileName) throws IOException {
@@ -17,7 +18,7 @@ public class AmazonController {
 
         this.sqsClient = new SqsClient();
         sqsClient.buildSQSClient();
-        String myQueueUrl = sqsClient.getQueueUrl();
+        myQueueUrl = sqsClient.getQueueUrl();
 
         SnsClient snsClient = new SnsClient();
         snsClient.buildSNSClient();
@@ -29,6 +30,6 @@ public class AmazonController {
     }
 
     public String getQueueUrl() {
-        return sqsClient.getQueueUrl();
+        return myQueueUrl;
     }
 }

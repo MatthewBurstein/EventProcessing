@@ -16,7 +16,7 @@ public class CSVFileService {
     private final String bucketCsvFile;
     private final String sensorCsvFile;
     private final int ESTIMATED_LINE_LENGTH = 70;
-
+    private final StringBuffer stringBuffer = new StringBuffer(ESTIMATED_LINE_LENGTH * 2);
     private static final Logger logger = LogManager.getLogger("S3Client");
 
     public CSVFileService(String bucketCsvFile, String sensorCsvFile) {
@@ -27,7 +27,7 @@ public class CSVFileService {
     public void write(Bucket bucket) {
         logger.info("Writing bucket with TimeRange " + bucket.getTimeRange() + "and " + bucket.getReadings().size() + " responses.");
         CSVFormat csvFormat = getBucketCsvFormat();
-        StringBuffer stringBuffer = new StringBuffer(ESTIMATED_LINE_LENGTH * 2);
+//        StringBuffer stringBuffer = new StringBuffer(ESTIMATED_LINE_LENGTH * 2);
         try (CSVPrinter csvPrinter = new CSVPrinter(stringBuffer, csvFormat)) {
             writeBucketToStream(csvPrinter, bucket);
             writeToFile(stringBuffer, bucketCsvFile);
@@ -39,7 +39,7 @@ public class CSVFileService {
     public void writeSensorData(Sensor sensor) {
         logger.info("Writing sensor data for location ID " + sensor.getLocationId());
         CSVFormat csvFormat = getSensorCsvFormat();
-        StringBuffer stringBuffer = new StringBuffer(ESTIMATED_LINE_LENGTH * 2);
+//        StringBuffer stringBuffer = new StringBuffer(ESTIMATED_LINE_LENGTH * 2);
         try (CSVPrinter csvPrinter = new CSVPrinter(stringBuffer, csvFormat)) {
             writeSensorToStream(csvPrinter, sensor);
             writeToFile(stringBuffer, sensorCsvFile);
@@ -76,16 +76,6 @@ public class CSVFileService {
         }
     }
 
-    private void writeToFile(StringBuffer stringBuffer, String fileToWriteTo) throws IOException {
-        int charCount = stringBuffer.length();
-        char[] dst =  new char[charCount];
-        stringBuffer.getChars(0, charCount, dst, 0);
-
-        FileWriter fileWriter = new FileWriter(fileToWriteTo, true);
-        fileWriter.append(new String(dst));
-        fileWriter.flush();
-    }
-
     private CSVFormat getBucketCsvFormat() {
         CSVFormat csvFormat;
         if (!fileExists(bucketCsvFile)) {
@@ -104,6 +94,21 @@ public class CSVFileService {
             csvFormat = CSVFormat.DEFAULT;
         }
         return csvFormat;
+    }
+
+    private void writeToFile(StringBuffer stringBuffer, String fileToWriteTo) throws IOException {
+        int charCount = stringBuffer.length();
+        char[] dst =  new char[charCount];
+        stringBuffer.getChars(0, charCount, dst, 0);
+
+        FileWriter fileWriter = new FileWriter(fileToWriteTo, true);
+        fileWriter.append(new String(dst));
+        fileWriter.flush();
+        clearStringBuffer();
+    }
+
+    private void clearStringBuffer() {
+        stringBuffer.delete(0, stringBuffer.length());
     }
 
     private boolean fileExists(String fileName) {

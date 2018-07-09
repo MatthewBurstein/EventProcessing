@@ -17,7 +17,7 @@ public class SqsResponseService {
             SqsResponse sqsResponseObject = gson.fromJson(jsonString, SqsResponse.class);
             return sqsResponseObject;
 
-        } catch (IllegalStateException | JsonSyntaxException e) {
+        } catch (IllegalStateException | JsonSyntaxException | NumberFormatException e) {
             throw new InvalidSqsResponseException(e);
         }
     }

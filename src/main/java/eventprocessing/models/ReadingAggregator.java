@@ -37,6 +37,7 @@ public class ReadingAggregator {
     }
 
     public void finalise() {
+        processAllBuckets();
         sensorList.getSensors().forEach(sensor -> csvFileService.writeSensorData(sensor));
     }
 

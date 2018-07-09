@@ -30,7 +30,7 @@ public class ResponseProcessorThread extends Thread {
             ReceiveMessageResult messageResult = getMessageResultFromStorage();
             processMessageResult(messageResult);
         }
-        readingAggregator.processAllBuckets();
+        readingAggregator.finalise();
         logger.info("Total messages received: " + messageCounter);
         logger.info("Total faulty sensors in this run: " + notWorkingSensorCount);
     }
