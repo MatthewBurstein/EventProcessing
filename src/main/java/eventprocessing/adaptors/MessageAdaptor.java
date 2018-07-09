@@ -15,13 +15,15 @@ public class MessageAdaptor implements JsonDeserializer<Message> {
         final double value = jsonObject.get("value").getAsDouble();
         final long timestamp = jsonObject.get("timestamp").getAsLong();
 
-        final Message message = new Message();
-        message.setLocationId(locationId);
-        message.setEventId(eventId);
-        message.setValue(value);
-        message.setTimestamp(timestamp);
-
+        final Message message = new Message.Builder()
+                .withLocationId(locationId)
+                .withEventId(eventId)
+                .withValue(value)
+                .withTimestamp(timestamp)
+                .build();
 
         return message;
     }
+
+
 }
