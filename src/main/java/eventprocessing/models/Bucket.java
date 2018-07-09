@@ -1,10 +1,7 @@
 package eventprocessing.models;
 
 import eventprocessing.GlobalConstants;
-import eventprocessing.Main;
 import org.apache.commons.lang3.Range;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.time.Clock;
 import java.util.ArrayList;
@@ -16,8 +13,6 @@ public class Bucket {
     private Range<Long> timeRange;
     private List<Reading> readings = new ArrayList<>();
     private GlobalConstants gc;
-
-    static Logger logger = LogManager.getLogger(Main.class);
 
     public Bucket(long startTime, GlobalConstants gc) {
         this.gc = gc;
@@ -33,13 +28,6 @@ public class Bucket {
 
     public List<Reading> getReadings() {
         return readings;
-    }
-
-    public List<Double> getReadingValues() {
-        return readings
-                .stream()
-                .map(Reading::getValue)
-                .collect(Collectors.toList());
     }
 
     public List<String> getReadingIds() {
@@ -68,5 +56,12 @@ public class Bucket {
 
     public boolean isDuplicateReading(Reading reading) {
         return getReadingIds().contains(reading.getId());
+    }
+
+    private List<Double> getReadingValues() {
+        return readings
+                .stream()
+                .map(Reading::getValue)
+                .collect(Collectors.toList());
     }
 }

@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class SqsClientThread extends Thread {
-    private static Logger logger = LogManager.getLogger("SqsClientThread ");
+    private static final Logger logger = LogManager.getLogger("SqsClientThread ");
 
     private final SqsClient sqsClient;
     private final String queueUrl;
@@ -29,13 +29,17 @@ public class SqsClientThread extends Thread {
             ReceiveMessageResult messageResult = sqsClient.getSqs().receiveMessage(receiveMessageRequest);
             try {
                 temporarySqsResponseStorage.put(messageResult);
-                if (messageResult.getMessages().size() > 0) {
-                    final String messageReceiptHandle = messageResult.getMessages().get(0).getReceiptHandle();
-                    sqsClient.getSqs().deleteMessage(new DeleteMessageRequest(queueUrl, messageReceiptHandle));
-                }
+                deleteMessageFromQueue(messageResult);
             } catch (InterruptedException e) {
                 logger.error(e.getStackTrace());
             }
+        }
+    }
+
+    private void deleteMessageFromQueue(ReceiveMessageResult messageResult) {
+        if (messageResult.getMessages().size() > 0) {
+            final String messageReceiptHandle = messageResult.getMessages().get(0).getReceiptHandle();
+            sqsClient.getSqs().deleteMessage(new DeleteMessageRequest(queueUrl, messageReceiptHandle));
         }
     }
 

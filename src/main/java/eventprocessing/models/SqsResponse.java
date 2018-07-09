@@ -31,7 +31,7 @@ public class SqsResponse {
 
     String getLocationId() { return message.getLocationId(); }
 
-    public long getMessageTimestamp() {
+    long getMessageTimestamp() {
         return message.getTimestamp();
     }
 

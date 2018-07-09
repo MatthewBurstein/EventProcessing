@@ -32,7 +32,6 @@ public class ResponseProcessorThread extends Thread {
         }
         readingAggregator.processAllBuckets();
         logger.info("Total messages received: " + messageCounter);
-        logger.info("Total duplicates in this run: " + readingAggregator.getDuplicateCounter());
         logger.info("Total faulty sensors in this run: " + notWorkingSensorCount);
     }
 

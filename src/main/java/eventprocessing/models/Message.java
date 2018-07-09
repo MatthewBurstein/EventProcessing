@@ -6,32 +6,32 @@ public class Message {
     private double value;
     private long timestamp;
 
-    public String getLocationId() {
+    String getLocationId() {
         return locationId;
+    }
+
+    String getEventId() {
+        return eventId;
     }
 
     public double getValue() {
         return value;
     }
 
-    public long getTimestamp() {
+    long getTimestamp() {
         return timestamp;
-    }
-
-    public String getEventId() {
-        return eventId;
     }
 
     public void setLocationId(String locationId) {
         this.locationId = locationId;
     }
 
-    public void setValue(double value) {
-        this.value = value;
-    }
-
     public void setEventId(String eventId) {
         this.eventId = eventId;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
     }
 
     public void setTimestamp(long timestamp) {
