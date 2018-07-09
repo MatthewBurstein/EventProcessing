@@ -1,6 +1,6 @@
 import eventprocessing.GlobalConstants;
-import eventprocessing.models.Reading;
 import eventprocessing.models.Bucket;
+import eventprocessing.models.Reading;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,11 +10,15 @@ import org.threeten.extra.MutableClock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static junit.framework.TestCase.assertTrue;
+import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.data.MapEntry.entry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 public class BucketTest {
@@ -88,6 +92,25 @@ public class BucketTest {
         assertFalse(bucket.isDuplicateReading(reading));
     }
 
+    @Test
+    public void getAverageSensorValues_whenOneReadingInBucket_returnsCorrectHashmap() {
+        String locationId = "locationId";
+        double value = 1.3;
+        Reading reading = buildReadingWithLocationAndValue(locationId, value);
+        bucket.addResponse(reading);
+
+        Map<String, Double> actual = bucket.getAverageSensorValues();
+        assertThat(actual).containsOnly(entry(locationId, value));
+    }
+
+
+    private Reading buildReadingWithLocationAndValue(String location,  double  value) {
+        Reading reading = Mockito.mock(Reading.class);
+        when(reading.getLocationId()).thenReturn(location);
+        when(reading.getValue()).thenReturn((value));
+        return reading;
+    }
+
     private Reading buildReadingWithId(String readingId) {
         Reading reading = Mockito.mock(Reading.class);
         when(reading.getId()).thenReturn(readingId);
@@ -115,7 +138,6 @@ public class BucketTest {
         }
         return readings;
     }
-
 
     private MutableClock buildClock(long millis) {
         Instant fixedInstant = Instant.ofEpochMilli(millis);
