@@ -17,8 +17,17 @@ public class SensorList {
     public boolean isWorkingSensor(Reading reading) {
         long count = sensors
                 .stream()
-                .filter(sensor -> sensor.getId().equals(reading.getLocationId()))
+                .filter(sensor -> sensor.getLocationId().equals(reading.getLocationId()))
                 .count();
         return count > 0;
+    }
+
+    public void storeSensorData(Reading reading) {
+        String readingLocationId = reading.getLocationId();
+        sensors.forEach(sensor -> {
+            if(sensor.getLocationId() == readingLocationId) {
+                sensor.addReading(reading);
+            }
+        });
     }
 }

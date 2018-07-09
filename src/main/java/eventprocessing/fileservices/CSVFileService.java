@@ -2,6 +2,8 @@ package eventprocessing.fileservices;
 
 import eventprocessing.Main;
 import eventprocessing.models.Bucket;
+import eventprocessing.models.Sensor;
+import eventprocessing.models.SensorList;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
@@ -32,6 +34,10 @@ public class CSVFileService {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    public void writeSensorData(Sensor sensor) {
+
     }
 
     private void writeBucketToStream(CSVPrinter csvPrinter, Bucket bucket) {

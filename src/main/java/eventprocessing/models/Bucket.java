@@ -55,7 +55,7 @@ public class Bucket {
 
         return total / getReadings().size();
     }
-// 
+//
 
 
     public boolean isDuplicateReading(Reading reading) {

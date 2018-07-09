@@ -2,9 +2,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eventprocessing.GlobalConstants;
 import eventprocessing.fileservices.CSVFileService;
-import eventprocessing.models.Bucket;
-import eventprocessing.models.Reading;
-import eventprocessing.models.ReadingAggregator;
+import eventprocessing.models.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -14,7 +12,6 @@ import org.threeten.extra.MutableClock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -27,13 +24,16 @@ public class ReadingAggregatorTest {
     private CSVFileService fileService;
     private MutableClock clock;
     private GlobalConstants gc;
+    private SensorList sensorList;
 
     @Before
     public void buildReadingAggregator() {
         clock = buildClock();
         fileService = Mockito.mock(CSVFileService.class);
         gc = new GlobalConstants(60, 5);
-        readingAggregator = new ReadingAggregator(fileService, clock, gc);
+//        List<Sensor> sensors = Lists.newArrayList(new Sensor("locationId", 1.3, 2.4));
+        sensorList = Mockito.mock(SensorList.class);
+        readingAggregator = new ReadingAggregator(fileService, clock, gc, sensorList);
     }
 
     @Test
@@ -126,6 +126,36 @@ public class ReadingAggregatorTest {
         readingAggregator.processAllBuckets();
 
         assertCalledOnceWithEachReading(readings);
+    }
+
+    @Test
+    public void process_callsAddReadingOnSensorListWithPassedReading() {
+        Reading reading = buildReadingWithLocationTimestampAndValue("locationId", (long) -4,  1.3);
+        readingAggregator.process(reading);
+
+        ArgumentCaptor<Reading> readingCaptor = ArgumentCaptor.forClass(Reading.class);
+        verify(sensorList, times(1)).storeSensorData(reading);
+    }
+
+    @Test
+    public void finalise_whenOneReadingProcessed_writesSensorDataToFile() {
+        Reading reading = buildReadingWithLocationTimestampAndValue("locationId", (long) -4,  1.3);
+        readingAggregator.process(reading);
+        readingAggregator.finalise();
+
+        ArgumentCaptor<Sensor> sensorCaptor = ArgumentCaptor.forClass(Sensor.class);
+        verify(fileService, times(1)).writeSensorData(sensorCaptor.capture());
+        List<Sensor> arguments = sensorCaptor.getAllValues();
+        assertThat(arguments.get(0).getTotalValue()).isEqualTo(1.3);
+        assertThat(arguments.get(0).getLocationId()).isEqualTo("locationId");
+    }
+
+    private Reading buildReadingWithLocationTimestampAndValue(String locationId, long timestamp, double value) {
+        Reading reading = Mockito.mock(Reading.class);
+        when(reading.getLocationId()).thenReturn(locationId);
+        when(reading.getTimestamp()).thenReturn(timestamp);
+        when(reading.getValue()).thenReturn(value);
+        return reading;
     }
 
     private void assertCalledOnceWithEachReading(List<Reading> readings) {

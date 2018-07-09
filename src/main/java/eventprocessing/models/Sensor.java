@@ -1,16 +1,19 @@
 package eventprocessing.models;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Sensor {
 
-    private final String id;
+    @SerializedName("id")
+    private final String locationId;
     private final double x;
     private final double y;
     private double totalValue = 0;
     private int numberOfReadings = 0;
 
 
-    public Sensor(String id, double x, double y) {
-        this.id = id;
+    public Sensor(String locationId, double x, double y) {
+        this.locationId = locationId;
         this.x = x;
         this.y = y;
     }
@@ -23,8 +26,8 @@ public class Sensor {
         return x;
     }
 
-    public String getId() {
-        return id;
+    public String getLocationId() {
+        return locationId;
     }
 
     public double getNumberOfReadings() {

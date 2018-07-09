@@ -29,13 +29,15 @@ public class Main {
     private static ReadingAggregator readingAggregator;
     private static TemporarySqsResponseStorage temporarySqsResponseStorage;
     private static String sensorsFileName = "locations.json";
+    private static SensorList sensorList;
 
     public static void main(String[] args) throws IOException {
         logger.info("App launched");
-        createObjects();
 
         JSONParser jsonParser = new JSONParser(sensorsFileName);
-        SensorList sensorList = jsonParser.createSensorList();
+        sensorList = jsonParser.createSensorList();
+
+        createObjects();
 
         SqsClient sqsClient = amazonController.getSqsClient();
         String queueUrl = amazonController.getQueueUrl();
@@ -95,7 +97,7 @@ public class Main {
         scanner = new Scanner(System.in);
         amazonController = new AmazonController(sensorsFileName);
         CSVFileService csvFileService = new CSVFileService("ResponseData" + System.currentTimeMillis() + ".csv");
-        readingAggregator = new ReadingAggregator(csvFileService, Clock.systemUTC(), gc);
+        readingAggregator = new ReadingAggregator(csvFileService, Clock.systemUTC(), gc, sensorList);
         temporarySqsResponseStorage = new TemporarySqsResponseStorage();
     }
 }
