@@ -1,9 +1,7 @@
 package eventprocessing.fileservices;
 
-import eventprocessing.Main;
 import eventprocessing.models.Bucket;
 import eventprocessing.models.Sensor;
-import eventprocessing.models.SensorList;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
@@ -15,28 +13,39 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class CSVFileService {
-    private final String outputCsvFile;
+    private final String bucketCsvFile;
+    private final String sensorCsvFile;
     private final int ESTIMATED_LINE_LENGTH = 70;
 
     private static final Logger logger = LogManager.getLogger("S3Client");
 
-    public CSVFileService(String outputCsvFile) {
-        this.outputCsvFile = outputCsvFile;
+    public CSVFileService(String bucketCsvFile, String sensorCsvFile) {
+        this.bucketCsvFile = bucketCsvFile;
+        this.sensorCsvFile = sensorCsvFile;
     }
 
-    public void write(Bucket bucketToWriteToFile) {
-        logger.info("Writing bucket with TimeRange " + bucketToWriteToFile.getTimeRange() + "and " + bucketToWriteToFile.getReadings().size() + " responses.");
-        CSVFormat csvFormat = getCsvFormat();
+    public void write(Bucket bucket) {
+        logger.info("Writing bucket with TimeRange " + bucket.getTimeRange() + "and " + bucket.getReadings().size() + " responses.");
+        CSVFormat csvFormat = getBucketCsvFormat();
         StringBuffer stringBuffer = new StringBuffer(ESTIMATED_LINE_LENGTH * 2);
         try (CSVPrinter csvPrinter = new CSVPrinter(stringBuffer, csvFormat)) {
-            writeBucketToStream(csvPrinter, bucketToWriteToFile);
-            writeToFile(stringBuffer);
+            writeBucketToStream(csvPrinter, bucket);
+            writeToFile(stringBuffer, bucketCsvFile);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
     public void writeSensorData(Sensor sensor) {
+        logger.info("Writing sensor data for location ID " + sensor.getLocationId());
+        CSVFormat csvFormat = getSensorCsvFormat();
+        StringBuffer stringBuffer = new StringBuffer(ESTIMATED_LINE_LENGTH * 2);
+        try (CSVPrinter csvPrinter = new CSVPrinter(stringBuffer, csvFormat)) {
+            writeSensorToStream(csvPrinter, sensor);
+            writeToFile(stringBuffer, sensorCsvFile);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
 
     }
 
@@ -54,19 +63,32 @@ public class CSVFileService {
         }
     }
 
-    private void writeToFile(StringBuffer stringBuffer) throws IOException {
+    private void writeSensorToStream(CSVPrinter csvPrinter, Sensor sensor) {
+        String locationId = sensor.getLocationId();
+        String numberOfResponses = String.valueOf(sensor.getNumberOfReadings());
+        String averageValue = Double.isNaN(sensor.getAverageValue()) ?
+                "No Values in Sensor" :
+                String.valueOf(sensor.getAverageValue());
+        try {
+            csvPrinter.printRecord(locationId, numberOfResponses, averageValue);
+        } catch (IOException e) {
+            logger.error(e.getStackTrace());
+        }
+    }
+
+    private void writeToFile(StringBuffer stringBuffer, String fileToWriteTo) throws IOException {
         int charCount = stringBuffer.length();
         char[] dst =  new char[charCount];
         stringBuffer.getChars(0, charCount, dst, 0);
 
-        FileWriter fileWriter = new FileWriter(outputCsvFile, true);
+        FileWriter fileWriter = new FileWriter(fileToWriteTo, true);
         fileWriter.append(new String(dst));
         fileWriter.flush();
     }
 
-    private CSVFormat getCsvFormat() {
+    private CSVFormat getBucketCsvFormat() {
         CSVFormat csvFormat;
-        if (!fileExists()) {
+        if (!fileExists(bucketCsvFile)) {
             csvFormat = CSVFormat.DEFAULT.withHeader("Start Time", "End Time", "Number of Responses", "Average Value");
         } else {
             csvFormat = CSVFormat.DEFAULT;
@@ -74,7 +96,17 @@ public class CSVFileService {
         return csvFormat;
     }
 
-    private boolean fileExists() {
-        return Files.exists(Paths.get(outputCsvFile));
+    private CSVFormat getSensorCsvFormat() {
+        CSVFormat csvFormat;
+        if (!fileExists(sensorCsvFile)) {
+            csvFormat = CSVFormat.DEFAULT.withHeader("Location ID", "Number of Responses", "Average Value");
+        } else {
+            csvFormat = CSVFormat.DEFAULT;
+        }
+        return csvFormat;
+    }
+
+    private boolean fileExists(String fileName) {
+        return Files.exists(Paths.get(fileName));
     }
 }

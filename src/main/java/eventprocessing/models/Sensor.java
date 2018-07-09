@@ -30,7 +30,7 @@ public class Sensor {
         return locationId;
     }
 
-    public double getNumberOfReadings() {
+    public int getNumberOfReadings() {
         return numberOfReadings;
     }
 
@@ -41,5 +41,9 @@ public class Sensor {
 
     public double getTotalValue() {
         return totalValue;
+    }
+
+    public double getAverageValue() {
+        return totalValue / numberOfReadings;
     }
 }

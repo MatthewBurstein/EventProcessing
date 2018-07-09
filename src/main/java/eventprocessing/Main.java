@@ -96,7 +96,9 @@ public class Main {
         gc = new GlobalConstants(60, 5);
         scanner = new Scanner(System.in);
         amazonController = new AmazonController(sensorsFileName);
-        CSVFileService csvFileService = new CSVFileService("ResponseData" + System.currentTimeMillis() + ".csv");
+        long fileCreationTime =  System.currentTimeMillis();
+        CSVFileService csvFileService = new CSVFileService(fileCreationTime + "ResponseData" + ".csv",
+                fileCreationTime + "SensorData"  + ".csv");
         readingAggregator = new ReadingAggregator(csvFileService, Clock.systemUTC(), gc, sensorList);
         temporarySqsResponseStorage = new TemporarySqsResponseStorage();
     }

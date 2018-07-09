@@ -44,6 +44,7 @@ public class SensorListTest {
         reading = buildReadingWithLocationAndValue("mockSensorId2", 1.3);
         sensorList.storeSensorData(reading);
         verify(sensor2, times(1)).addReading(reading);
+
     }
 
     private Reading buildReadingWithLocationAndValue(String locationId, double value) {

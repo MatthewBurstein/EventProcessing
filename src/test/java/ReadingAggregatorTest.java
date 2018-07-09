@@ -132,7 +132,6 @@ public class ReadingAggregatorTest {
         Reading reading = buildReadingWithLocationTimestampAndValue("locationId", (long) -4,  1.3);
         readingAggregator.process(reading);
 
-        ArgumentCaptor<Reading> readingCaptor = ArgumentCaptor.forClass(Reading.class);
         verify(sensorList, times(1)).storeSensorData(reading);
     }
 
