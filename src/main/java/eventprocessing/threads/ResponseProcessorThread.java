@@ -13,15 +13,11 @@ public class ResponseProcessorThread extends Thread {
 
     private final SqsResponseService sqsResponseService = new SqsResponseService();
     private TemporarySqsResponseStorage temporarySqsResponseStorage;
-    private SensorList sensorList;
     private ReadingAggregator readingAggregator;
     private boolean running = true;
-    private int notWorkingSensorCount = 0;
-    private int messageCounter = 0;
 
     public ResponseProcessorThread(TemporarySqsResponseStorage temporarySqsResponseStorage, SensorList sensorList, ReadingAggregator readingAggregator) {
         this.temporarySqsResponseStorage = temporarySqsResponseStorage;
-        this.sensorList = sensorList;
         this.readingAggregator = readingAggregator;
     }
 
@@ -31,8 +27,7 @@ public class ResponseProcessorThread extends Thread {
             processMessageResult(messageResult);
         }
         readingAggregator.finalise();
-        logger.info("Total messages received: " + messageCounter);
-        logger.info("Total faulty sensors in this run: " + notWorkingSensorCount);
+        readingAggregator.getTotalMessageCount();
     }
 
     private ReceiveMessageResult getMessageResultFromStorage() {
@@ -58,12 +53,7 @@ public class ResponseProcessorThread extends Thread {
     private void processMessage(Message msg) {
         SqsResponse sqsResponse = sqsResponseService.parseResponse(msg.getBody());
         Reading reading = new Reading(sqsResponse);
-        if (sensorList.isWorkingSensor(reading)) {
-            readingAggregator.process(reading);
-            messageCounter++;
-        } else {
-            notWorkingSensorCount++;
-        }
+        readingAggregator.process(reading);
     }
 
     public void terminate() {

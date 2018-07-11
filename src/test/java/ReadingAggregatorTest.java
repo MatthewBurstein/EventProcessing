@@ -32,6 +32,7 @@ public class ReadingAggregatorTest {
         fileService = Mockito.mock(CSVFileService.class);
         gc = new GlobalConstants(60, 5);
         sensorList = Mockito.mock(SensorList.class);
+        when(sensorList.isWorkingSensor(any())).thenReturn(true);
         readingAggregator = new ReadingAggregator(fileService, clock, gc, sensorList);
     }
 
@@ -112,7 +113,15 @@ public class ReadingAggregatorTest {
     }
 
     @Test
-    public void processAllBuckets_writesAllBucketsToFile() {
+    public void process_callsAddReadingOnSensorListWithPassedReading() {
+        Reading reading = buildReadingWithLocationTimestampAndValue("locationId", (long) -4,  1.3);
+        readingAggregator.process(reading);
+
+        verify(sensorList, times(1)).storeSensorData(reading);
+    }
+
+    @Test
+    public void finalise_writesAllBucketsToFile() {
         Reading firstReading = buildReadingWithTimestampMinutesAndId(-4.8, "id1");
         Reading secondReading = buildReadingWithTimestampMinutesAndId(-3.8, "id2");
         Reading thirdReading = buildReadingWithTimestampMinutesAndId(-2.8, "id3");
@@ -122,17 +131,9 @@ public class ReadingAggregatorTest {
         List<Reading> readings = Lists.newArrayList(firstReading, secondReading, thirdReading, fourthReading, fifthReading, sixthReading);
 
         processMultipleReadings(firstReading, secondReading, thirdReading, fourthReading, fifthReading, sixthReading);
-        readingAggregator.processAllBuckets();
+        readingAggregator.finalise();
 
         assertCalledOnceWithEachReading(readings);
-    }
-
-    @Test
-    public void process_callsAddReadingOnSensorListWithPassedReading() {
-        Reading reading = buildReadingWithLocationTimestampAndValue("locationId", (long) -4,  1.3);
-        readingAggregator.process(reading);
-
-        verify(sensorList, times(1)).storeSensorData(reading);
     }
 
     @Test
