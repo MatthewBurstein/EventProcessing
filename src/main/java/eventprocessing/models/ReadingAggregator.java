@@ -119,10 +119,10 @@ public class ReadingAggregator {
 
     private boolean isUniqueReading(Reading reading) {
         if (getReadingIds().contains(reading.getId())) {
-            return true;
-        } else {
             duplicateMessageCount++;
             return false;
+        } else {
+            return true;
         }
     }
 

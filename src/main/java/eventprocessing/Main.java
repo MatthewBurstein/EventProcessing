@@ -1,16 +1,17 @@
 package eventprocessing;
 
 import com.amazonaws.services.sqs.model.GetQueueAttributesRequest;
+import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import com.google.common.collect.Lists;
 import eventprocessing.amazonservices.AmazonController;
 import eventprocessing.amazonservices.SqsClient;
+import eventprocessing.customerrors.InvalidSqsResponseException;
 import eventprocessing.fileservices.CSVFileService;
 import eventprocessing.fileservices.JSONParser;
-import eventprocessing.models.ReadingAggregator;
-import eventprocessing.models.SensorList;
-import eventprocessing.models.TemporarySqsResponseStorage;
-import eventprocessing.threads.ResponseProcessorThread;
+import eventprocessing.models.*;
+import eventprocessing.responseservices.SqsResponseService;
 import eventprocessing.threads.SqsClientThread;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +31,7 @@ public class Main {
     private static TemporarySqsResponseStorage temporarySqsResponseStorage;
     private static String sensorsFileName = "locations.json";
     private static SensorList sensorList;
+    private static SqsResponseService sqsResponseService;
 
     public static void main(String[] args) throws IOException {
         logger.info("App launched");
@@ -49,22 +51,14 @@ public class Main {
         SqsClientThread sqsClientThread1 = createAndStartSqsClientThread(sqsClient, receiveMessageRequest, queueUrl);
         SqsClientThread sqsClientThread2 = createAndStartSqsClientThread(sqsClient, receiveMessageRequest, queueUrl);
         SqsClientThread sqsClientThread3 = createAndStartSqsClientThread(sqsClient, receiveMessageRequest, queueUrl);
-        ResponseProcessorThread responseProcessorThread = createAndStartResponseProcessorThread(sensorList);
 
         runForMinutes(duration, sqsClient, queueUrl);
 
         sqsClientThread1.terminate();
         sqsClientThread2.terminate();
         sqsClientThread3.terminate();
-        responseProcessorThread.terminate();
 
         sqsClient.destroyQueue();
-    }
-
-    private static ResponseProcessorThread createAndStartResponseProcessorThread(SensorList sensorList) {
-        ResponseProcessorThread responseProcessorThread = new ResponseProcessorThread(temporarySqsResponseStorage, sensorList, readingAggregator);
-        responseProcessorThread.start();
-        return responseProcessorThread;
     }
 
     private static SqsClientThread createAndStartSqsClientThread(SqsClient sqsClient, ReceiveMessageRequest receiveMessageRequest, String queueUrl) {
@@ -76,11 +70,49 @@ public class Main {
     private static void runForMinutes(int duration, SqsClient sqsClient, String queueUrl) {
         long tensOfSeconds = System.currentTimeMillis() / 10000;
         long endTime = System.currentTimeMillis() + duration * 60000;
+
         while (System.currentTimeMillis() < endTime) {
-        tensOfSeconds = logSqsQueueSizeEveryTenSeconds(sqsClient, queueUrl, tensOfSeconds);
+            tensOfSeconds = logSqsQueueSizeEveryTenSeconds(sqsClient, queueUrl, tensOfSeconds);
+            processResponses();
+        }
+        finaliseResponses();
+    }
+
+    private static void finaliseResponses() {
+        readingAggregator.finalise();
+        readingAggregator.getTotalMessageCount();
+    }
+
+    private static void processResponses() {
+        ReceiveMessageResult messageResult = getMessageResultFromStorage();
+        processMessageResult(messageResult);
+    }
+
+    private static ReceiveMessageResult getMessageResultFromStorage() {
+        try {
+            ReceiveMessageResult messageResult = temporarySqsResponseStorage.take();
+            return messageResult;
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
+    private static void processMessageResult(ReceiveMessageResult messageResult) {
+        for (Message msg : messageResult.getMessages()) {
+            try {
+                processMessage(msg);
+            } catch (InvalidSqsResponseException e) {
+                logger.error("Invalid JSON string received" + e.getMessage());
+                logger.error("Received json string: " + msg.getBody());
+            }
+        }
+    }
+
+    private static void processMessage(Message msg) {
+        SqsResponse sqsResponse = sqsResponseService.parseResponse(msg.getBody());
+        Reading reading = new Reading(sqsResponse);
+        readingAggregator.process(reading);
+    }
     private static long logSqsQueueSizeEveryTenSeconds(SqsClient sqsClient, String queueUrl, long tensOfSeconds) {
         if (tensOfSeconds == System.currentTimeMillis() / 10000) {
             GetQueueAttributesRequest attr = new GetQueueAttributesRequest(queueUrl);
@@ -101,5 +133,6 @@ public class Main {
                 fileCreationTime + "SensorData"  + ".csv");
         readingAggregator = new ReadingAggregator(csvFileService, Clock.systemUTC(), gc, sensorList);
         temporarySqsResponseStorage = new TemporarySqsResponseStorage();
+        sqsResponseService = new SqsResponseService();
     }
 }
