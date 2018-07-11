@@ -102,8 +102,7 @@ public class Main {
             try {
                 processMessage(msg);
             } catch (InvalidSqsResponseException e) {
-                logger.error("Invalid JSON string received" + e.getMessage());
-                logger.error("Received json string: " + msg.getBody());
+                logger.error("Invalid JSON string received", e);
             }
         }
     }

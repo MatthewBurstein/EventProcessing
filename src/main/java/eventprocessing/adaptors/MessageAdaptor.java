@@ -1,6 +1,7 @@
 package eventprocessing.adaptors;
 
 import com.google.gson.*;
+import com.google.gson.stream.MalformedJsonException;
 import eventprocessing.models.Message;
 
 import java.lang.reflect.Type;
@@ -24,8 +25,8 @@ public class MessageAdaptor implements JsonDeserializer<Message> {
                     .build();
 
             return message;
-        } catch (NumberFormatException e) {
-            throw new JsonSyntaxException(e);
+        } catch (RuntimeException e) {
+            throw new JsonSyntaxException("Invalid or malformed message JSON received: " + jsonElement, e);
         }
 
     }
